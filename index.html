@@ -14,7 +14,6 @@
             background-color: #f7f9fc;
         }
         .table-auto-layout {
-            /* Ensures table is wide enough for content, enabling horizontal scroll on mobile */
             width: 1200px; 
             table-layout: fixed;
             border-collapse: collapse;
@@ -27,14 +26,11 @@
             vertical-align: top;
         }
         
-        /* Ensure table headers are centered and aligned properly */
         #prosesPelaksanaanTable th {
             text-align: center;
-            /* Allow wrapping in headers but ensure minimum width is respected */
             white-space: normal; 
             line-height: 1.2;
         }
-        
     </style>
 </head>
 <body>
@@ -43,23 +39,66 @@
 <div id="loadingOverlay" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
     <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
-        <p class="mt-4 text-indigo-700 font-semibold">Loading Pelan Operasi Editor...</p>
+        <p class="mt-4 text-indigo-700 font-semibold">Memulakan Aplikasi...</p>
     </div>
 </div>
 
 <div id="app" class="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto hidden">
 
-    <!-- Header Section -->
+    <!-- Header Section (Fixed Titles) -->
     <header class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-indigo-900">PELAN OPERASI 2</h1>
-        <h2 class="text-2xl font-bold text-gray-800">MATA PELAJARAN SEJARAH</h2>
-        <p class="text-sm text-gray-500 mt-1">Sila kemas kini dan simpan butiran pelan operasi ini.</p>
+        <h1 class="text-4xl font-extrabold text-indigo-900 mb-2 tracking-tight">
+            SMK Seri Pulai Perdana
+        </h1>
+        <h2 id="pageMainTitle" class="text-2xl font-bold text-gray-800">
+            Pelan Strategik Mata Pelajaran
+        </h2>
+        <p id="headerSubtitle" class="text-sm text-gray-500 mt-1">Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.</p>
     </header>
 
-    <!-- Main Content Container -->
-    <div class="bg-white p-6 rounded-xl shadow-2xl">
-        <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
+    <!-- Subject Management Section (Only visible in Subject Editing Mode) -->
+    <div id="subjectManagementSection" class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto mb-8 space-y-4">
+        
+        <!-- 1. Existing Subject Selector -->
+        <div>
+            <label for="subjectSelector" class="block text-lg font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran (Subjek) untuk Diedit:</label>
+            <select id="subjectSelector" class="w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white">
+                <!-- Options populated by JavaScript -->
+            </select>
+            <p id="subjectListMessage" class="text-xs text-gray-500 mt-1 hidden">Memuatkan senarai subjek...</p>
+        </div>
 
+        <!-- 2. Add New Subject -->
+        <div class="border-t pt-4">
+            <label for="newSubjectInput" class="block text-lg font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
+            <div class="flex space-x-2">
+                <input type="text" id="newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-3 border border-green-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150">
+                <button id="addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-3 rounded-lg hover:bg-green-700 transition duration-200">
+                    Tambah
+                </button>
+            </div>
+            <div id="newSubjectMessageBox" class="mt-3 p-2 text-center rounded-lg hidden text-sm"></div>
+        </div>
+    </div>
+    
+    <!-- MASTER TEMPLATE ADMIN LOGIN GATE (Hidden by default, shown when footer link is clicked) -->
+    <div id="templateAdminGate" class="bg-yellow-50 p-6 rounded-xl shadow-lg max-w-lg mx-auto mb-8 space-y-4 hidden">
+        <h3 class="text-xl font-bold text-yellow-800">Templat Induk: Sila Sahkan</h3>
+        <p class="text-sm text-yellow-700">Mod ini membolehkan anda mengedit templat asas untuk subjek baharu.</p>
+        <div class="flex space-x-2">
+            <input type="password" id="templateAdminKeyInput" placeholder="Masukkan Kunci Pentadbir" class="flex-grow p-3 border border-yellow-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 transition duration-150">
+            <button id="templateAdminLoginButton" class="bg-yellow-600 text-white font-semibold px-4 py-3 rounded-lg hover:bg-yellow-700 transition duration-200">
+                Buka Kunci
+            </button>
+        </div>
+        <div id="templateAdminMessage" class="mt-3 p-2 text-center rounded-lg hidden text-sm"></div>
+    </div>
+
+
+    <!-- Main Content Container (Used for both Subject Editing and Template Editing) -->
+    <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden">
+        <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
+        
         <!-- Section 1: Program Details Table -->
         <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Butiran Program</h3>
         <div class="overflow-x-auto mb-8">
@@ -67,33 +106,33 @@
                 <tbody>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Nama Program</th>
-                        <td colspan="3"><input type="text" id="programName" class="w-full focus:outline-none" value="Transformasi Digital"></td>
+                        <td colspan="3"><input type="text" id="programName" class="w-full focus:outline-none" value=""></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Objektif Program</th>
-                        <td colspan="3"><textarea id="objektifProgram" rows="3" class="w-full focus:outline-none resize-none">100% guru mengaplikasi PAK21 dalam PdPC. Menyempurnakan penggunaan Delima kepada guru dan murid.</textarea></td>
+                        <td colspan="3"><textarea id="objektifProgram" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Aktiviti Program</th>
-                        <td colspan="3"><textarea id="aktivitiProgram" rows="5" class="w-full focus:outline-none resize-none">Peer Coaching\nVideo Critique\nBaca-I-Think\nDelima</textarea></td>
+                        <td colspan="3"><textarea id="aktivitiProgram" rows="5" class="w-full focus:outline-none resize-none"></textarea></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Program</th>
-                        <td class="w-2/5"><input type="text" id="penyelarasProgram" class="w-full focus:outline-none" value="Rahman Ahmad, Mohd Nasri Sugiman dan Siti Fatimah"></td>
+                        <td class="w-2/5"><input type="text" id="penyelarasProgram" class="w-full focus:outline-none" value=""></td>
                         <th class="w-1/5 bg-gray-100 font-medium">Tarikh Mula - Akhir</th>
-                        <td class="w-1/5"><input type="text" id="tarikhMulaAkhir" class="w-full focus:outline-none" value="April - Oktober 2025"></td>
+                        <td class="w-1/5"><input type="text" id="tarikhMulaAkhir" class="w-full focus:outline-none" value=""></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Aktiviti</th>
-                        <td><input type="text" id="penyelarasAktiviti" class="w-full focus:outline-none" value="Zuraimahai bin Rohami, Mohd Nasri Sugiman"></td>
+                        <td><input type="text" id="penyelarasAktiviti" class="w-full focus:outline-none" value=""></td>
                         <th class="w-1/5 bg-gray-100 font-medium">Tempat</th>
-                        <td><input type="text" id="tempat" class="w-full focus:outline-none" value="Tiada"></td>
+                        <td><input type="text" id="tempat" class="w-full focus:outline-none" value=""></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Sasaran</th>
-                        <td><input type="text" id="sasaran" class="w-full focus:outline-none" value="Semua Guru dan murid-murid Sejarah"></td>
+                        <td><input type="text" id="sasaran" class="w-full focus:outline-none" value=""></td>
                         <th class="w-1/5 bg-gray-100 font-medium">Kos dan Sumber</th>
-                        <td><input type="text" id="kosSumber" class="w-full focus:outline-none" value="PCG"></td>
+                        <td><input type="text" id="kosSumber" class="w-full focus:outline-none" value=""></td>
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Jawatankuasa</th>
@@ -101,7 +140,7 @@
                     </tr>
                     <tr>
                         <th class="w-1/5 bg-gray-100 font-medium">Ringkasan Program</th>
-                        <td colspan="3"><textarea id="ringkasanProgram" rows="4" class="w-full focus:outline-none resize-none">Program memperkasakan PAK 21 melalui aktiviti peer coaching, video critique dan peta I-THINK dalam PdPC Sejarah. Ia dilaksanakan melalui modul togas bagi mengaplikasikan PAK 21 dan menggunakan kaedah PdPc agar dapat memberi peluang kepada murid untuk lebih memahami konsep & pembelajaran Sejarah dengan lebih mudah. Guru dan murid menggunakan aplikasi Delima secara giat.</textarea></td>
+                        <td colspan="3"><textarea id="ringkasanProgram" rows="4" class="w-full focus:outline-none resize-none"></textarea></td>
                     </tr>
                 </tbody>
             </table>
@@ -116,11 +155,11 @@
                     <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
                         <th style="width: 50px;">Langkah</th>
                         <th style="width: 250px;">Proses Kerja</th>
-                        <th style="width: 150px;">Tanggungjawab</th> <!-- Increased to 150px -->
-                        <th style="width: 150px;">Tarikh Mula-Akhir</th> <!-- Increased to 150px -->
+                        <th style="width: 150px;">Tanggungjawab</th> 
+                        <th style="width: 150px;">Tarikh Mula-Akhir</th> 
                         <th style="width: 150px;">KPI</th>
                         <th style="width: 150px;">Sasaran</th>
-                        <th style="width: 120px;">Status</th> <!-- Increased to 120px -->
+                        <th style="width: 120px;">Status</th> 
                         <th style="width: 80px;">Tindakan</th>
                     </tr>
                 </thead>
@@ -147,11 +186,18 @@
     </div>
 </div>
 
+<!-- Subtle Footer Link for Admin Mode -->
+<footer class="p-4 text-center">
+    <button id="adminFooterToggle" class="text-xs text-gray-400 hover:text-indigo-600 transition duration-150 cursor-pointer">
+        Mod Pentadbir
+    </button>
+</footer>
+
 <!-- Firebase SDKs -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     setLogLevel('debug');
@@ -172,7 +218,6 @@
     let firebaseConfig = FALLBACK_FIREBASE_CONFIG;
     try {
         if (typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '') {
-            // Attempt to use environment variable if present and not empty
             const parsedConfig = JSON.parse(__firebase_config);
             if (Object.keys(parsedConfig).length > 0) {
                  firebaseConfig = parsedConfig;
@@ -188,9 +233,15 @@
     let app, db, auth;
     let userId = null;
     let isAuthReady = false;
+    let currentSubject = null; 
+    let isAdminMode = false; 
+    const ADMIN_SECRET_KEY = "admin2025";
 
-    // --- FIRESTORE PATH ---
-    const PLAN_DOC_PATH = `artifacts/${appId}/public/data/pelan_operasi/sejarah_plan`;
+
+    // --- FIRESTORE PATHS ---
+    const SUBJECTS_DOC_PATH = `artifacts/${appId}/public/data/subject_config/subject_list`;
+    const PLAN_COLLECTION_BASE = `artifacts/${appId}/public/data/pelan_strategik`; 
+    const MASTER_TEMPLATE_PATH = `${PLAN_COLLECTION_BASE}/master_template`; 
 
     // --- DOM ELEMENTS ---
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -199,14 +250,30 @@
     const saveButton = document.getElementById('saveButton');
     const addRowButton = document.getElementById('addRowButton');
     const tableBody = document.getElementById('tableBody');
+    const subjectSelector = document.getElementById('subjectSelector');
+    const planEditorContainer = document.getElementById('planEditorContainer');
+    const pageMainTitle = document.getElementById('pageMainTitle');
+    const newSubjectInput = document.getElementById('newSubjectInput');
+    const addNewSubjectButton = document.getElementById('addNewSubjectButton');
+    const newSubjectMessageBox = document.getElementById('newSubjectMessageBox');
+    const subjectListMessage = document.getElementById('subjectListMessage');
+    
+    const adminFooterToggle = document.getElementById('adminFooterToggle');
+    const subjectManagementSection = document.getElementById('subjectManagementSection');
+    const templateAdminGate = document.getElementById('templateAdminGate');
+    const templateAdminKeyInput = document.getElementById('templateAdminKeyInput');
+    const templateAdminLoginButton = document.getElementById('templateAdminLoginButton');
+    const templateAdminMessage = document.getElementById('templateAdminMessage');
+    const headerSubtitle = document.getElementById('headerSubtitle');
+
 
     // --- UTILITIES ---
 
-    function showMessage(message, type = 'success') {
-        messageBox.textContent = message;
-        messageBox.className = `p-3 text-center rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} mb-4`;
-        messageBox.classList.remove('hidden');
-        setTimeout(() => { messageBox.classList.add('hidden'); }, 5000);
+    function showMessage(message, type = 'success', target = messageBox) {
+        target.textContent = message;
+        target.className = `p-3 text-center rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} mb-4`;
+        target.classList.remove('hidden');
+        setTimeout(() => { target.classList.add('hidden'); }, 5000);
     }
     
     // Convert multiline text to array for saving
@@ -214,18 +281,65 @@
     // Convert array back to multiline text for textarea
     const arrayToText = (array) => Array.isArray(array) ? array.join('\n') : '';
     
-    // Function to guarantee UI visibility after a short delay
-    function guaranteeUIVisibility() {
-        if (mainApp.classList.contains('hidden')) {
-             console.warn("Forcing UI visibility after timeout. Check for silent errors in initialization.");
-             loadingOverlay.classList.add('hidden');
-             mainApp.classList.remove('hidden');
-             showMessage("Initialization complete. If data didn't load, check console for Firebase errors.", 'info');
-        }
+    // Function to ensure UI is visible after initialization
+    function ensureUIVisible() {
+        loadingOverlay.classList.add('hidden');
+        mainApp.classList.remove('hidden');
     }
 
+    // --- TEMPLATE & ADMIN MODE LOGIC ---
+    
+    function setAdminMode(enable) {
+        isAdminMode = enable;
+        
+        // Clear any prior selection/input context
+        subjectSelector.value = '';
 
-    // --- DYNAMIC TABLE MANAGEMENT ---
+        if (isAdminMode) {
+            // Enter Admin Mode UI
+            subjectManagementSection.classList.add('hidden');
+            templateAdminGate.classList.remove('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
+            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
+            currentSubject = null; 
+        } else {
+            // Exit Admin Mode UI (back to Subject Editing)
+            subjectManagementSection.classList.remove('hidden');
+            templateAdminGate.classList.add('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
+            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
+        }
+    }
+    
+    // ----------------------------------------------------
+    // Template Admin Login Handler
+    // ----------------------------------------------------
+    templateAdminLoginButton.addEventListener('click', () => {
+        if (templateAdminKeyInput.value === ADMIN_SECRET_KEY) {
+            templateAdminGate.classList.add('hidden');
+            planEditorContainer.classList.remove('hidden');
+            headerSubtitle.textContent = 'Anda mengedit TEMPLAT INDUK. Perubahan di sini akan digunakan pada subjek BAHARU sahaja.';
+            templateAdminKeyInput.value = ''; 
+            
+            // Load the Master Template Data (Setting isAdminTemplateLoad=true)
+            loadPlan(MASTER_TEMPLATE_PATH, true); 
+        } else {
+            showMessage('Kunci Pentadbir tidak sah.', 'error', templateAdminMessage);
+            templateAdminKeyInput.value = '';
+        }
+    });
+
+    // ----------------------------------------------------
+    // Toggle Admin/Subject Mode (triggered by footer)
+    // ----------------------------------------------------
+    adminFooterToggle.addEventListener('click', () => {
+        setAdminMode(true);
+    });
+
+
+    // --- DYNAMIC TABLE MANAGEMENT (Omitted for brevity, unchanged) ---
 
     function createTableRow(data = {}) {
         const langkah = tableBody.rows.length + 1;
@@ -233,17 +347,15 @@
         row.dataset.index = langkah;
         row.className = 'hover:bg-gray-50';
 
-        // Default data structure for a new row
         const rowData = {
             langkah: langkah,
-            // Ensure prosesKerja is properly handled for new rows
             prosesKerja: arrayToText(data.prosesKerja || ["Proses 1", "Proses 2"]),
-            tanggungJawab: data.tanggungJawab || 'Penyelaras Program',
-            tarikhMulaAkhir: data.tarikhMulaAkhir || 'April - Oktober',
-            kpi: data.kpi || '100% kehadiran',
-            sasaran: data.sasaran || 'Semua guru Sejarah',
+            tanggungJawab: data.tanggungJawab || '',
+            tarikhMulaAkhir: data.tarikhMulaAkhir || '',
+            kpi: data.kpi || '',
+            sasaran: data.sasaran || '',
             status: data.status || 'Jelas',
-            ...data // Overwrite defaults with any provided data
+            ...data
         };
 
         const statusOptions = ['Jelas', 'Belum Mula', 'Sedang Jalan', 'Selesai', 'Laporan disemak'];
@@ -267,7 +379,6 @@
             </td>
         `;
 
-        // Event listener for delete button
         row.querySelector('.delete-row-btn').addEventListener('click', () => {
             row.remove();
             updateRowNumbers();
@@ -290,9 +401,7 @@
                 const fieldName = input.dataset.field;
                 let value = input.value.trim();
                 
-                // Special handling for 'prosesKerja'
                 if (fieldName === 'prosesKerja') {
-                    // Collect multiline text as array of strings
                     value = textToArray(value);
                 }
                 rowData[fieldName] = value;
@@ -307,73 +416,125 @@
         createTableRow({});
         updateRowNumbers();
     });
-    
-    // --- LOAD AND SAVE LOGIC ---
 
-    async function loadPlan() {
-        if (!isAuthReady || !db) {
-            console.warn("Attempted loadPlan before auth was ready.");
+    // --- SUBJECT MANAGEMENT (Omitted for brevity, unchanged) ---
+
+    function createSubjectSlug(subjectName) {
+        return subjectName.toLowerCase().replace(/[^a-z0-9]+/g, '_').trim('_');
+    }
+
+    async function loadSubjectList(selectSubject = null) {
+        if (!isAuthReady || !db) return;
+
+        subjectListMessage.classList.remove('hidden');
+        subjectListMessage.textContent = 'Memuatkan senarai subjek...';
+        subjectSelector.innerHTML = '<option value="" disabled selected>--- Memuatkan... ---</option>';
+
+        try {
+            const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
+            const docSnap = await getDoc(subjectsRef);
+            let subjects = [];
+
+            if (docSnap.exists() && Array.isArray(docSnap.data().subjects)) {
+                subjects = docSnap.data().subjects;
+            } else {
+                subjects = ["Sejarah", "Matematik", "Sains", "Bahasa Inggeris", "Pendidikan Islam"];
+                await setDoc(subjectsRef, { subjects: subjects });
+            }
+
+            subjectSelector.innerHTML = '<option value="" disabled selected>--- Sila Pilih Subjek ---</option>';
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelector.appendChild(option);
+            });
+            
+            subjectListMessage.classList.add('hidden');
+
+            if (selectSubject) {
+                subjectSelector.value = selectSubject;
+                loadPlan(selectSubject, false);
+            }
+
+        } catch (error) {
+            console.error("Error loading subject list:", error);
+            subjectListMessage.textContent = 'Ralat memuatkan senarai subjek.';
+            showMessage('Ralat memuatkan senarai subjek.', 'error', newSubjectMessageBox);
+        }
+    }
+    
+    async function addNewSubject() {
+        if (!isAuthReady || !db) return;
+        const newSubjectName = newSubjectInput.value.trim();
+        
+        if (!newSubjectName) {
+            showMessage('Sila masukkan nama subjek.', 'error', newSubjectMessageBox);
             return;
         }
 
-        const planRef = doc(db, PLAN_DOC_PATH);
+        const addSubjectButton = addNewSubjectButton;
+        addSubjectButton.disabled = true;
+        addSubjectButton.textContent = 'Menambah...';
+
         try {
-            const docSnap = await getDoc(planRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                // Populate Static Fields
-                document.getElementById('programName').value = data.programName || '';
-                document.getElementById('objektifProgram').value = data.objektifProgram || '';
-                document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
-                document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
-                document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
-                document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
-                document.getElementById('tempat').value = data.tempat || '';
-                document.getElementById('sasaran').value = data.sasaran || '';
-                document.getElementById('kosSumber').value = data.kosSumber || '';
-                document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
-                document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
-
-                // Populate Dynamic Table
-                tableBody.innerHTML = '';
-                if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
-                    data.prosesPelaksanaan.forEach(row => createTableRow(row));
-                    updateRowNumbers();
-                } else {
-                    loadDefaultTableData();
-                }
-                showMessage('Pelan Operasi berjaya dimuatkan.', 'success');
-
-            } else {
-                // Document doesn't exist, load defaults
-                loadDefaultData();
-                showMessage('Memuatkan templat Pelan Operasi baharu.', 'info');
+            const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
+            
+            const docSnap = await getDoc(subjectsRef);
+            if (docSnap.exists() && docSnap.data().subjects.includes(newSubjectName)) {
+                showMessage(`Subjek '${newSubjectName}' sudah wujud.`, 'error', newSubjectMessageBox);
+                newSubjectInput.value = '';
+                addSubjectButton.disabled = false;
+                addSubjectButton.textContent = 'Tambah';
+                return;
             }
+
+            await updateDoc(subjectsRef, {
+                subjects: arrayUnion(newSubjectName)
+            });
+
+            newSubjectInput.value = '';
+            showMessage(`Subjek '${newSubjectName}' berjaya ditambah!`, 'success', newSubjectMessageBox);
+            
+            await loadSubjectList(newSubjectName);
+
         } catch (error) {
-            console.error("Error fetching or loading plan data:", error);
-            showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan data lalai.`, 'error');
-            loadDefaultData();
+            console.error("Error adding new subject:", error);
+            showMessage(`Gagal menambah subjek: ${error.message}`, 'error', newSubjectMessageBox);
         } finally {
-             // Ensure UI is visible regardless of data loading success
-             loadingOverlay.classList.add('hidden');
-             mainApp.classList.remove('hidden');
+            addSubjectButton.disabled = false;
+            addSubjectButton.textContent = 'Tambah';
         }
     }
-    
-    function loadDefaultTableData() {
-        tableBody.innerHTML = '';
-        const defaultTable = [
-            { langkah: 1, prosesKerja: ["Mesyuarat Jawatankuasa:", "Bentang kertas kerja", "Lantikan J/Kuasa", "Anggaran kos", "Anggaran Tugas"], tanggungJawab: 'KP, Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: '100% kehadiran semua guru', sasaran: 'Semua guru Sejarah', status: 'Jelas' },
-            { langkah: 2, prosesKerja: ["Menyediakan bahan"], tanggungJawab: 'Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: 'Bahan diriso', sasaran: 'Guru-guru', status: 'Sedia' },
-            { langkah: 3, prosesKerja: ["Pelaksanaan Program", "Penyediaan Bahan", "Sijil"], tanggungJawab: 'Penyelaras Program, AJK', tarikhMulaAkhir: 'Mei - Ogos', kpi: 'Program berjalan lancar', sasaran: 'Semua guru Sejarah', status: 'Sedang Jalan' },
-        ];
-        defaultTable.forEach(row => createTableRow(row));
-        updateRowNumbers();
+    addNewSubjectButton.addEventListener('click', addNewSubject);
+
+
+    // --- LOAD AND SAVE LOGIC ---
+
+    function getPlanDocPath(subject) {
+        if (subject === MASTER_TEMPLATE_PATH) return MASTER_TEMPLATE_PATH;
+        const slug = createSubjectSlug(subject);
+        return `${PLAN_COLLECTION_BASE}/${slug}_plan`;
     }
     
-    function loadDefaultData() {
+    function resetForm() {
+        document.getElementById('programName').value = '';
+        document.getElementById('objektifProgram').value = '';
+        document.getElementById('aktivitiProgram').value = '';
+        document.getElementById('penyelarasProgram').value = '';
+        document.getElementById('tarikhMulaAkhir').value = '';
+        document.getElementById('penyelarasAktiviti').value = '';
+        document.getElementById('tempat').value = '';
+        document.getElementById('sasaran').value = '';
+        document.getElementById('kosSumber').value = '';
+        document.getElementById('jawatankuasa').value = '';
+        document.getElementById('ringkasanProgram').value = '';
+        tableBody.innerHTML = '';
+    }
+    
+    // Loads the hardcoded default data to ensure the master template is initialized
+    function loadHardcodedDefaults() {
+        resetForm(); // Start clean
         document.getElementById('programName').value = 'Transformasi Digital';
         document.getElementById('objektifProgram').value = '100% guru mengaplikasi PAK21 dalam PdPC. Menyempurnakan penggunaan Delima kepada guru dan murid.';
         document.getElementById('aktivitiProgram').value = 'Peer Coaching\nVideo Critique\nBaca-I-Think\nDelima';
@@ -386,18 +547,138 @@
         document.getElementById('jawatankuasa').value = '';
         document.getElementById('ringkasanProgram').value = 'Program memperkasakan PAK 21 melalui aktiviti peer coaching, video critique dan peta I-THINK dalam PdPC Sejarah. Ia dilaksanakan melalui modul togas bagi mengaplikasikan PAK 21 dan menggunakan kaedah PdPc agar dapat memberi peluang kepada murid untuk lebih memahami konsep & pembelajaran Sejarah dengan lebih mudah. Guru dan murid menggunakan aplikasi Delima secara giat.';
         
-        loadDefaultTableData();
+        tableBody.innerHTML = '';
+        const defaultTable = [
+            { langkah: 1, prosesKerja: ["Mesyuarat Jawatankuasa:", "Bentang kertas kerja", "Lantikan J/Kuasa", "Anggaran kos", "Anggaran Tugas"], tanggungJawab: 'KP, Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: '100% kehadiran semua guru', sasaran: 'Semua guru Sejarah', status: 'Jelas' },
+            { langkah: 2, prosesKerja: ["Menyediakan bahan"], tanggungJawab: 'Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: 'Bahan diriso', sasaran: 'Guru-guru', status: 'Sedia' },
+            { langkah: 3, prosesKerja: ["Pelaksanaan Program", "Penyediaan Bahan", "Sijil"], tanggungJawab: 'Penyelaras Program, AJK', tarikhMulaAkhir: 'Mei - Ogos', kpi: 'Program berjalan lancar', sasaran: 'Semua guru Sejarah', status: 'Sedang Jalan' },
+        ];
+        defaultTable.forEach(row => createTableRow(row));
+        updateRowNumbers();
+    }
+    
+    // Loads data from the Firebase master template document
+    async function loadTemplateData(saveIfMissing = false) {
+        const templateRef = doc(db, MASTER_TEMPLATE_PATH);
+        const docSnap = await getDoc(templateRef);
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('programName').value = data.programName || '';
+            document.getElementById('objektifProgram').value = data.objektifProgram || '';
+            document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
+            document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
+            document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
+            document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
+            document.getElementById('tempat').value = data.tempat || '';
+            document.getElementById('sasaran').value = data.sasaran || '';
+            document.getElementById('kosSumber').value = data.kosSumber || '';
+            document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
+            document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
+
+            tableBody.innerHTML = '';
+            if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
+                data.prosesPelaksanaan.forEach(row => createTableRow(row));
+                updateRowNumbers();
+            } else {
+                createTableRow({prosesKerja: ['']});
+                updateRowNumbers();
+            }
+        } else {
+            // Template does not exist yet
+            loadHardcodedDefaults();
+            if (saveIfMissing) {
+                // Save the hardcoded defaults to Firebase as the initial master template
+                await savePlan(null, MASTER_TEMPLATE_PATH);
+            }
+        }
     }
 
 
-    async function savePlan() {
-        if (!isAuthReady || !db) {
-            showMessage("Authentication in progress. Please wait.", 'error');
+    async function loadPlan(subject, isAdminTemplateLoad = false) {
+        if (!isAuthReady || !db || !subject) {
+            planEditorContainer.classList.add('hidden');
+            return;
+        }
+
+        currentSubject = subject;
+        if (!isAdminTemplateLoad) {
+            pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`;
+        }
+        
+        planEditorContainer.classList.remove('hidden');
+        loadingOverlay.classList.remove('hidden');
+        
+        const planRef = doc(db, getPlanDocPath(subject));
+        try {
+            const docSnap = await getDoc(planRef);
+            
+            if (docSnap.exists()) {
+                // 1. Data exists for this specific subject, load it.
+                const data = docSnap.data();
+                
+                document.getElementById('programName').value = data.programName || '';
+                document.getElementById('objektifProgram').value = data.objektifProgram || '';
+                document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
+                document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
+                document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
+                document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
+                document.getElementById('tempat').value = data.tempat || '';
+                document.getElementById('sasaran').value = data.sasaran || '';
+                document.getElementById('kosSumber').value = data.kosSumber || '';
+                document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
+                document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
+
+                tableBody.innerHTML = '';
+                if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
+                    data.prosesPelaksanaan.forEach(row => createTableRow(row));
+                } else {
+                    createTableRow({prosesKerja: ['']});
+                }
+                updateRowNumbers();
+                
+                if (!isAdminTemplateLoad) {
+                    showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
+                } else {
+                     saveButton.textContent = 'Simpan Templat Induk';
+                }
+
+            } else if (!isAdminTemplateLoad) {
+                // 2. Data does NOT exist for this subject. Load Master Template.
+                showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
+                await loadTemplateData(true); // Load template and save if missing
+                saveButton.textContent = 'Simpan Pelan Operasi'; 
+                
+            } else {
+                 // 3. Document does not exist AND it's the admin template load. Initialize defaults.
+                 loadHardcodedDefaults();
+                 showMessage('Templat Induk baharu telah dibuat dari templat lalai.', 'info');
+                 saveButton.textContent = 'Simpan Templat Induk';
+                 await savePlan(null, MASTER_TEMPLATE_PATH); // Save the defaults
+            }
+        } catch (error) {
+            console.error("Error fetching or loading plan data:", error);
+            showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan templat kosong.`, 'error');
+            resetForm();
+        } finally {
+             loadingOverlay.classList.add('hidden');
+        }
+    }
+
+
+    async function savePlan(e, specificPath = null) {
+        if (e) e.preventDefault();
+        
+        const savePath = specificPath || getPlanDocPath(currentSubject);
+        const subjectName = specificPath === MASTER_TEMPLATE_PATH ? 'Templat Induk' : currentSubject;
+
+        if (!isAuthReady || !db || !subjectName) {
+            showMessage("Sila pilih subjek atau sahkan templat.", 'error');
             return;
         }
 
         saveButton.disabled = true;
-        saveButton.textContent = 'Menyimpan...';
+        saveButton.textContent = `Menyimpan ${subjectName}...`;
 
         try {
             // Collect Static Data
@@ -419,17 +700,17 @@
                 updatedAt: serverTimestamp(),
             };
 
-            const planRef = doc(db, PLAN_DOC_PATH);
+            const planRef = doc(db, savePath);
             await setDoc(planRef, staticData);
             
-            showMessage('Pelan Operasi berjaya disimpan!', 'success');
+            showMessage(`Pelan Strategik untuk ${subjectName} berjaya disimpan!`, 'success');
 
         } catch (error) {
             console.error("Error saving plan:", error);
             showMessage(`Gagal menyimpan: ${error.message}`, 'error');
         } finally {
             saveButton.disabled = false;
-            saveButton.textContent = 'Simpan Pelan Operasi';
+            saveButton.textContent = specificPath === MASTER_TEMPLATE_PATH ? 'Simpan Templat Induk' : 'Simpan Pelan Operasi';
         }
     }
     
@@ -439,9 +720,7 @@
         try {
             if (Object.keys(firebaseConfig).length === 0) {
                 console.error("Firebase config is empty. Cannot initialize.");
-                // We should theoretically never hit this due to the fallback, but include it just in case.
-                loadingOverlay.classList.add('hidden');
-                mainApp.classList.remove('hidden');
+                ensureUIVisible();
                 showMessage("Ralat Kritikal: Konfigurasi Firebase tidak lengkap.", 'error');
                 return;
             }
@@ -450,10 +729,7 @@
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // Set a fallback timer to ensure the UI eventually appears
-            setTimeout(guaranteeUIVisibility, 5000); 
-
-            // Ensure we are signed in before trying to read/write Firestore
+            // Wait for authentication to resolve
             onAuthStateChanged(auth, async (user) => {
                 if (!user) {
                     if (initialAuthToken) {
@@ -465,21 +741,34 @@
                 userId = auth.currentUser?.uid;
                 isAuthReady = true;
                 
-                // Now that auth is ready, load the plan data
-                loadPlan();
+                // Load subjects and show main UI
+                await loadSubjectList();
+                ensureUIVisible();
+                
+                // Set default mode (Subject Editing)
+                setAdminMode(false);
             });
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
-            // Fallback for severe errors
-            loadingOverlay.classList.add('hidden');
-            mainApp.classList.remove('hidden');
+            ensureUIVisible();
             showMessage(`Ralat Sistem: ${error.message}. Sila semak konsol log.`, 'error');
         }
     }
     
     // --- EVENT LISTENERS & STARTUP ---
     saveButton.addEventListener('click', savePlan);
+    
+    subjectSelector.addEventListener('change', (e) => {
+        const selectedSubject = e.target.value;
+        if (selectedSubject) {
+            loadPlan(selectedSubject, false);
+            saveButton.textContent = 'Simpan Pelan Operasi'; 
+        } else {
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.innerHTML = 'Pelan Strategik Mata Pelajaran';
+        }
+    });
     
     // Start the whole process
     initializeFirebaseAndAuth();
