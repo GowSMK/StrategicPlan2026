@@ -114,6 +114,23 @@
             </button>
         </div>
 
+        <!-- Section 0.2: Analisis Quantum SMART (NEW SECTION) -->
+        <h3 class="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Analisis Quantum SMART (Prinsip Teras)</h3>
+        <div class="overflow-x-auto mb-8 p-4 border border-teal-200 rounded-lg bg-teal-50">
+            <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
+                <tbody>
+                    <tr>
+                        <th class="w-1/5 bg-teal-100 font-medium">Quantum SMART Principle</th>
+                        <td colspan="3"><textarea id="smartPrinciple" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan bagaimana setiap program taktik memenuhi prinsip SMART. Contoh: Semua KPI (Measurable) mestilah boleh dicapai (Achievable) dalam tempoh (Time-bound) yang ditetapkan."></textarea></td>
+                    </tr>
+                    <tr>
+                        <th class="w-1/5 bg-teal-100 font-medium">Entanglement Measurement</th>
+                        <td colspan="3"><textarea id="entanglementMeasure" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan metrik utama yang mengukur kejayaan holistik program ini. Contoh: Peningkatan 15% Gred A merentasi semua tingkatan dalam tempoh 6 bulan, diukur melalui ujian PBD dan Peperiksaan Pertengahan Tahun."></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- Section 0.5: Strategic Goals Table -->
         <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">Matlamat & Strategi</h3>
         <div class="overflow-x-auto mb-8">
@@ -336,6 +353,10 @@
     const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
     const addTaktikalProgramButton = document.getElementById('addTaktikalProgramButton');
 
+    // Elements for NEW SMART Module
+    const smartPrinciple = document.getElementById('smartPrinciple');
+    const entanglementMeasure = document.getElementById('entanglementMeasure');
+
     let programCounter = 0;
 
 
@@ -359,7 +380,7 @@
         mainApp.classList.remove('hidden');
     }
 
-    // --- PELAN TAKTIKAL TABLE MANAGEMENT ---
+    // --- PELAN TAKTIKAL TABLE MANAGEMENT (Unchanged) ---
     
     function createTaktikalProgramRow(data = {}) {
         programCounter++;
@@ -684,6 +705,10 @@
     }
     
     function resetForm() {
+        // Reset SMART Module
+        smartPrinciple.value = '';
+        entanglementMeasure.value = '';
+
         // Reset Pelan Taktikal
         pelanTaktikalTableBody.innerHTML = '';
         
@@ -710,6 +735,11 @@
     function loadHardcodedDefaults() {
         resetForm();
         
+        // Default SMART Module
+        smartPrinciple.value = 'Setiap program taktik (Output/Outcome) mesti spesifik (S), diukur melalui data PBD/Peperiksaan (M), dicapai dengan sumber sedia ada (A), relevan dengan Matlamat Strategik (R), dan diselesaikan dalam tempoh 6-8 bulan (T).';
+        entanglementMeasure.value = 'Peningkatan 15% bilangan murid mendapat Band 4 ke atas dalam PBD Sejarah, diukur setiap suku tahun, yang selaras dengan peningkatan 10% penggunaan sumber digital oleh guru (KPI program LITERASI DIGITAL).';
+
+
         // Default Pelan Taktikal Programs (Cross-curricular & Strategic Focus)
         const defaultTaktikalPrograms = [
             { 
@@ -828,6 +858,10 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
+                // SMART Module
+                smartPrinciple.value = data.smartPrinciple || '';
+                entanglementMeasure.value = data.entanglementMeasure || '';
+
                 // Pelan Taktikal
                 pelanTaktikalTableBody.innerHTML = '';
                 if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
@@ -871,7 +905,6 @@
             }
         } catch (error) {
              console.error("Error loading master template:", error);
-             // CRITICAL: If loading template fails, load hardcoded defaults to ensure structural integrity
              loadHardcodedDefaults();
              if (saveIfMissing) {
                 await savePlan(null, MASTER_TEMPLATE_PATH);
@@ -894,6 +927,10 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
+                // SMART Module
+                smartPrinciple.value = data.smartPrinciple || '';
+                entanglementMeasure.value = data.entanglementMeasure || '';
+
                 // Pelan Taktikal
                 pelanTaktikalTableBody.innerHTML = '';
                 if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
@@ -930,7 +967,7 @@
             } else if (!isAdminTemplateLoad) {
                 // DATA TIDAK WUJUD UNTUK SUBJEK: Load Master Template
                 showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
-                await loadTemplateData(false); // Load template, but don't save it as default here
+                await loadTemplateData(false); 
                 saveButton.textContent = 'Simpan Pelan Operasi'; 
             } else {
                  // MASTER TEMPLATE TIDAK WUJUD: Initialize Defaults
@@ -963,6 +1000,10 @@
 
         try {
             const staticData = {
+                // SMART Module
+                smartPrinciple: smartPrinciple.value.trim(),
+                entanglementMeasure: entanglementMeasure.value.trim(),
+
                 pelanTaktikal: collectPelanTaktikalData(),
                 matlamatStrategik: matlamatStrategik.value.trim(),
                 strategiList: textToArray(strategiList.value),
