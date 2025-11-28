@@ -278,7 +278,7 @@
 <!-- Firebase SDKs -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -289,7 +289,6 @@
     const ADMIN_SECRET_KEY = "admin2025";
     
     // --- FIREBASE CONFIGURATION ---
-    // NOTE: This config MUST match your Firestore project settings.
     const firebaseConfig = {
         apiKey: "AIzaSyBgvyb95-jujtCC2HPiHXLdYMJgQquIEx4",
         authDomain: "jadual-3f0aa.firebaseapp.com",
@@ -304,15 +303,16 @@
     const MASTER_TEMPLATE_PATH = `${PLAN_COLLECTION_BASE}/master_template`; 
 
 
-    // --- GLOBAL STATE (Implied for brevity) ---
+    // --- GLOBAL STATE ---
     let app, db, auth;
     let userId = null;
     let isAuthReady = false;
     let currentSubject = null; 
     let isAdminMode = false; 
+    let masterTemplateCache = {};
 
 
-    // --- DOM ELEMENTS (Implied for brevity) ---
+    // --- DOM ELEMENTS (Defined for brevity) ---
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainApp = document.getElementById('app');
     const messageBox = document.getElementById('messageBox');
@@ -360,8 +360,6 @@
         loadingOverlay.classList.add('hidden');
         mainApp.classList.remove('hidden');
     }
-
-    // --- FORM/DATA FUNCTIONS ---
     
     function getFormState() {
         return {
@@ -428,9 +426,8 @@
     }
 
 
-    // --- TABLE MANAGEMENT FUNCTIONS (Abbreviated for brevity, see previous full version for implementation) ---
-    // (createTaktikalProgramRow, updateTaktikalProgramRowNumbers, collectPelanTaktikalData, createTableRow, updateRowNumbers, collectTableData are defined but not repeated here for conciseness)
-
+    // --- TABLE MANAGEMENT FUNCTIONS ---
+    
     function createTaktikalProgramRow(data = {}) {
         programCounter++;
         const row = pelanTaktikalTableBody.insertRow();
@@ -570,50 +567,295 @@
     }
 
 
-    // --- DEFAULT MASTER CONTENT (SEJARAH) ---
+    // --- DEFAULT MASTER CONTENT (ENRICHED) ---
     const DEFAULT_MASTER_DATA = {
-        smartPrinciple: 'Setiap program taktik (Output/Outcome) mesti spesifik (S), diukur melalui data PBD/Peperiksaan (M), dicapai dengan sumber sedia ada (A), relevan dengan Matlamat Strategik (R), dan diselesaikan dalam tempoh 6-8 bulan (T).',
-        entanglementMeasure: 'Peningkatan 15% bilangan murid mendapat Band 4 ke atas dalam PBD Sejarah, diukur setiap suku tahun, yang selaras dengan peningkatan 10% penggunaan sumber digital oleh guru (KPI program LITERASI DIGITAL).',
-        matlamatStrategik: 'Meningkatkan penguasaan kefahaman konsep Sejarah melalui pendekatan inkuiri (Project Based Learning) dan melonjakkan pencapaian akademik (A > 30%).',
-        strategiList: ['Melaksanakan strategi Pembelajaran Abad Ke-21 (PAK21) secara konsisten.', 'Memperkasa kemahiran guru dalam menilai soalan KBAT.', 'Memanfaatkan teknologi Delima sepenuhnya dalam PdP.'],
+        smartPrinciple: 'Strategi ini memastikan setiap program taktik adalah benar-benar SMART: Spesifik kepada keperluan sebenar murid dan panitia, Measurable melalui data PBD, peperiksaan dan rekod kehadiran, Achievable berdasarkan kapasiti guru dan sumber sedia ada, Relevant kepada hala tuju sekolah dan panitia, serta Time bound dengan tempoh pelaksanaan dan semakan yang jelas (mingguan, bulanan dan suku tahun).',
+        entanglementMeasure: 'Keberhasilan pelan diukur melalui gabungan indikator yang saling berkaitan: peningkatan sekurang-kurangnya 15% murid dalam kategori lulus dan cemerlang, pengurangan bilangan murid berprestasi sangat rendah, peningkatan penggunaan platform digital PdP oleh guru, peningkatan kadar penyertaan murid dalam program intervensi, serta maklum balas kualitatif yang positif daripada guru, murid dan ibu bapa.',
+        matlamatStrategik: 'Melonjakkan kualiti PdP dan pencapaian akademik murid melalui program berfokus data, intervensi sistematik dan integrasi teknologi supaya sekurang-kurangnya 80% murid mencapai tahap penguasaan minimum dan berlaku peningkatan sekurang-kurangnya 15% dalam kategori cemerlang bagi mata pelajaran panitia.',
+        strategiList: [
+            'Melaksanakan PdP berteraskan PAK21, pembelajaran aktif dan kemahiran berfikir aras tinggi di semua kelas secara konsisten.',
+            'Menggunakan data PBD, ujian diagnostik dan peperiksaan untuk merancang intervensi khusus bagi murid berisiko.',
+            'Menghasilkan dan berkongsi bahan digital panitia yang seragam, mudah dicapai dan mesra murid.',
+            'Memperkasa kompetensi guru melalui PLC, lesson study, peer coaching dan bimbingan rakan sebaya digital.',
+            'Memantau dan menilai keberkesanan program secara berkala serta menambah baik pelan berdasarkan dapatan data dan maklum balas.'
+        ],
         
         pelanTaktikal: [
-            { namaProgram: 'LITERASI DIGITAL & e-PORTFOLIO (Cross-Curricular)', aktiviti: ['Bengkel Pembangunan E-Portfolio Murid', 'Latihan VLE/Google Classroom', 'Penggunaan Quizizz/Kahoot untuk kuiz'], tanggungJawab: 'Penyelaras Digital & Semua Guru', tempoh: 'Sepanjang Tahun', kosSumber: 'PCG Digital', sasaran: 'Semua Guru & Murid', outputOutcome: ['100% murid mempunyai e-portfolio', 'Peningkatan engagement dalam PdP'], pelanKontengensi: ['Manual PdP luar talian'] },
-            { namaProgram: 'PLC BERFOKUS (Penjajaran Kurikulum)', aktiviti: ['Mesyuarat Panitia Penjajaran DSKP', 'Peer Coaching', 'Lesson Study'], tanggungJawab: 'Ketua Panitia & Guru Kanan Mata Pelajaran', tempoh: 'Feb - Okt', kosSumber: 'PCG Panitia', sasaran: 'Semua Guru', outputOutcome: ['100% guru menyelaraskan RPH', 'Peningkatan mutu pengajaran'], pelanKontengensi: ['Sesi bimbingan individu'] },
-            { namaProgram: 'BENGKEL TEKNIK MENJAWAB KBAT', aktiviti: ['Klinik Skor A', 'Latih tubi berfokus KBAT', 'Modul F4/F5 berpusat'], tanggungJawab: 'Semua guru Sejarah (Master)', tempoh: 'Apr - Okt', kosSumber: 'Dana Panitia', sasaran: 'Murid Tingkatan 4 & 5', outputOutcome: ['90% murid mahir jawab KBAT', 'Peningkatan % lulus peperiksaan'], pelanKontengensi: ['Modul alternatif secara atas talian'] },
-            { namaProgram: 'AUDIT DATA PBD BERSEPADU', aktiviti: ['Analisis jurang PBD bulanan', 'Sesi intervensi data silang panitia', 'Penetapan sasaran gred berdasarkan data awal'], tanggungJawab: 'SU Peperiksaan & Ketua Panitia', tempoh: 'Sepanjang Tahun (Suku Tahun)', kosSumber: 'Tiada', sasaran: 'Semua Guru Tingkatan', outputOutcome: ['Laporan tren pencapaian murid', 'Intervensi segera untuk murid kritikal (bottom 10%)'], pelanKontengensi: ['Pengumpulan data PBD manual'] },
-            { namaProgram: 'PUSAT SUMBER DIGITAL INTERAKTIF', aktiviti: ['Penciptaan repositori video PdP', 'Mengintegrasi AR/VR dalam Sejarah/Sains', 'Penyediaan modul interaktif Delima'], tanggungJawab: 'Guru Media/ICT', tempoh: 'Sepanjang Tahun', kosSumber: 'PCG/ Sumbangan PIBG', sasaran: 'Semua Murid & Guru', outputOutcome: ['50+ bahan P&P interaktif tersedia', 'Peningkatan penggunaan Bilik Komputer'], pelanKontengensi: ['Penggunaan bahan bercetak'] },
+            {
+                namaProgram: 'LITERASI DIGITAL & e-PORTFOLIO PANITIA',
+                aktiviti: [
+                    'Bengkel pembangunan e-portfolio mengikut format standard panitia.',
+                    'Latihan penggunaan Delima / Google Classroom untuk tugasan dan refleksi murid.',
+                    'Pelaksanaan kuiz interaktif mingguan (Quizizz, Kahoot dan seumpamanya).'
+                ],
+                tanggungJawab: 'Penyelaras Digital & Semua Guru Panitia',
+                tempoh: 'Januari – November (mingguan)',
+                kosSumber: 'PCG Digital, capaian internet, peranti sedia ada',
+                sasaran: 'Semua murid mengikut tingkatan dan kelas yang diurus panitia.',
+                outputOutcome: [
+                    '100% murid mempunyai e-portfolio aktif yang dikemas kini secara berkala.',
+                    'Peningkatan ketekalan serahan tugasan dalam talian sekurang-kurangnya 20%.',
+                    'Peningkatan penglibatan murid dalam PdP digital (rujuk analitik platform).'
+                ],
+                pelanKontengensi: [
+                    'Menggunakan modul bercetak dan buku latihan sekiranya capaian internet terhad.',
+                    'Menjalankan PdP secara bersemuka dengan lembaran kerja fizikal sebagai alternatif.'
+                ]
+            },
+            {
+                namaProgram: 'PLC BERFOKUS & PENYELARASAN KURIKULUM',
+                aktiviti: [
+                    'Sesi PLC berkala untuk penjajaran RPH, DSKP dan standard pentaksiran.',
+                    'Lesson Study melibatkan perancangan, pemerhatian dan refleksi PdP.',
+                    'Perkongsian amalan terbaik (best practice) dan bank soalan panitia.'
+                ],
+                tanggungJawab: 'Ketua Panitia & GKMP',
+                tempoh: 'Februari – Oktober (sekali setiap bulan)',
+                kosSumber: 'PCG Panitia, bahan cetakan dan alat bantu mengajar.',
+                sasaran: 'Semua guru dalam panitia.',
+                outputOutcome: [
+                    'RPH selaras dengan DSKP dan standard pentaksiran semasa.',
+                    'Peningkatan kualiti PdP berdasarkan dapatan pencerapan dan refleksi PLC.',
+                    'Pembinaan budaya kolaboratif dan sokongan profesional dalam kalangan guru.'
+                ],
+                pelanKontengensi: [
+                    'Menggunakan platform dalam talian (Google Meet / Delima) bagi PLC jika bersemuka tidak dapat dilaksanakan.',
+                    'Sesi bimbingan individu bagi guru yang memerlukan sokongan tambahan.'
+                ]
+            },
+            {
+                namaProgram: 'BENGKEL TEKNIK MENJAWAB & MODUL KBAT',
+                aktiviti: [
+                    'Penyediaan modul soalan berfokus KBAT mengikut format peperiksaan semasa.',
+                    'Pelaksanaan bengkel teknik menjawab untuk murid sasaran (pertengahan dan akhir tahun).',
+                    'Latih tubi dan klinik akademik berkala berdasarkan analisis item.'
+                ],
+                tanggungJawab: 'Ketua Panitia & Guru Subjek Peperiksaan',
+                tempoh: 'Mac – Oktober (mengikut jadual peperiksaan dalaman dan awam).',
+                kosSumber: 'PCG Panitia, bahan modul cetakan, penggunaan bilik khas.',
+                sasaran: 'Murid kelas peperiksaan dan murid yang dikenal pasti berpotensi cemerlang.',
+                outputOutcome: [
+                    'Peningkatan keyakinan murid menjawab soalan aras tinggi.',
+                    'Peningkatan peratus lulus dan cemerlang dalam peperiksaan dalaman dan awam.',
+                    'Pengurangan kesalahan berulang dalam item yang sama (berdasarkan analisis item).'
+                ],
+                pelanKontengensi: [
+                    'Menjalankan bengkel dalam kumpulan kecil mengikut keperluan jika jadual padat.',
+                    'Menyediakan rakaman video ringkas teknik menjawab untuk rujukan kendiri murid.'
+                ]
+            },
+            {
+                namaProgram: 'AUDIT DATA PBD & INTERVENSI BERFOKUS',
+                aktiviti: [
+                    'Mengumpul dan menganalisis data PBD secara berkala (suku tahun).',
+                    'Mengenal pasti murid berisiko dan merangka intervensi khusus.',
+                    'Melaksanakan intervensi kecil (klinikal, bimbingan, tutor rakan sebaya).'
+                ],
+                tanggungJawab: 'SU Peperiksaan, Guru Data & Ketua Panitia',
+                tempoh: 'Februari, Mei, Ogos dan November.',
+                kosSumber: 'Tiada kos besar, hanya keperluan cetakan dan rekod data.',
+                sasaran: 'Semua murid dengan fokus khas kepada murid berprestasi rendah.',
+                outputOutcome: [
+                    'Laporan trend pencapaian murid yang jelas dan mudah dibaca.',
+                    'Pengurangan bilangan murid dalam kategori sangat lemah.',
+                    'Intervensi direkod dan ditindak susul sehingga akhir tahun.'
+                ],
+                pelanKontengensi: [
+                    'Menggunakan rekod manual sekiranya sistem digital tidak dapat diakses.',
+                    'Melaksanakan intervensi bertahap mengikut kekangan masa dan sumber.'
+                ]
+            },
+            {
+                namaProgram: 'PUSAT SUMBER DIGITAL & BAHAN INTERAKTIF',
+                aktiviti: [
+                    'Membangunkan repositori bahan digital (video, slaid, modul interaktif).',
+                    'Menggalakkan penggunaan makmal komputer dan peranti mudah alih bagi PdP.',
+                    'Menyelaras perkongsian bahan antara panitia untuk mengelak penduaan.'
+                ],
+                tanggungJawab: 'Guru Media, Penyelaras ICT & Ketua Panitia.',
+                tempoh: 'Sepanjang tahun dengan semakan bahan setiap suku tahun.',
+                kosSumber: 'PCG, sokongan PIBG, capaian internet dan peralatan sedia ada.',
+                sasaran: 'Semua murid dan guru yang terlibat dalam PdP.',
+                outputOutcome: [
+                    'Sekurang-kurangnya 50 bahan digital berinteraktif tersedia mengikut topik.',
+                    'Peningkatan penggunaan bilik komputer dan platform digital PdP.',
+                    'Murid menunjukkan minat dan motivasi lebih tinggi terhadap topik sukar.'
+                ],
+                pelanKontengensi: [
+                    'Menyediakan versi bercetak atau offline bagi bahan utama.',
+                    'Menggunakan alat bantu mengajar mudah (kad, carta, manipulatif) jika capaian digital terhad.'
+                ]
+            },
+            {
+                namaProgram: 'KAPSUL VIDEO MIKRO & ULANGKAJI TOPIK',
+                aktiviti: [
+                    'Merancang skrip ringkas untuk video mikro (3–5 minit setiap topik).',
+                    'Merakam dan menyusun video mengikut unit atau bab.',
+                    'Mempromosikan penggunaan video sebagai pengulangan sebelum ujian dan peperiksaan.'
+                ],
+                tanggungJawab: 'Penyelaras Media Panitia & Guru Berminat.',
+                tempoh: 'Mac – September.',
+                kosSumber: 'Peralatan rakaman asas (telefon pintar), platform perkongsian video sekolah.',
+                sasaran: 'Murid semua tingkatan dengan keutamaan kepada kelas peperiksaan.',
+                outputOutcome: [
+                    'Sekurang-kurangnya 20 video mikro bagi topik utama.',
+                    'Murid lebih mudah mengulang kaji topik yang kompleks dalam masa singkat.',
+                    'Peningkatan kefahaman konsep berdasarkan maklum balas murid dan keputusan ujian.'
+                ],
+                pelanKontengensi: [
+                    'Menghasilkan infografik statik jika rakaman video tidak dapat dibuat.',
+                    'Menggunakan slaid ringkas atau nota bergambar sebagai bahan alternatif.'
+                ]
+            },
+            {
+                namaProgram: 'e-MENTORING GURU & BIMBINGAN RAKAN SEBAYA DIGITAL',
+                aktiviti: [
+                    'Memadankan guru pakar dengan guru yang memerlukan bimbingan dalam aspek pedagogi dan teknologi.',
+                    'Sesi bimbingan bersemuka atau dalam talian secara berkala.',
+                    'Rekod perkembangan guru dan tindakan susulan berdasarkan keperluan.'
+                ],
+                tanggungJawab: 'Penyelaras LDP, GKMP & Ketua Panitia.',
+                tempoh: 'Januari – November.',
+                kosSumber: 'Tiada kos besar, hanya masa dan ruang perbincangan.',
+                sasaran: 'Guru baharu dan guru yang memerlukan sokongan dalam penggunaan teknologi dan PdP berimpak tinggi.',
+                outputOutcome: [
+                    'Peningkatan keyakinan dan kompetensi guru dalam PdP digital dan berfokus data.',
+                    'Pengurangan jurang kemahiran antara guru pakar dan guru baharu.',
+                    'Budaya sokongan profesional yang sihat dalam kalangan warga panitia.'
+                ],
+                pelanKontengensi: [
+                    'Mengganti sesi bimbingan formal dengan konsultasi tidak formal jika jadual padat.',
+                    'Menggunakan kumpulan WhatsApp/Telegram sebagai saluran sokongan teknikal pantas.'
+                ]
+            }
         ],
-        programName: 'Program Peningkatan Prestasi Sejarah Menyeluruh',
-        objektifProgram: 'Memastikan 100% murid menguasai konsep dan fakta Sejarah asas dan mencapai sekurang-kurangnya gred Lulus.',
-        aktivitiProgram: ['Program mentor-mentee', 'Pembelajaran berasaskan projek', 'Lawatan sambil belajar maya/fizikal'],
-        penyelarasProgram: 'Ketua Panitia Sejarah',
-        tarikhMulaAkhir: 'Sepanjang Tahun',
-        penyelarasAktiviti: 'Semua Guru Sejarah',
-        tempat: 'Bilik Darjah / Makmal Komputer',
-        sasaran: 'Semua Murid Tingkatan 1-5',
-        kosSumber: 'PCG & Sumbangan Komuniti',
-        jawatankuasa: 'AJK Kurikulum Sekolah',
-        ringkasanProgram: 'Program ini menggabungkan pelbagai pendekatan untuk menjadikan subjek Sejarah lebih relevan dan menarik, menggunakan alat digital dan pendekatan inkuiri.',
+        
+        programName: 'Program Transformasi PdP Berimpak Tinggi',
+        objektifProgram: 'Menyusun dan melaksanakan siri program taktikal yang menyokong pencapaian matlamat strategik panitia melalui PdP berkualiti, intervensi berfokus dan penggunaan teknologi secara optimum demi meningkatkan pencapaian murid dan mengurangkan jurang prestasi.',
+        aktivitiProgram: [
+            'Pelaksanaan PdP berasaskan projek, inkuiri dan pembelajaran aktif mengikut takwim panitia.',
+            'Intervensi berkala untuk murid berprestasi rendah berdasarkan analisis data PBD dan peperiksaan.',
+            'Klinik akademik, bengkel teknik menjawab dan sesi ulangkaji terancang sebelum peperiksaan utama.'
+        ],
+        penyelarasProgram: 'Ketua Panitia',
+        tarikhMulaAkhir: 'Januari – November',
+        penyelarasAktiviti: 'Penyelaras Program bersama guru mata pelajaran terlibat.',
+        tempat: 'Bilik darjah, makmal komputer, pusat sumber dan ruang pembelajaran lain yang bersesuaian.',
+        sasaran: 'Semua murid di bawah panitia dengan fokus kepada kelas peperiksaan dan murid berisiko.',
+        kosSumber: 'Peruntukan PCG, sumbangan PIBG, sokongan komuniti dan penggunaan sumber sedia ada sekolah.',
+        jawatankuasa: 'Pentadbir, GKMP, Ketua Panitia, SU Peperiksaan, Penyelaras Digital dan guru panitia.',
+        ringkasanProgram: 'Program ini menyelaras semua inisiatif panitia dalam satu pelan strategik yang jelas merangkumi PdP harian, intervensi berfokus, penggunaan teknologi digital dan pemantauan berterusan. Pendekatan ini memastikan setiap murid mendapat peluang pembelajaran yang tersusun, adil dan berimpak tinggi serta membantu panitia mengekalkan budaya penambahbaikan berterusan.',
         
         prosesPelaksanaan: [
-            { langkah: 1, prosesKerja: ["Mesyuarat JK Panitia & Penjajaran Dokumen Standard", "Analisis Data Peperiksaan Tahun Lalu", "Penetapan KPI & Sasaran"], tanggungJawab: 'KP & Penyelaras Program', tarikhMulaAkhir: 'Januari', kpi: 'Dokumen dan KPI disahkan', sasaran: 'Semua guru Sejarah', status: 'Selesai' },
-            { langkah: 4, prosesKerja: ["Pelaksanaan program utama mengikut jadual (Tactical Execution)"], tanggungJawab: 'Penyelaras Program', tarikhMulaAkhir: 'Sepanjang Tahun', kpi: 'Program dilaksanakan 100%', sasaran: 'Semua guru/murid Sejarah', status: 'Sedang Jalan' },
-            { langkah: 7, prosesKerja: ["Post-Mortem Program Akhir Tahun", "Laporan Penilaian Keseluruhan & Cadangan Penambahbaikan"], tanggungjawab: 'KP Panitia', tarikhMulaAkhir: 'November', kpi: 'Laporan disemak dan disahkan', sasaran: 'JK Panitia', status: 'Belum Mula' }
+            {
+                langkah: 1,
+                prosesKerja: [
+                    'Mengadakan mesyuarat awal panitia untuk menyemak pencapaian tahun sebelumnya.',
+                    'Menganalisis data PBD, peperiksaan dan kehadiran untuk mengenal pasti isu utama.',
+                    'Menetapkan matlamat strategik dan KPI tahunan panitia.'
+                ],
+                tanggungJawab: 'Ketua Panitia & GKMP',
+                tarikhMulaAkhir: 'Januari',
+                kpi: 'Dokumen analisis data dan KPI panitia disiapkan dan disahkan pentadbir.',
+                sasaran: 'Semua guru panitia hadir dan terlibat.',
+                status: 'Selesai'
+            },
+            {
+                langkah: 2,
+                prosesKerja: [
+                    'Merancang takwim program dan pelan taktikal mengikut fasa tahun persekolahan.',
+                    'Menyusun tugasan jawatankuasa kecil dan penyelaras program.',
+                    'Menyediakan garis panduan pelaksanaan bagi setiap program utama.'
+                ],
+                tanggungJawab: 'Ketua Panitia & Jawatankuasa Program',
+                tarikhMulaAkhir: 'Januari – Februari',
+                kpi: 'Takwim program dan pelan taktikal diluluskan dan dikongsikan kepada semua guru.',
+                sasaran: 'Semua program utama mempunyai PIC yang jelas.',
+                status: 'Sedang Jalan'
+            },
+            {
+                langkah: 3,
+                prosesKerja: [
+                    'Penyediaan modul PdP, bahan digital dan alat bantu mengajar mengikut perancangan.',
+                    'Penyediaan modul intervensi dan bahan KBAT untuk murid sasaran.',
+                    'Mengemas kini repositori bahan panitia di platform yang dipersetujui.'
+                ],
+                tanggungJawab: 'Guru Panitia & Penyelaras Digital',
+                tarikhMulaAkhir: 'Februari – Mac',
+                kpi: 'Sekurang-kurangnya 80% bahan utama tersedia sebelum pertengahan tahun.',
+                sasaran: 'Semua guru mempunyai akses kepada bahan yang diperlukan.',
+                status: 'Sedang Jalan'
+            },
+            {
+                langkah: 4,
+                prosesKerja: [
+                    'Melaksanakan PdP mengikut RPH selaras DSKP dan strategi yang telah dirancang.',
+                    'Melaksanakan program taktikal seperti bengkel KBAT, e-portfolio dan intervensi berfokus.',
+                    'Merekod kehadiran, penglibatan dan pencapaian murid secara berkala.'
+                ],
+                tanggungJawab: 'Semua Guru Panitia & Penyelaras Program',
+                tarikhMulaAkhir: 'Mac – Oktober',
+                kpi: 'Program dilaksanakan mengikut jadual dengan rekod pelaksanaan yang lengkap.',
+                sasaran: 'Semua murid di bawah panitia mendapat manfaat daripada program.',
+                status: 'Sedang Jalan'
+            },
+            {
+                langkah: 5,
+                prosesKerja: [
+                    'Menjalankan penilaian formatif dan sumatif mengikut takwim peperiksaan.',
+                    'Menganalisis keputusan untuk mengenal pasti keberkesanan program dan jurang baharu.',
+                    'Mengemas kini data dalam laporan panitia dan merancang intervensi tambahan jika perlu.'
+                ],
+                tanggungJawab: 'SU Peperiksaan, Guru Data & Guru Kelas',
+                tarikhMulaAkhir: 'Mei, Ogos & November',
+                kpi: 'Laporan analisis keputusan peperiksaan disiapkan dalam tempoh dua minggu selepas peperiksaan.',
+                sasaran: 'Semua kelas di bawah panitia.',
+                status: 'Sedang Jalan'
+            },
+            {
+                langkah: 6,
+                prosesKerja: [
+                    'Melaksanakan pemantauan dan pencerapan PdP secara berkala.',
+                    'Memberi maklum balas profesional kepada guru melalui coaching dan mentoring.',
+                    'Merekod dapatan pemantauan untuk tindakan susulan.'
+                ],
+                tanggungJawab: 'Pentadbir, GKMP & Ketua Panitia',
+                tarikhMulaAkhir: 'Februari – Oktober',
+                kpi: 'Setiap guru dipantau sekurang-kurangnya dua kali setahun.',
+                sasaran: 'Semua guru panitia.',
+                status: 'Sedang Jalan'
+            },
+            {
+                langkah: 7,
+                prosesKerja: [
+                    'Mengadakan mesyuarat post-mortem akhir tahun untuk menilai semua program.',
+                    'Menyediakan laporan komprehensif yang merangkumi pencapaian, cabaran dan cadangan.',
+                    'Menetapkan fokus utama penambahbaikan untuk tahun berikutnya.'
+                ],
+                tanggungJawab: 'Ketua Panitia & Jawatankuasa Panitia',
+                tarikhMulaAkhir: 'November – Disember',
+                kpi: 'Laporan post-mortem panitia disiapkan dan dibentang kepada pentadbir.',
+                sasaran: 'Seluruh panitia dan pihak pengurusan sekolah.',
+                status: 'Belum Mula'
+            }
         ]
     };
 
 
-    // --- FIREBASE LOAD/SAVE LOGIC ---
+    // --- FIREBASE LOAD/SAVE LOGIC (Unchanged) ---
 
-    // Load the form state either from Firestore or defaults
     async function loadTemplateData(path, saveIfMissing = false) {
         try {
             const docSnap = await getDoc(doc(db, path));
+            
             if (docSnap.exists()) {
-                setFormState(docSnap.data());
+                // Update global cache and set form state
+                masterTemplateCache = docSnap.data();
+                setFormState(masterTemplateCache);
                 return true;
             } else {
+                // Template not found, use hardcoded default
+                masterTemplateCache = DEFAULT_MASTER_DATA;
                 setFormState(DEFAULT_MASTER_DATA);
                 if (saveIfMissing) {
                     await savePlan(null, path);
@@ -622,34 +864,43 @@
             }
         } catch (error) {
              console.error(`Error processing path ${path}:`, error);
+             // On critical error, fallback to hardcoded data to ensure UI loads
+             masterTemplateCache = DEFAULT_MASTER_DATA;
              setFormState(DEFAULT_MASTER_DATA);
              return false;
         }
     }
 
 
-    // Loads the plan for a specific subject or the master template
     async function loadPlan(subject, isAdminTemplateLoad = false) {
         if (!isAuthReady || !db || !subject) { planEditorContainer.classList.add('hidden'); return; }
         currentSubject = subject;
         if (!isAdminTemplateLoad) { pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`; }
         planEditorContainer.classList.remove('hidden');
+        loadingOverlay.classList.remove('hidden'); 
         
         const path = getPlanDocPath(subject);
         
-        const dataExists = await loadTemplateData(path, false); // Try loading subject/master plan
-        
-        if (!dataExists && !isAdminTemplateLoad) {
-            // Subject not found -> Load Master Template structure
-            await loadTemplateData(MASTER_TEMPLATE_PATH, true); 
-            showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
-            saveButton.textContent = 'Simpan Pelan Operasi'; 
-        } else if (isAdminTemplateLoad) {
-             saveButton.textContent = 'Simpan Templat Induk';
-        } else {
-            showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
-            saveButton.textContent = 'Simpan Pelan Operasi';
-        }
+        try {
+            const docSnap = await getDoc(doc(db, path));
+            
+            if (docSnap.exists()) {
+                // Load existing subject data
+                setFormState(docSnap.data());
+                showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
+            } else if (!isAdminTemplateLoad) {
+                // Load from cache/master template for new subject
+                setFormState(JSON.parse(JSON.stringify(masterTemplateCache))); // Deep clone the template
+                showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
+            }
+            
+            saveButton.textContent = isAdminTemplateLoad ? 'Simpan Templat Induk' : 'Simpan Pelan Operasi';
+
+        } catch (error) {
+            console.error("Error fetching or loading plan data:", error);
+            showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan templat Master.`, 'error');
+            setFormState(DEFAULT_MASTER_DATA); // Final fallback
+        } finally { loadingOverlay.classList.add('hidden'); }
     }
 
 
@@ -685,68 +936,6 @@
     }
     
     // --- FIREBASE INITIALIZATION AND APP STARTUP ---
-
-    async function initializeFirebaseAndAuth() {
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            
-            // Critical Step: Sign in anonymously to ensure write access (assuming security rules allow unauthenticated writes)
-            await signInAnonymously(auth); 
-            userId = auth.currentUser?.uid;
-            isAuthReady = true;
-
-            // 1. Ensure UI is visible immediately after auth (guaranteed visibility)
-            ensureUIVisible(); 
-            
-            // 2. Start data loading
-            await loadSubjectList();
-            
-            // 3. Set default mode 
-            setAdminMode(false);
-
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            ensureUIVisible();
-            showMessage(`Ralat Sistem (Firebase): ${error.message}. SILA SEMAK PERATURAN KESELAMATAN FIREBASE ANDA.`, 'error');
-        }
-    }
-    
-    // --- COMPONENT LOGIC (Simplified/Defined below) ---
-
-    function setAdminMode(enable) {
-        isAdminMode = enable;
-        subjectSelector.value = '';
-        pelanTaktikalTableBody.innerHTML = ''; 
-
-        if (isAdminMode) {
-            subjectManagementSection.classList.add('hidden');
-            templateAdminGate.classList.remove('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
-            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
-            currentSubject = null; 
-            addTaktikalProgramButton.classList.remove('hidden');
-        } else {
-            subjectManagementSection.classList.remove('hidden');
-            templateAdminGate.classList.add('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
-            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
-            addTaktikalProgramButton.classList.add('hidden');
-        }
-    }
-
-    function createSubjectSlug(subjectName) {
-        return subjectName.toLowerCase().replace(/[^a-z0-9]+/g, '_').trim('_');
-    }
-    
-    function getPlanDocPath(subject) {
-        if (subject === MASTER_TEMPLATE_PATH) return MASTER_TEMPLATE_PATH;
-        const slug = createSubjectSlug(subject);
-        return `${PLAN_COLLECTION_BASE}/${slug}_plan`;
-    }
 
     async function loadSubjectList(selectSubject = null) {
         if (!isAuthReady || !db) return;
@@ -788,11 +977,74 @@
             showMessage('Ralat memuatkan senarai subjek.', 'error', newSubjectMessageBox);
         }
     }
+
+    async function initializeFirebaseAndAuth() {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            await signInAnonymously(auth); 
+            userId = auth.currentUser?.uid;
+            isAuthReady = true;
+
+            // 1. Ensure UI is visible immediately after auth (guaranteed visibility)
+            ensureUIVisible(); 
+            
+            // 2. Load Master Template Data into cache first (synchronous structure ready)
+            await loadTemplateData(MASTER_TEMPLATE_PATH, false);
+            
+            // 3. Start subject loading
+            await loadSubjectList();
+            
+            // 4. Set default mode 
+            setAdminMode(false);
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            ensureUIVisible();
+            showMessage(`Ralat Sistem (Firebase): ${error.message}. SILA SEMAK PERATURAN KESELAMATAN FIREBASE ANDA.`, 'error');
+        }
+    }
+    
+    // --- COMPONENT LOGIC ---
+
+    function setAdminMode(enable) {
+        isAdminMode = enable;
+        subjectSelector.value = '';
+        pelanTaktikalTableBody.innerHTML = ''; 
+
+        if (isAdminMode) {
+            subjectManagementSection.classList.add('hidden');
+            templateAdminGate.classList.remove('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
+            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
+            currentSubject = null; 
+            addTaktikalProgramButton.classList.remove('hidden');
+        } else {
+            subjectManagementSection.classList.remove('hidden');
+            templateAdminGate.classList.add('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
+            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
+            addTaktikalProgramButton.classList.add('hidden');
+        }
+    }
+
+    function createSubjectSlug(subjectName) {
+        return subjectName.toLowerCase().replace(/[^a-z0-9]+/g, '_').trim('_');
+    }
+    
+    function getPlanDocPath(subject) {
+        if (subject === MASTER_TEMPLATE_PATH) return MASTER_TEMPLATE_PATH;
+        const slug = createSubjectSlug(subject);
+        return `${PLAN_COLLECTION_BASE}/${slug}_plan`;
+    }
     
     // --- EVENT HANDLERS ---
     
-    // Table Action Handlers
-    document.addEventListener('DOMContentLoaded', initializeFirebaseAndAuth);
+    document.addEventListener('DOMContentLoaded', initializeFirebaseAndAuth); 
     document.getElementById('addRowButton').addEventListener('click', () => { createTableRow({}); updateRowNumbers(); });
     document.getElementById('addTaktikalProgramButton').addEventListener('click', () => { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); });
     document.getElementById('saveButton').addEventListener('click', savePlan);
@@ -803,11 +1055,12 @@
         currentSubject = null;
         subjectSelector.value = ''; 
         pelanTaktikalTableBody.innerHTML = '';
-        addTaktikalProgramButton.classList.add('hidden');
+        document.getElementById('addTaktikalProgramButton').classList.add('hidden');
     });
 
     document.getElementById('addNewSubjectButton').addEventListener('click', async () => {
         if (!isAuthReady || !db) return;
+        const newSubjectInput = document.getElementById('newSubjectInput');
         const newSubjectName = newSubjectInput.value.trim();
         if (!newSubjectName) { showMessage('Sila masukkan nama subjek.', 'error', newSubjectMessageBox); return; }
 
@@ -849,4 +1102,3 @@
 
 </body>
 </html>
-
