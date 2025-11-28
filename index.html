@@ -99,6 +99,14 @@
     <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden">
         <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
         
+        <!-- NEW: Switch Subject Button -->
+        <div class="flex justify-start mb-4">
+            <button id="switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition duration-150 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Tukar Subjek
+            </button>
+        </div>
+        
         <!-- Section 1: Program Details Table -->
         <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Butiran Program</h3>
         <div class="overflow-x-auto mb-8">
@@ -266,6 +274,8 @@
     const templateAdminMessage = document.getElementById('templateAdminMessage');
     const headerSubtitle = document.getElementById('headerSubtitle');
 
+    const switchSubjectButton = document.getElementById('switchSubjectButton');
+
 
     // --- UTILITIES ---
 
@@ -336,6 +346,16 @@
     // ----------------------------------------------------
     adminFooterToggle.addEventListener('click', () => {
         setAdminMode(true);
+    });
+    
+    // ----------------------------------------------------
+    // Switch Subject Button Handler (The fix for the user's issue)
+    // ----------------------------------------------------
+    switchSubjectButton.addEventListener('click', () => {
+        setAdminMode(false); // Ensure we are in Subject Editing Mode
+        currentSubject = null;
+        subjectSelector.value = ''; // Reset selection
+        // The setAdminMode(false) call handles hiding the editor and showing the subject menu
     });
 
 
