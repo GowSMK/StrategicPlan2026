@@ -159,13 +159,27 @@
     // --- MANDATORY GLOBAL VARIABLE SETUP ---
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     
-    let firebaseConfig = {};
+    // Hardcoded Firebase Config Fallback from SDK_Jadual.txt
+    const FALLBACK_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyBgvyb95-jujtCC2HPiHXLdYMJgQquIEx4",
+        authDomain: "jadual-3f0aa.firebaseapp.com",
+        projectId: "jadual-3f0aa",
+        storageBucket: "jadual-3f0aa.firebasestorage.app",
+        messagingSenderId: "496526436851",
+        appId: "1:496526436851:web:78ff48b28bfc8c31f14a86"
+    };
+
+    let firebaseConfig = FALLBACK_FIREBASE_CONFIG;
     try {
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
+        if (typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '') {
+            // Attempt to use environment variable if present and not empty
+            const parsedConfig = JSON.parse(__firebase_config);
+            if (Object.keys(parsedConfig).length > 0) {
+                 firebaseConfig = parsedConfig;
+            }
         }
     } catch (e) {
-        console.error("Error parsing __firebase_config:", e);
+        console.error("Error parsing __firebase_config. Using fallback.", e);
     }
     
     const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -425,7 +439,10 @@
         try {
             if (Object.keys(firebaseConfig).length === 0) {
                 console.error("Firebase config is empty. Cannot initialize.");
-                showMessage("Setup Error: Firebase configuration missing.", 'error');
+                // We should theoretically never hit this due to the fallback, but include it just in case.
+                loadingOverlay.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                showMessage("Ralat Kritikal: Konfigurasi Firebase tidak lengkap.", 'error');
                 return;
             }
 
