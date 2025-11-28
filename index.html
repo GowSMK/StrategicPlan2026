@@ -14,6 +14,7 @@
             background-color: #f7f9fc;
         }
         .table-auto-layout {
+            /* Ensures table is wide enough for content, enabling horizontal scroll on mobile */
             width: 1200px; 
             table-layout: fixed;
             border-collapse: collapse;
@@ -26,11 +27,17 @@
             vertical-align: top;
         }
         
-        #prosesPelaksanaanTable th {
+        #prosesPelaksanaanTable th, #pelanTaktikalTable th {
             text-align: center;
             white-space: normal; 
             line-height: 1.2;
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
+        #pelanTaktikalTable textarea {
+            min-height: 60px; /* Ensure sufficient space for multiline text */
+        }
+        
     </style>
 </head>
 <body>
@@ -99,16 +106,62 @@
     <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden">
         <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
         
-        <!-- NEW: Switch Subject Button -->
+        <!-- Switch Subject Button -->
         <div class="flex justify-start mb-4">
             <button id="switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition duration-150 flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Tukar Subjek
             </button>
         </div>
+
+        <!-- Section 0.5: Strategic Goals Table -->
+        <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">Matlamat & Strategi</h3>
+        <div class="overflow-x-auto mb-8">
+            <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
+                <tbody>
+                    <tr>
+                        <th class="w-1/5 bg-red-100 font-medium">MATLAMAT STRATEGIK</th>
+                        <td colspan="3"><textarea id="matlamatStrategik" rows="2" class="w-full focus:outline-none resize-none"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th class="w-1/5 bg-red-100 font-medium">STRATEGI</th>
+                        <td colspan="3"><textarea id="strategiList" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         
-        <!-- Section 1: Program Details Table -->
-        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Butiran Program</h3>
+        <!-- Section 0.7: Pelan Taktikal (Senarai Program) - NEW COMPREHENSIVE TABLE -->
+        <h3 class="text-xl font-semibold text-purple-600 mb-4 border-b pb-2">Pelan Taktikal (Senarai Program)</h3>
+        <div class="overflow-x-auto mb-8">
+            <table class="table-auto-layout border-collapse border border-gray-200" id="pelanTaktikalTable" style="width: 1800px;">
+                <thead>
+                    <tr class="bg-purple-50 text-gray-600 uppercase text-xs">
+                        <th style="width: 30px;" class="text-center">Bil</th>
+                        <th style="width: 150px;">Nama Program</th>
+                        <th style="width: 250px;">Aktiviti</th>
+                        <th style="width: 150px;">Tanggungjawab</th>
+                        <th style="width: 100px;">Tempoh / Hari / Kekerapan</th>
+                        <th style="width: 80px;">Kos / Sumber</th>
+                        <th style="width: 150px;">Sasaran</th>
+                        <th style="width: 200px;">Output / Outcome / Benefit</th>
+                        <th style="width: 200px;">Pelan Kontengensi</th>
+                        <th style="width: 50px;" class="text-center">Padam</th>
+                    </tr>
+                </thead>
+                <tbody id="pelanTaktikalTableBody">
+                    <!-- Dynamic Taktikal Program Rows -->
+                </tbody>
+            </table>
+            <button id="addTaktikalProgramButton" class="bg-purple-500 text-white px-3 py-1 mt-2 text-sm rounded-lg hover:bg-purple-600 transition duration-150 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Tambah Program Taktikal
+            </button>
+        </div>
+
+
+        <!-- Section 1: Butiran Program (Static Header Info - Now less relevant due to tactical table) -->
+        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Butiran Program (Untuk Pelan Am)</h3>
         <div class="overflow-x-auto mb-8">
             <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
                 <tbody>
@@ -154,8 +207,8 @@
             </table>
         </div>
 
-        <!-- Section 2: Proses Pelaksanaan Table -->
-        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Proses Pelaksanaan</h3>
+        <!-- Section 2: Proses Pelaksanaan Table (Proses Kerja) -->
+        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Proses Pelaksanaan (Langkah-langkah)</h3>
         
         <div class="overflow-x-auto mb-4">
             <table class="table-auto-layout border-collapse border border-gray-200" id="prosesPelaksanaanTable" style="width: 1200px;">
@@ -273,8 +326,17 @@
     const templateAdminLoginButton = document.getElementById('templateAdminLoginButton');
     const templateAdminMessage = document.getElementById('templateAdminMessage');
     const headerSubtitle = document.getElementById('headerSubtitle');
-
     const switchSubjectButton = document.getElementById('switchSubjectButton');
+    
+    // Elements for Strategic Goals
+    const matlamatStrategik = document.getElementById('matlamatStrategik');
+    const strategiList = document.getElementById('strategiList');
+    
+    // Elements for NEW Pelan Taktikal Table
+    const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
+    const addTaktikalProgramButton = document.getElementById('addTaktikalProgramButton');
+
+    let programCounter = 0;
 
 
     // --- UTILITIES ---
@@ -297,70 +359,85 @@
         mainApp.classList.remove('hidden');
     }
 
-    // --- TEMPLATE & ADMIN MODE LOGIC ---
+    // --- PELAN TAKTIKAL TABLE MANAGEMENT ---
     
-    function setAdminMode(enable) {
-        isAdminMode = enable;
-        
-        // Clear any prior selection/input context
-        subjectSelector.value = '';
+    function createTaktikalProgramRow(data = {}) {
+        programCounter++;
+        const row = pelanTaktikalTableBody.insertRow();
+        row.dataset.id = `taktikal-program-${programCounter}`;
+        row.className = 'hover:bg-gray-50';
 
-        if (isAdminMode) {
-            // Enter Admin Mode UI
-            subjectManagementSection.classList.add('hidden');
-            templateAdminGate.classList.remove('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
-            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
-            currentSubject = null; 
-        } else {
-            // Exit Admin Mode UI (back to Subject Editing)
-            subjectManagementSection.classList.remove('hidden');
-            templateAdminGate.classList.add('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
-            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
-        }
+        const rowData = {
+            bil: pelanTaktikalTableBody.rows.length,
+            namaProgram: data.namaProgram || '',
+            aktiviti: arrayToText(data.aktiviti || ['Aktiviti 1']),
+            tanggungJawab: data.tanggungJawab || '',
+            tempoh: data.tempoh || '',
+            kosSumber: data.kosSumber || '',
+            sasaran: data.sasaran || '',
+            outputOutcome: arrayToText(data.outputOutcome || ['Output/Outcome']),
+            pelanKontengensi: arrayToText(data.pelanKontengensi || ['Pelan Kontengensi']),
+            ...data
+        };
+
+        row.innerHTML = `
+            <td class="text-center font-medium program-bil">${rowData.bil}</td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="namaProgram">${rowData.namaProgram}</textarea></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="aktiviti">${rowData.aktiviti}</textarea></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tanggungJawab" value="${rowData.tanggungJawab}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tempoh" value="${rowData.tempoh}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="kosSumber" value="${rowData.kosSumber}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="sasaran" value="${rowData.sasaran}"></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="outputOutcome">${rowData.outputOutcome}</textarea></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="pelanKontengensi">${rowData.pelanKontengensi}</textarea></td>
+            <td class="text-center">
+                <button type="button" class="text-red-500 hover:text-red-700 delete-program-taktikal-btn" title="Hapus">
+                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg>
+                </button>
+            </td>
+        `;
+
+        // Event listener for delete button
+        row.querySelector('.delete-program-taktikal-btn').addEventListener('click', () => {
+            row.remove();
+            updateTaktikalProgramRowNumbers();
+        });
+    }
+
+    function updateTaktikalProgramRowNumbers() {
+        Array.from(pelanTaktikalTableBody.rows).forEach((row, index) => {
+            row.cells[0].textContent = index + 1;
+        });
+    }
+
+    function collectPelanTaktikalData() {
+        const data = [];
+        Array.from(pelanTaktikalTableBody.rows).forEach(row => {
+            const rowData = {};
+            Array.from(row.querySelectorAll('[data-field]')).forEach(input => {
+                const fieldName = input.dataset.field;
+                let value = input.value.trim();
+                
+                // Fields that should be stored as arrays (multiline text)
+                if (['aktiviti', 'outputOutcome', 'pelanKontengensi'].includes(fieldName)) {
+                    value = textToArray(value);
+                }
+                rowData[fieldName] = value;
+            });
+            rowData.bil = parseInt(row.cells[0].textContent, 10);
+            data.push(rowData);
+        });
+        return data;
     }
     
-    // ----------------------------------------------------
-    // Template Admin Login Handler
-    // ----------------------------------------------------
-    templateAdminLoginButton.addEventListener('click', () => {
-        if (templateAdminKeyInput.value === ADMIN_SECRET_KEY) {
-            templateAdminGate.classList.add('hidden');
-            planEditorContainer.classList.remove('hidden');
-            headerSubtitle.textContent = 'Anda mengedit TEMPLAT INDUK. Perubahan di sini akan digunakan pada subjek BAHARU sahaja.';
-            templateAdminKeyInput.value = ''; 
-            
-            // Load the Master Template Data (Setting isAdminTemplateLoad=true)
-            loadPlan(MASTER_TEMPLATE_PATH, true); 
-        } else {
-            showMessage('Kunci Pentadbir tidak sah.', 'error', templateAdminMessage);
-            templateAdminKeyInput.value = '';
-        }
+    addTaktikalProgramButton.addEventListener('click', () => {
+        createTaktikalProgramRow({});
+        updateTaktikalProgramRowNumbers();
     });
 
-    // ----------------------------------------------------
-    // Toggle Admin/Subject Mode (triggered by footer)
-    // ----------------------------------------------------
-    adminFooterToggle.addEventListener('click', () => {
-        setAdminMode(true);
-    });
+
+    // --- DYNAMIC TABLE (Proses Pelaksanaan) MANAGEMENT (Unchanged) ---
     
-    // ----------------------------------------------------
-    // Switch Subject Button Handler (The fix for the user's issue)
-    // ----------------------------------------------------
-    switchSubjectButton.addEventListener('click', () => {
-        setAdminMode(false); // Ensure we are in Subject Editing Mode
-        currentSubject = null;
-        subjectSelector.value = ''; // Reset selection
-        // The setAdminMode(false) call handles hiding the editor and showing the subject menu
-    });
-
-
-    // --- DYNAMIC TABLE MANAGEMENT (Omitted for brevity, unchanged) ---
-
     function createTableRow(data = {}) {
         const langkah = tableBody.rows.length + 1;
         const row = tableBody.insertRow();
@@ -437,6 +514,69 @@
         updateRowNumbers();
     });
 
+    // --- TEMPLATE & ADMIN MODE LOGIC ---
+    
+    function setAdminMode(enable) {
+        isAdminMode = enable;
+        subjectSelector.value = '';
+        pelanTaktikalTableBody.innerHTML = ''; 
+
+        if (isAdminMode) {
+            subjectManagementSection.classList.add('hidden');
+            templateAdminGate.classList.remove('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
+            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
+            currentSubject = null; 
+            addTaktikalProgramButton.classList.remove('hidden');
+        } else {
+            subjectManagementSection.classList.remove('hidden');
+            templateAdminGate.classList.add('hidden');
+            planEditorContainer.classList.add('hidden');
+            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
+            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
+            addTaktikalProgramButton.classList.add('hidden');
+        }
+    }
+    
+    // ----------------------------------------------------
+    // Template Admin Login Handler
+    // ----------------------------------------------------
+    templateAdminLoginButton.addEventListener('click', () => {
+        if (templateAdminKeyInput.value === ADMIN_SECRET_KEY) {
+            templateAdminGate.classList.add('hidden');
+            planEditorContainer.classList.remove('hidden');
+            headerSubtitle.textContent = 'Anda mengedit TEMPLAT INDUK. Perubahan di sini akan digunakan pada subjek BAHARU sahaja.';
+            templateAdminKeyInput.value = ''; 
+            addTaktikalProgramButton.classList.remove('hidden');
+            
+            // Load the Master Template Data (Setting isAdminTemplateLoad=true)
+            loadPlan(MASTER_TEMPLATE_PATH, true); 
+        } else {
+            showMessage('Kunci Pentadbir tidak sah.', 'error', templateAdminMessage);
+            templateAdminKeyInput.value = '';
+        }
+    });
+
+    // ----------------------------------------------------
+    // Toggle Admin/Subject Mode (triggered by footer)
+    // ----------------------------------------------------
+    adminFooterToggle.addEventListener('click', () => {
+        setAdminMode(true);
+    });
+    
+    // ----------------------------------------------------
+    // Switch Subject Button Handler (The fix for the user's issue)
+    // ----------------------------------------------------
+    switchSubjectButton.addEventListener('click', () => {
+        setAdminMode(false); 
+        currentSubject = null;
+        subjectSelector.value = ''; 
+        pelanTaktikalTableBody.innerHTML = '';
+        addTaktikalProgramButton.classList.add('hidden');
+    });
+
+
     // --- SUBJECT MANAGEMENT (Omitted for brevity, unchanged) ---
 
     function createSubjectSlug(subjectName) {
@@ -444,7 +584,11 @@
     }
 
     async function loadSubjectList(selectSubject = null) {
-        if (!isAuthReady || !db) return;
+        if (!isAuthReady || !db) {
+             subjectListMessage.classList.remove('hidden');
+             subjectListMessage.textContent = 'Ralat: Sambungan terputus atau Firebase tidak sedia.';
+             return;
+        }
 
         subjectListMessage.classList.remove('hidden');
         subjectListMessage.textContent = 'Memuatkan senarai subjek...';
@@ -454,13 +598,15 @@
             const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
             const docSnap = await getDoc(subjectsRef);
             let subjects = [];
-
-            if (docSnap.exists() && Array.isArray(docSnap.data().subjects)) {
-                subjects = docSnap.data().subjects;
+            
+            // --- CORE LOGIC: Initialize 'Sejarah' as the first subject if list is empty
+            if (!docSnap.exists() || !Array.isArray(docSnap.data().subjects) || docSnap.data().subjects.length === 0) {
+                 subjects = ["Sejarah", "Matematik", "Sains", "Bahasa Inggeris", "Pendidikan Islam"];
+                 await setDoc(subjectsRef, { subjects: subjects });
             } else {
-                subjects = ["Sejarah", "Matematik", "Sains", "Bahasa Inggeris", "Pendidikan Islam"];
-                await setDoc(subjectsRef, { subjects: subjects });
+                subjects = docSnap.data().subjects;
             }
+            // --- END CORE LOGIC ---
 
             subjectSelector.innerHTML = '<option value="" disabled selected>--- Sila Pilih Subjek ---</option>';
             subjects.forEach(subject => {
@@ -538,6 +684,14 @@
     }
     
     function resetForm() {
+        // Reset Pelan Taktikal
+        pelanTaktikalTableBody.innerHTML = '';
+        
+        // Reset Strategic Goals
+        matlamatStrategik.value = '';
+        strategiList.value = '';
+        
+        // Reset Butiran Program
         document.getElementById('programName').value = '';
         document.getElementById('objektifProgram').value = '';
         document.getElementById('aktivitiProgram').value = '';
@@ -552,91 +706,143 @@
         tableBody.innerHTML = '';
     }
     
-    // Loads the hardcoded default data to ensure the master template is initialized
+    // --- LOAD DEFAULT CONTENT (SEJARAH MASTER MODULE) ---
     function loadHardcodedDefaults() {
-        resetForm(); // Start clean
-        document.getElementById('programName').value = 'Transformasi Digital';
-        document.getElementById('objektifProgram').value = '100% guru mengaplikasi PAK21 dalam PdPC. Menyempurnakan penggunaan Delima kepada guru dan murid.';
-        document.getElementById('aktivitiProgram').value = 'Peer Coaching\nVideo Critique\nBaca-I-Think\nDelima';
-        document.getElementById('penyelarasProgram').value = 'Rahman Ahmad, Mohd Nasri Sugiman dan Siti Fatimah';
-        document.getElementById('tarikhMulaAkhir').value = 'April - Oktober 2025';
-        document.getElementById('penyelarasAktiviti').value = 'Zuraimahai bin Rohami, Mohd Nasri Sugiman';
-        document.getElementById('tempat').value = 'Tiada';
-        document.getElementById('sasaran').value = 'Semua Guru dan murid-murid Sejarah';
-        document.getElementById('kosSumber').value = 'PCG';
-        document.getElementById('jawatankuasa').value = '';
-        document.getElementById('ringkasanProgram').value = 'Program memperkasakan PAK 21 melalui aktiviti peer coaching, video critique dan peta I-THINK dalam PdPC Sejarah. Ia dilaksanakan melalui modul togas bagi mengaplikasikan PAK 21 dan menggunakan kaedah PdPc agar dapat memberi peluang kepada murid untuk lebih memahami konsep & pembelajaran Sejarah dengan lebih mudah. Guru dan murid menggunakan aplikasi Delima secara giat.';
+        resetForm();
         
-        tableBody.innerHTML = '';
-        const defaultTable = [
-            { langkah: 1, prosesKerja: ["Mesyuarat Jawatankuasa:", "Bentang kertas kerja", "Lantikan J/Kuasa", "Anggaran kos", "Anggaran Tugas"], tanggungJawab: 'KP, Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: '100% kehadiran semua guru', sasaran: 'Semua guru Sejarah', status: 'Jelas' },
-            { langkah: 2, prosesKerja: ["Menyediakan bahan"], tanggungJawab: 'Penyelaras Program', tarikhMulaAkhir: 'April - Julai', kpi: 'Bahan diriso', sasaran: 'Guru-guru', status: 'Sedia' },
-            { langkah: 3, prosesKerja: ["Pelaksanaan Program", "Penyediaan Bahan", "Sijil"], tanggungJawab: 'Penyelaras Program, AJK', tarikhMulaAkhir: 'Mei - Ogos', kpi: 'Program berjalan lancar', sasaran: 'Semua guru Sejarah', status: 'Sedang Jalan' },
+        // Default Pelan Taktikal Programs (Cross-curricular & Strategic Focus)
+        const defaultTaktikalPrograms = [
+            { 
+                namaProgram: 'LITERASI DIGITAL & e-PORTFOLIO (Cross-Curricular)', 
+                aktiviti: ['Bengkel Pembangunan E-Portfolio Murid', 'Latihan VLE/Google Classroom', 'Penggunaan Quizizz/Kahoot untuk kuiz'], 
+                tanggungJawab: 'Penyelaras Digital & Semua Guru', 
+                tempoh: 'Sepanjang Tahun', 
+                kosSumber: 'PCG Digital', 
+                sasaran: 'Semua Guru & Murid', 
+                outputOutcome: ['100% murid mempunyai e-portfolio', 'Peningkatan engagement dalam PdP'], 
+                pelanKontengensi: ['Manual PdP luar talian'] 
+            },
+            { 
+                namaProgram: 'PLC BERFOKUS (Penjajaran Kurikulum)', 
+                aktiviti: ['Mesyuarat Panitia Penjajaran DSKP', 'Peer Coaching', 'Lesson Study'], 
+                tanggungJawab: 'Ketua Panitia & Guru Kanan Mata Pelajaran', 
+                tempoh: 'Feb - Okt', 
+                kosSumber: 'PCG Panitia', 
+                sasaran: 'Semua Guru', 
+                outputOutcome: ['100% guru menyelaraskan RPH', 'Peningkatan mutu pengajaran'], 
+                pelanKontengensi: ['Sesi bimbingan individu'] 
+            },
+             { 
+                namaProgram: 'BENGKEL TEKNIK MENJAWAB KBAT', 
+                aktiviti: ['Klinik Skor A', 'Latih tubi berfokus KBAT', 'Modul F4/F5 berpusat'], 
+                tanggungJawab: 'Semua guru Sejarah (Master)', 
+                tempoh: 'Apr - Okt', 
+                kosSumber: 'Dana Panitia', 
+                sasaran: 'Murid Tingkatan 4 & 5', 
+                outputOutcome: ['90% murid mahir jawab KBAT', 'Peningkatan % lulus peperiksaan'], 
+                pelanKontengensi: ['Modul alternatif secara atas talian'] 
+            },
+            // --- NEW CROSS-CURRICULAR PROGRAMS ---
+            { 
+                namaProgram: 'AUDIT DATA PBD BERSEPADU', 
+                aktiviti: ['Analisis jurang PBD bulanan', 'Sesi intervensi data silang panitia', 'Penetapan sasaran gred berdasarkan data awal'], 
+                tanggungJawab: 'SU Peperiksaan & Ketua Panitia', 
+                tempoh: 'Sepanjang Tahun (Suku Tahun)', 
+                kosSumber: 'Tiada', 
+                sasaran: 'Semua Guru Tingkatan', 
+                outputOutcome: ['Laporan tren pencapaian murid', 'Intervensi segera untuk murid kritikal (bottom 10%)'], 
+                pelanKontengensi: ['Pengumpulan data PBD manual'] 
+            },
+            { 
+                namaProgram: 'PUSAT SUMBER DIGITAL INTERAKTIF', 
+                aktiviti: ['Penciptaan repositori video PdP', 'Mengintegrasi AR/VR dalam Sejarah/Sains', 'Penyediaan modul interaktif Delima'], 
+                tanggungJawab: 'Guru Media/ICT', 
+                tempoh: 'Sepanjang Tahun', 
+                kosSumber: 'PCG/ Sumbangan PIBG', 
+                sasaran: 'Semua Murid & Guru', 
+                outputOutcome: ['50+ bahan P&P interaktif tersedia', 'Peningkatan penggunaan Bilik Komputer'], 
+                pelanKontengensi: ['Penggunaan bahan bercetak'] 
+            },
+            { 
+                namaProgram: 'KAPSUL MIKRO SEJARAH (Video Content)', 
+                aktiviti: ['Bengkel ringkas penciptaan video PdP', 'Muat naik video 5 minit ke platform sekolah (untuk ulangkaji)', 'Pertandingan Video Sejarah Murid'], 
+                tanggungJawab: 'Penyelaras Media Panitia', 
+                tempoh: 'Mac - Sep', 
+                kosSumber: 'Tiada', 
+                sasaran: 'Murid Menengah Rendah', 
+                outputOutcome: ['20+ video ulangkaji tersedia', 'Peningkatan kefahaman konsep sukar'], 
+                pelanKontengensi: ['Penggunaan infografik statik'] 
+            },
+            { 
+                namaProgram: 'BIMBINGAN RAKAN SEBAYA DIGITAL (e-Mentoring)', 
+                aktiviti: ['Memadankan guru pakar digital dengan guru baharu', 'Sesi bimbingan 1:1', 'Rekod sesi bimbingan dalam talian'], 
+                tanggungJawab: 'Penyelaras LDP & SU Kurikulum', 
+                tempoh: 'Sepanjang Tahun', 
+                kosSumber: 'Tiada', 
+                sasaran: 'Guru Baharu & Guru Kurang Mahir Digital', 
+                outputOutcome: ['Peningkatan 80% keyakinan digital guru', 'Guru baharu mencapai standard Delima'], 
+                pelanKontengensi: ['Sesi bimbingan bersemuka'] 
+            },
         ];
-        defaultTable.forEach(row => createTableRow(row));
+        defaultTaktikalPrograms.forEach(row => createTaktikalProgramRow(row));
+        updateTaktikalProgramRowNumbers();
+
+        // Default Strategic Goals (Sejarah Focus)
+        matlamatStrategik.value = 'Meningkatkan penguasaan kefahaman konsep Sejarah melalui pendekatan inkuiri (Project Based Learning) dan melonjakkan pencapaian akademik (A > 30%).';
+        strategiList.value = 'Melaksanakan strategi Pembelajaran Abad Ke-21 (PAK21) secara konsisten.\nMemperkasa kemahiran guru dalam menilai soalan KBAT.\nMemanfaatkan teknologi Delima sepenuhnya dalam PdP.';
+        
+        // Butiran Program (General Default)
+        document.getElementById('programName').value = 'Program Peningkatan Prestasi Sejarah Menyeluruh';
+        document.getElementById('objektifProgram').value = 'Memastikan 100% murid menguasai konsep dan fakta Sejarah asas dan mencapai sekurang-kurangnya gred Lulus.';
+        document.getElementById('aktivitiProgram').value = 'Program mentor-mentee\nPembelajaran berasaskan projek\nLawatan sambil belajar maya/fizikal';
+        document.getElementById('penyelarasProgram').value = 'Ketua Panitia Sejarah';
+        document.getElementById('tarikhMulaAkhir').value = 'Sepanjang Tahun';
+        document.getElementById('penyelarasAktiviti').value = 'Semua Guru Sejarah';
+        document.getElementById('tempat').value = 'Bilik Darjah / Makmal Komputer';
+        document.getElementById('sasaran').value = 'Semua Murid Tingkatan 1-5';
+        document.getElementById('kosSumber').value = 'PCG & Sumbangan Komuniti';
+        document.getElementById('jawatankuasa').value = 'AJK Kurikulum Sekolah';
+        document.getElementById('ringkasanProgram').value = 'Program ini menggabungkan pelbagai pendekatan untuk menjadikan subjek Sejarah lebih relevan dan menarik, menggunakan alat digital dan pendekatan inkuiri.';
+        
+        // Proses Pelaksanaan
+        tableBody.innerHTML = '';
+        const defaultProses = [
+            { langkah: 1, prosesKerja: ["Mesyuarat JK Panitia & Penjajaran Dokumen Standard", "Analisis Data Peperiksaan Tahun Lalu", "Penetapan KPI & Sasaran"], tanggungJawab: 'KP & Penyelaras Program', tarikhMulaAkhir: 'Januari', kpi: 'Dokumen dan KPI disahkan', sasaran: 'Semua guru Sejarah', status: 'Selesai' },
+            { langkah: 2, prosesKerja: ["Penyediaan bahan mengikut keperluan taktik", "Pengagihan tugas AJK dan guru"], tanggungJawab: 'Penyelaras Program & AJK', tarikhMulaAkhir: 'Februari - Mac', kpi: '80% bahan sokongan siap', sasaran: 'Guru dan Murid terlibat', status: 'Sedia' },
+            { langkah: 3, prosesKerja: ["Pempromosian program", "Surat pemakluman kepada pihak berkepentingan"], tanggungJawab: 'Penyelaras Aktiviti', tarikhMulaAkhir: 'Mac', kpi: 'Semua pihak maklum', sasaran: 'Semua guru', status: 'Selesai' },
+            { langkah: 4, prosesKerja: ["Pelaksanaan program utama mengikut jadual (Tactical Execution)"], tanggungJawab: 'Penyelaras Program', tarikhMulaAkhir: 'Sepanjang Tahun', kpi: 'Program dilaksanakan 100%', sasaran: 'Semua guru/murid Sejarah', status: 'Sedang Jalan' },
+            { langkah: 5, prosesKerja: ["Penilaian & Pelaporan prestasi berkala (Ujian, PBD)", "Pengemaskinian data"], tanggungJawab: 'Pengetua, PKP & Guru Data', tarikhMulaAkhir: 'Mei - November', kpi: 'Peningkatan pencapaian murid', sasaran: 'Semua murid terlibat', status: 'Sedang Jalan' },
+            { langkah: 6, prosesKerja: ["Pemantauan dan penyeliaan berterusan (Peer Coaching/Pencerapan)"], tanggungJawab: 'Pentadbir & GKMP', tarikhMulaAkhir: 'Sepanjang Tahun', kpi: 'Sesi pemantauan direkod', sasaran: 'Semua guru', status: 'Sedang Jalan' },
+            { langkah: 7, prosesKerja: ["Post-Mortem Program Akhir Tahun", "Laporan Penilaian Keseluruhan & Cadangan Penambahbaikan"], tanggungjawab: 'KP Panitia', tarikhMulaAkhir: 'November', kpi: 'Laporan disemak dan disahkan', sasaran: 'JK Panitia', status: 'Belum Mula' }
+        ];
+        defaultProses.forEach(row => createTableRow(row));
         updateRowNumbers();
     }
     
     // Loads data from the Firebase master template document
     async function loadTemplateData(saveIfMissing = false) {
         const templateRef = doc(db, MASTER_TEMPLATE_PATH);
-        const docSnap = await getDoc(templateRef);
-        
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('programName').value = data.programName || '';
-            document.getElementById('objektifProgram').value = data.objektifProgram || '';
-            document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
-            document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
-            document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
-            document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
-            document.getElementById('tempat').value = data.tempat || '';
-            document.getElementById('sasaran').value = data.sasaran || '';
-            document.getElementById('kosSumber').value = data.kosSumber || '';
-            document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
-            document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
-
-            tableBody.innerHTML = '';
-            if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
-                data.prosesPelaksanaan.forEach(row => createTableRow(row));
-                updateRowNumbers();
-            } else {
-                createTableRow({prosesKerja: ['']});
-                updateRowNumbers();
-            }
-        } else {
-            // Template does not exist yet
-            loadHardcodedDefaults();
-            if (saveIfMissing) {
-                // Save the hardcoded defaults to Firebase as the initial master template
-                await savePlan(null, MASTER_TEMPLATE_PATH);
-            }
-        }
-    }
-
-
-    async function loadPlan(subject, isAdminTemplateLoad = false) {
-        if (!isAuthReady || !db || !subject) {
-            planEditorContainer.classList.add('hidden');
-            return;
-        }
-
-        currentSubject = subject;
-        if (!isAdminTemplateLoad) {
-            pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`;
-        }
-        
-        planEditorContainer.classList.remove('hidden');
-        loadingOverlay.classList.remove('hidden');
-        
-        const planRef = doc(db, getPlanDocPath(subject));
         try {
-            const docSnap = await getDoc(planRef);
+            const docSnap = await getDoc(templateRef);
             
             if (docSnap.exists()) {
-                // 1. Data exists for this specific subject, load it.
                 const data = docSnap.data();
                 
+                // Pelan Taktikal
+                pelanTaktikalTableBody.innerHTML = '';
+                if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
+                    data.pelanTaktikal.forEach(row => createTaktikalProgramRow(row));
+                    updateTaktikalProgramRowNumbers();
+                } else {
+                    createTaktikalProgramRow({});
+                    updateTaktikalProgramRowNumbers();
+                }
+                
+                // Strategic Goals
+                matlamatStrategik.value = data.matlamatStrategik || '';
+                strategiList.value = arrayToText(data.strategiList) || '';
+                
+                // Butiran Program
                 document.getElementById('programName').value = data.programName || '';
                 document.getElementById('objektifProgram').value = data.objektifProgram || '';
                 document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
@@ -652,37 +858,92 @@
                 tableBody.innerHTML = '';
                 if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
                     data.prosesPelaksanaan.forEach(row => createTableRow(row));
+                    updateRowNumbers();
                 } else {
                     createTableRow({prosesKerja: ['']});
+                    updateRowNumbers();
                 }
+            } else {
+                loadHardcodedDefaults();
+                if (saveIfMissing) {
+                    await savePlan(null, MASTER_TEMPLATE_PATH);
+                }
+            }
+        } catch (error) {
+             console.error("Error loading master template:", error);
+             // CRITICAL: If loading template fails, load hardcoded defaults to ensure structural integrity
+             loadHardcodedDefaults();
+             if (saveIfMissing) {
+                await savePlan(null, MASTER_TEMPLATE_PATH);
+             }
+        }
+    }
+
+
+    async function loadPlan(subject, isAdminTemplateLoad = false) {
+        if (!isAuthReady || !db || !subject) { planEditorContainer.classList.add('hidden'); return; }
+        currentSubject = subject;
+        if (!isAdminTemplateLoad) { pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`; }
+        planEditorContainer.classList.remove('hidden');
+        loadingOverlay.classList.remove('hidden'); 
+        
+        const planRef = doc(db, getPlanDocPath(subject));
+        try {
+            const docSnap = await getDoc(planRef);
+            
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // Pelan Taktikal
+                pelanTaktikalTableBody.innerHTML = '';
+                if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
+                    data.pelanTaktikal.forEach(row => createTaktikalProgramRow(row));
+                    updateTaktikalProgramRowNumbers();
+                } else { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); }
+
+                // Strategic Goals
+                matlamatStrategik.value = data.matlamatStrategik || '';
+                strategiList.value = arrayToText(data.strategiList) || '';
+                
+                // Butiran Program
+                document.getElementById('programName').value = data.programName || '';
+                document.getElementById('objektifProgram').value = data.objektifProgram || '';
+                document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
+                document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
+                document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
+                document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
+                document.getElementById('tempat').value = data.tempat || '';
+                document.getElementById('sasaran').value = data.sasaran || '';
+                document.getElementById('kosSumber').value = data.kosSumber || '';
+                document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
+                document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
+
+                tableBody.innerHTML = '';
+                if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
+                    data.prosesPelaksanaan.forEach(row => createTableRow(row));
+                } else { createTableRow({prosesKerja: ['']}); }
                 updateRowNumbers();
                 
-                if (!isAdminTemplateLoad) {
-                    showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
-                } else {
-                     saveButton.textContent = 'Simpan Templat Induk';
-                }
+                if (!isAdminTemplateLoad) { showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
+                } else { saveButton.textContent = 'Simpan Templat Induk'; }
 
             } else if (!isAdminTemplateLoad) {
-                // 2. Data does NOT exist for this subject. Load Master Template.
+                // DATA TIDAK WUJUD UNTUK SUBJEK: Load Master Template
                 showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
-                await loadTemplateData(true); // Load template and save if missing
+                await loadTemplateData(false); // Load template, but don't save it as default here
                 saveButton.textContent = 'Simpan Pelan Operasi'; 
-                
             } else {
-                 // 3. Document does not exist AND it's the admin template load. Initialize defaults.
+                 // MASTER TEMPLATE TIDAK WUJUD: Initialize Defaults
                  loadHardcodedDefaults();
                  showMessage('Templat Induk baharu telah dibuat dari templat lalai.', 'info');
                  saveButton.textContent = 'Simpan Templat Induk';
-                 await savePlan(null, MASTER_TEMPLATE_PATH); // Save the defaults
+                 await savePlan(null, MASTER_TEMPLATE_PATH); 
             }
         } catch (error) {
             console.error("Error fetching or loading plan data:", error);
             showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan templat kosong.`, 'error');
             resetForm();
-        } finally {
-             loadingOverlay.classList.add('hidden');
-        }
+        } finally { loadingOverlay.classList.add('hidden'); }
     }
 
 
@@ -701,8 +962,11 @@
         saveButton.textContent = `Menyimpan ${subjectName}...`;
 
         try {
-            // Collect Static Data
             const staticData = {
+                pelanTaktikal: collectPelanTaktikalData(),
+                matlamatStrategik: matlamatStrategik.value.trim(),
+                strategiList: textToArray(strategiList.value),
+                
                 programName: document.getElementById('programName').value.trim(),
                 objektifProgram: document.getElementById('objektifProgram').value.trim(),
                 aktivitiProgram: textToArray(document.getElementById('aktivitiProgram').value),
@@ -715,7 +979,6 @@
                 jawatankuasa: document.getElementById('jawatankuasa').value.trim(),
                 ringkasanProgram: document.getElementById('ringkasanProgram').value.trim(),
                 
-                // Collect Dynamic Table Data
                 prosesPelaksanaan: collectTableData(),
                 updatedAt: serverTimestamp(),
             };
@@ -749,7 +1012,6 @@
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // Wait for authentication to resolve
             onAuthStateChanged(auth, async (user) => {
                 if (!user) {
                     if (initialAuthToken) {
@@ -761,11 +1023,13 @@
                 userId = auth.currentUser?.uid;
                 isAuthReady = true;
                 
-                // Load subjects and show main UI
-                await loadSubjectList();
-                ensureUIVisible();
+                // 1. Load subjects and show main UI (CRITICAL: ensure visible first)
+                ensureUIVisible(); 
                 
-                // Set default mode (Subject Editing)
+                // 2. Start data loading
+                await loadSubjectList();
+                
+                // 3. Set default mode 
                 setAdminMode(false);
             });
 
