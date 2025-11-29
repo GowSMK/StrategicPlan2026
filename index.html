@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Use Inter font -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap'); 
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f7f9fc;
@@ -27,7 +27,7 @@
             vertical-align: top;
         }
         
-        #prosesPelaksanaanTable th, #pelanTaktikalTable th, #qsamMatrixTable th { /* Added QSAM table */
+        #prosesPelaksanaanTable th, #pelanTaktikalTable th, #qsamMatrixTable th {
             text-align: center;
             white-space: normal; 
             line-height: 1.2;
@@ -43,12 +43,12 @@
             overflow-x: auto;
         }
         
-        /* --- Strategy Map Specific Styles --- */
+        /* --- Strategy Map Specific Styles (for Editor View) --- */
         .strategy-map-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px; /* Space between perspectives */
+            gap: 16px; 
             padding: 20px 0;
             border-radius: 12px;
             background-color: #ffffff;
@@ -61,52 +61,18 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
-        .perspective-title {
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-        }
-        .perspective-content {
-            font-size: 0.95rem;
-            font-weight: 500;
-            min-height: 30px;
-        }
-        /* Arrow Styling (for visual flow) */
-        .strategy-arrow {
-            width: 4px;
-            height: 16px;
-            background-color: #3b82f6; /* Blue-500 */
-            border-radius: 2px;
-            position: relative;
-            z-index: 10;
-        }
-        .strategy-arrow::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: -4px;
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 8px solid #3b82f6;
-        }
         /* Specific Colors */
-        .impact { background-color: #fef2f2; border: 2px solid #ef4444; } /* Red-100 */
+        .impact { background-color: #fef2f2; border: 2px solid #ef4444; } 
         .impact .perspective-title { color: #ef4444; }
-        .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } /* Amber-100 */
+        .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } 
         .outcome .perspective-title { color: #f59e0b; }
-        .process { background-color: #eff6ff; border: 2px solid #3b82f6; } /* Blue-100 */
+        .process { background-color: #eff6ff; border: 2px solid #3b82f6; } 
         .process .perspective-title { color: #3b82f6; }
-        .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } /* Green-100 */
+        .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } 
         .capacity .perspective-title { color: #10b981; }
-
+        
         /* QSAM Specific Styling */
-        .qsam-score {
-            font-weight: bold;
-            text-align: center;
-        }
+        .qsam-score { font-weight: bold; text-align: center; }
         
         /* Appendix Styling */
         #appendixContent {
@@ -115,9 +81,45 @@
             overflow: hidden;
             padding: 0 1rem;
         }
-        #appendixContent.open {
-            max-height: 1000px; /* Large enough value */
+        #appendixContent.open { max-height: 1000px; padding: 1rem; }
+        
+        /* --- DASHBOARD VIEW SPECIFIC STYLES --- */
+        .dashboard-container {
+            background-color: #f1f5f9; /* Slate-100 */
             padding: 1rem;
+            min-height: 600px;
+        }
+        .dashboard-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .kpi-circle {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.5rem;
+            color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .ei-score { background-color: #f87171; } 
+        .qra-score { background-color: #34d399; } 
+        .tbs-score { background-color: #60a5fa; } 
+        .qsam-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px dashed #e2e8f0;
+        }
+        .qsam-name { font-weight: 600; color: #1e293b; font-size: 0.9rem; width: 50%; }
+        .qsam-badge {
+            font-size: 0.75rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 9999px; margin-left: 8px;
+        }
+        .ei-high { background-color: #fee2e2; color: #ef4444; }
+        .im-high { background-color: #fffbeb; color: #f59e0b; }
+        .dashboard-map .strategy-map-perspective {
+            max-width: 100%;
+            margin: 10px 0;
+            padding: 10px;
         }
     </style>
 </head>
@@ -127,7 +129,7 @@
 <div id="loadingOverlay" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
     <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
-        <p class="mt-4 text-indigo-700 font-semibold">Memulakan Aplikasi...</p>
+        <p class="mt-4 text-indigo-700 font-semibold" id="loadingMessage">Memulakan Aplikasi...</p>
     </div>
 </div>
 
@@ -148,7 +150,7 @@
     <div id="subjectManagementSection" class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto mb-8 space-y-4">
         
         <!-- 1. Existing Subject Selector -->
-        <div>
+        <div id="subjectSelectorContainer">
             <label for="subjectSelector" class="block text-lg font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran (Subjek) untuk Diedit:</label>
             <select id="subjectSelector" class="w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white">
                 <!-- Options populated by JavaScript -->
@@ -157,7 +159,7 @@
         </div>
 
         <!-- 2. Add New Subject -->
-        <div class="border-t pt-4">
+        <div class="border-t pt-4" id="addNewSubjectContainer">
             <label for="newSubjectInput" class="block text-lg font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
             <div class="flex space-x-2">
                 <input type="text" id="newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-3 border border-green-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150">
@@ -187,201 +189,34 @@
     <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden">
         <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
         
-        <!-- Switch Subject Button -->
-        <div class="flex justify-start mb-4">
+        <!-- View Toggle and Subject Switch -->
+        <div class="flex justify-between items-center mb-4">
             <button id="switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition duration-150 flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Tukar Subjek
             </button>
-        </div>
-
-        <!-- Section 0.2: Analisis Quantum SMART (NEW SECTION) -->
-        <h3 class="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Analisis Quantum SMART (Prinsip Teras)</h3>
-        <div class="overflow-x-auto mb-8 p-4 border border-teal-200 rounded-lg bg-teal-50">
-            <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
-                <tbody>
-                    <tr>
-                        <th class="w-1/5 bg-teal-100 font-medium">Quantum SMART Principle</th>
-                        <td colspan="3"><textarea id="smartPrinciple" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan bagaimana setiap program taktik memenuhi prinsip SMART. Contoh: Semua KPI (Measurable) mestilah boleh dicapai (Achievable) dalam tempoh (Time-bound) yang ditetapkan."></textarea></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-teal-100 font-medium">Entanglement Measurement</th>
-                        <td colspan="3"><textarea id="entanglementMeasure" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan metrik utama yang mengukur kejayaan holistik program ini. Contoh: Peningkatan 15% Gred A merentasi semua tingkatan dalam tempoh 6 bulan, diukur melalui ujian PBD dan Peperiksaan Pertengahan Tahun."></textarea></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Section 0.5: Strategic Goals Table -->
-        <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">Matlamat & Strategi</h3>
-        <div class="overflow-x-auto mb-8">
-            <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
-                <tbody>
-                    <tr>
-                        <th class="w-1/5 bg-red-100 font-medium">MATLAMAT STRATEGIK</th>
-                        <td colspan="3"><textarea id="matlamatStrategik" rows="2" class="w-full focus:outline-none resize-none"></textarea></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-red-100 font-medium">STRATEGI</th>
-                        <td colspan="3"><textarea id="strategiList" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- SECTION 0.6: VISUAL STRATEGY MAP -->
-        <h3 class="text-xl font-semibold text-blue-600 mb-4 border-b pb-2">Peta Strategi Visual (Strategic Outcome Flow)</h3>
-        <div id="strategyMapDisplay" class="mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
-            <!-- Content will be rendered here by JS function renderStrategyMap() -->
-        </div>
-
-        <!-- Section 0.7: Pelan Taktikal (Senarai Program) - NEW COMPREHENSIVE TABLE -->
-        <h3 class="text-xl font-semibold text-purple-600 mb-4 border-b pb-2">Pelan Taktikal (Senarai Program)</h3>
-        <div class="overflow-x-auto mb-8">
-            <table class="table-auto-layout border-collapse border border-gray-200" id="pelanTaktikalTable" style="width: 1800px;">
-                <thead>
-                    <tr class="bg-purple-50 text-gray-600 uppercase text-xs">
-                        <th style="width: 30px;" class="text-center">Bil</th>
-                        <th style="width: 150px;">Nama Program</th>
-                        <th style="width: 250px;">Aktiviti</th>
-                        <th style="width: 150px;">Tanggungjawab</th>
-                        <th style="width: 100px;">Tempoh / Hari / Kekerapan</th>
-                        <th style="width: 80px;">Kos / Sumber</th>
-                        <th style="width: 150px;">Sasaran</th>
-                        <th style="width: 200px;">Output / Outcome / Benefit</th>
-                        <th style="width: 200px;">Pelan Kontengensi</th>
-                        <th style="width: 50px;" class="text-center">Padam</th>
-                    </tr>
-                </thead>
-                <tbody id="pelanTaktikalTableBody">
-                    <!-- Dynamic Taktikal Program Rows -->
-                </tbody>
-            </table>
-            <button id="addTaktikalProgramButton" class="bg-purple-500 text-white px-3 py-1 mt-2 text-sm rounded-lg hover:bg-purple-600 transition duration-150 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Tambah Program Taktikal
-            </button>
-        </div>
-        
-        <!-- NEW SECTION: Quantum Strategic Alignment Matrix (QSAM) -->
-        <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">3. Matriks Penjajaran Strategik Quantum (QSAM) - Pemantauan Outcome</h3>
-        <p class="text-sm text-gray-600 mb-4">QSAM mengukur Entanglement Index (EI) setiap program taktik dengan Matlamat Strategik. Skala EI (0-5), di mana 5 = Impak Tinggi kepada KPI utama.</p>
-        <div class="overflow-x-auto mb-8">
-            <table class="table-auto-layout border-collapse border border-gray-200" id="qsamMatrixTable" style="width: 1500px;">
-                <thead>
-                    <tr class="bg-green-100 text-gray-700 uppercase text-xs">
-                        <th style="width: 30px;" class="text-center">Bil</th>
-                        <th style="width: 250px;">Nama Program Taktikal</th>
-                        <th style="width: 80px;">Impact Multiplier (IM) (1-10)</th>
-                        <th style="width: 150px;">Entanglement Index (EI) (0-5)</th>
-                        <th style="width: 150px;">Quantum Resource Allocation (QRA) (%)</th>
-                        <th style="width: 150px;">T-Bound Score (TBS) (%)</th>
-                        <th style="width: 150px;">Status / Catatan Penjajaran</th>
-                        <th style="width: 150px;">Laporan Kemajuan Output (Terbaru)</th>
-                    </tr>
-                </thead>
-                <tbody id="qsamMatrixTableBody">
-                    <!-- Dynamic QSAM Rows generated by JS -->
-                </tbody>
-            </table>
-            <button id="syncQsamButton" class="bg-blue-500 text-white px-3 py-1 mt-2 text-sm rounded-lg hover:bg-blue-600 transition duration-150 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                Segerak QSAM (Sync Program List)
-            </button>
-        </div>
-
-        <!-- NEW APPENDIX SECTION -->
-        <div class="border-t pt-4 mt-8">
-            <button id="toggleAppendixButton" class="w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700 rounded-lg flex justify-between items-center transition duration-150">
-                <span>LAMPIRAN A: Penjelasan Matriks Penjajaran Strategik Quantum (QSAM)</span>
-                <svg id="appendixArrow" class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            <div id="appendixContent" class="bg-gray-50 border border-gray-200 rounded-b-lg">
-                <!-- Content will be injected by JS -->
+            <div class="flex space-x-2">
+                <button id="toggleEditView" class="bg-indigo-500 text-white font-semibold px-3 py-1 rounded-lg hover:bg-indigo-600 transition duration-150 text-sm">
+                    Mod Edit (Lengkap)
+                </button>
+                <button id="toggleDashboardView" class="bg-purple-600 text-white font-semibold px-3 py-1 rounded-lg hover:bg-purple-700 transition duration-150 text-sm">
+                    Mod Dashboard (Visual)
+                </button>
             </div>
         </div>
 
-        <!-- Section 1: Butiran Program (Static Header Info - Now less relevant due to tactical table) -->
-        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2 mt-8">Butiran Program (Untuk Pelan Am)</h3>
-        <div class="overflow-x-auto mb-8">
-            <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
-                <tbody>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Nama Program</th>
-                        <td colspan="3"><input type="text" id="programName" class="w-full focus:outline-none" value=""></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Objektif Program</th>
-                        <td colspan="3"><textarea id="objektifProgram" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Aktiviti Program</th>
-                        <td colspan="3"><textarea id="aktivitiProgram" rows="5" class="w-full focus:outline-none resize-none"></textarea></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Program</th>
-                        <td class="w-2/5"><input type="text" id="penyelarasProgram" class="w-full focus:outline-none" value=""></td>
-                        <th class="w-1/5 bg-gray-100 font-medium">Tarikh Mula - Akhir</th>
-                        <td class="w-1/5"><input type="text" id="tarikhMulaAkhir" class="w-full focus:outline-none" value=""></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Aktiviti</th>
-                        <td><input type="text" id="penyelarasAktiviti" class="w-full focus:outline-none" value=""></td>
-                        <th class="w-1/5 bg-gray-100 font-medium">Tempat</th>
-                        <td><input type="text" id="tempat" class="w-full focus:outline-none" value=""></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Sasaran</th>
-                        <td><input type="text" id="sasaran" class="w-full focus:outline-none" value=""></td>
-                        <th class="w-1/5 bg-gray-100 font-medium">Kos dan Sumber</th>
-                        <td><input type="text" id="kosSumber" class="w-full focus:outline-none" value=""></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Jawatankuasa</th>
-                        <td colspan="3"><input type="text" id="jawatankuasa" class="w-full focus:outline-none" value=""></td>
-                    </tr>
-                    <tr>
-                        <th class="w-1/5 bg-gray-100 font-medium">Ringkasan Program</th>
-                        <td colspan="3"><textarea id="ringkasanProgram" rows="4" class="w-full focus:outline-none resize-none"></textarea></td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Dynamic Content Area -->
+        <div id="dynamicPlanContent">
+            <!-- All tables/sections are injected here -->
         </div>
 
-        <!-- Section 2: Proses Pelaksanaan Table (Proses Kerja) -->
-        <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Proses Pelaksanaan (Langkah-langkah)</h3>
-        
-        <div class="overflow-x-auto mb-4">
-            <table class="table-auto-layout border-collapse border border-gray-200" id="prosesPelaksanaanTable" style="width: 1200px;">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
-                        <th style="width: 50px;">Langkah</th>
-                        <th style="width: 250px;">Proses Kerja</th>
-                        <th style="width: 150px;">Tanggungjawab</th> 
-                        <th style="width: 150px;">Tarikh Mula-Akhir</th> 
-                        <th style="width: 150px;">KPI</th>
-                        <th style="width: 150px;">Sasaran</th>
-                        <th style="width: 120px;">Status</th> 
-                        <th style="width: 80px;">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Dynamic rows will be inserted here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Table Action Buttons -->
-        <div class="flex justify-between items-center mb-6">
-            <button id="addRowButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition duration-150 flex items-center">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Tambah Langkah
+        <!-- Save and Export Button -->
+        <div class="border-t pt-4 mt-6 flex justify-between items-center" id="saveSection">
+            <button id="downloadPlanButton" class="bg-gray-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-gray-600 transition duration-200 shadow-md flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Eksport (JSON)
             </button>
-        </div>
-
-        <!-- Save Button -->
-        <div class="border-t pt-4">
-            <button id="saveButton" class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition duration-200 shadow-md">
+            <button id="saveButton" class="w-2/3 bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition duration-200 shadow-md">
                 Simpan Pelan Operasi
             </button>
         </div>
@@ -405,12 +240,8 @@
     setLogLevel('debug');
 
     // --- Core Configuration and Paths ---
-    // APP ID IS STATIC SINCE THIS IS STANDALONE HTML
-    const appId = 'strategic2026'; 
-    const ADMIN_SECRET_KEY = "admin2025";
-    
-    // --- FIREBASE CONFIGURATION (UPDATED) ---
-    const firebaseConfig = {
+    const DEFAULT_APP_ID = 'strategic2026';
+    const HARDCODED_FIREBASE_CONFIG = {
         apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU",
         authDomain: "strategic2026.firebaseapp.com",
         projectId: "strategic2026",
@@ -418,66 +249,58 @@
         messagingSenderId: "642605714672",
         appId: "1:642605714672:web:5dcdfbf351c36ca6084635"
     };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : DEFAULT_APP_ID;
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : HARDCODED_FIREBASE_CONFIG;
+
     
+    const ADMIN_SECRET_KEY = "admin2025";
     const SUBJECTS_DOC_PATH = `artifacts/${appId}/public/data/subject_config/subject_list`;
     const PLAN_COLLECTION_BASE = `artifacts/${appId}/public/data/pelan_strategik`; 
     const MASTER_TEMPLATE_PATH = `${PLAN_COLLECTION_BASE}/master_template`; 
 
 
     // --- GLOBAL STATE ---
-    let app, db, auth;
+    let app, db, auth; 
     let userId = null;
     let isAuthReady = false;
     let currentSubject = null; 
     let isAdminMode = false; 
     let masterTemplateCache = {};
+    let currentPlanData = {}; 
+    let programCounter = 0; 
 
-
-    // --- DOM ELEMENTS ---
+    // --- DOM ELEMENTS (Mappings remain the same) ---
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingMessage = document.getElementById('loadingMessage');
     const mainApp = document.getElementById('app');
     const messageBox = document.getElementById('messageBox');
     const saveButton = document.getElementById('saveButton');
-    const addRowButton = document.getElementById('addRowButton');
-    const tableBody = document.getElementById('tableBody');
+    const downloadPlanButton = document.getElementById('downloadPlanButton'); // NEW
     const subjectSelector = document.getElementById('subjectSelector');
     const planEditorContainer = document.getElementById('planEditorContainer');
+    const dynamicPlanContent = document.getElementById('dynamicPlanContent');
     const pageMainTitle = document.getElementById('pageMainTitle');
-    const newSubjectInput = document.getElementById('newSubjectInput');
-    const addNewSubjectButton = document.getElementById('addNewSubjectButton');
-    const newSubjectMessageBox = document.getElementById('newSubjectMessageBox');
-    const subjectListMessage = document.getElementById('subjectListMessage');
-    const adminFooterToggle = document.getElementById('adminFooterToggle');
-    const subjectManagementSection = document.getElementById('subjectManagementSection');
-    const templateAdminGate = document.getElementById('templateAdminGate');
-    const templateAdminKeyInput = document.getElementById('templateAdminKeyInput');
-    const templateAdminLoginButton = document.getElementById('templateAdminLoginButton');
-    const templateAdminMessage = document.getElementById('templateAdminMessage');
-    const headerSubtitle = document.getElementById('headerSubtitle');
-    const switchSubjectButton = document.getElementById('switchSubjectButton');
-    const matlamatStrategik = document.getElementById('matlamatStrategik');
-    const strategiList = document.getElementById('strategiList');
-    const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
-    const addTaktikalProgramButton = document.getElementById('addTaktikalProgramButton');
-    const smartPrinciple = document.getElementById('smartPrinciple');
-    const entanglementMeasure = document.getElementById('entanglementMeasure');
-    const strategyMapDisplay = document.getElementById('strategyMapDisplay');
+    const saveSection = document.getElementById('saveSection');
     
-    // QSAM elements
-    const qsamMatrixTableBody = document.getElementById('qsamMatrixTableBody');
-    const syncQsamButton = document.getElementById('syncQsamButton');
+    const toggleEditView = document.getElementById('toggleEditView');
+    const toggleDashboardView = document.getElementById('toggleDashboardView');
+
+    const ADMIN_ELEMENTS = {
+        newSubjectInput: document.getElementById('newSubjectInput'),
+        addNewSubjectButton: document.getElementById('addNewSubjectButton'),
+        newSubjectMessageBox: document.getElementById('newSubjectMessageBox'),
+        adminFooterToggle: document.getElementById('adminFooterToggle'),
+        subjectManagementSection: document.getElementById('subjectManagementSection'),
+        templateAdminGate: document.getElementById('templateAdminGate'),
+        templateAdminKeyInput: document.getElementById('templateAdminKeyInput'),
+        templateAdminLoginButton: document.getElementById('templateAdminLoginButton'),
+        templateAdminMessage: document.getElementById('templateAdminMessage'),
+        headerSubtitle: document.getElementById('headerSubtitle'),
+        switchSubjectButton: document.getElementById('switchSubjectButton'),
+    };
     
-    // Appendix elements
-    const toggleAppendixButton = document.getElementById('toggleAppendixButton');
-    const appendixContent = document.getElementById('appendixContent');
-    const appendixArrow = document.getElementById('appendixArrow');
-
-
-    let programCounter = 0;
-
-
     // --- UTILITIES ---
-
     function showMessage(message, type = 'success', target = messageBox) {
         target.textContent = message;
         target.className = `p-3 text-center rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} mb-4`;
@@ -488,128 +311,17 @@
     const textToArray = (text) => text.split('\n').map(item => item.trim()).filter(item => item.length > 0);
     const arrayToText = (array) => Array.isArray(array) ? array.join('\n') : '';
     
-    function ensureUIVisible() {
+    // --- Loader Management ---
+    function hideLoadingOverlay() {
         loadingOverlay.classList.add('hidden');
         mainApp.classList.remove('hidden');
     }
+
+    // --- QSAM CONTENT GENERATION AND UTILITES ---
     
-    function getFormState() {
-        return {
-            smartPrinciple: smartPrinciple.value.trim(),
-            entanglementMeasure: entanglementMeasure.value.trim(),
-            matlamatStrategik: matlamatStrategik.value.trim(),
-            strategiList: textToArray(strategiList.value),
-            pelanTaktikal: collectPelanTaktikalData(),
-            qsamData: collectQsamData(), // Added QSAM data collection
-            
-            programName: document.getElementById('programName').value.trim(),
-            objektifProgram: document.getElementById('objektifProgram').value.trim(),
-            aktivitiProgram: textToArray(document.getElementById('aktivitiProgram').value),
-            penyelarasProgram: document.getElementById('penyelarasProgram').value.trim(),
-            tarikhMulaAkhir: document.getElementById('tarikhMulaAkhir').value.trim(),
-            penyelarasAktiviti: document.getElementById('penyelarasAktiviti').value.trim(),
-            tempat: document.getElementById('tempat').value.trim(),
-            sasaran: document.getElementById('sasaran').value.trim(),
-            kosSumber: document.getElementById('kosSumber').value.trim(),
-            jawatankuasa: document.getElementById('jawatankuasa').value.trim(),
-            ringkasanProgram: document.getElementById('ringkasanProgram').value.trim(),
-            
-            prosesPelaksanaan: collectTableData(),
-            updatedAt: serverTimestamp(),
-        };
-    }
-    
-    function setFormState(data) {
-        smartPrinciple.value = data.smartPrinciple || '';
-        entanglementMeasure.value = data.entanglementMeasure || '';
-        matlamatStrategik.value = data.matlamatStrategik || '';
-        strategiList.value = arrayToText(data.strategiList) || '';
-        
-        document.getElementById('programName').value = data.programName || '';
-        document.getElementById('objektifProgram').value = data.objektifProgram || '';
-        document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
-        document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
-        document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
-        document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
-        document.getElementById('tempat').value = data.tempat || '';
-        document.getElementById('sasaran').value = data.sasaran || '';
-        document.getElementById('kosSumber').value = data.kosSumber || '';
-        document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
-        document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
-
-        // Pelan Taktikal
-        pelanTaktikalTableBody.innerHTML = '';
-        if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
-            data.pelanTaktikal.forEach(row => createTaktikalProgramRow(row));
-            updateTaktikalProgramRowNumbers();
-        } else {
-            createTaktikalProgramRow({});
-            updateTaktikalProgramRowNumbers();
-        }
-        
-        // QSAM Matrix (Sync with Pelan Taktikal, then apply stored QSAM data)
-        syncQsamMatrix(data.pelanTaktikal, data.qsamData);
-
-        // Proses Pelaksanaan
-        tableBody.innerHTML = '';
-        if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
-            data.prosesPelaksanaan.forEach(row => createTableRow(row));
-            updateRowNumbers();
-        } else {
-            createTableRow({prosesKerja: ['']});
-            updateRowNumbers();
-        }
-
-        // Render Strategy Map after data is loaded
-        renderStrategyMap(data);
-    }
-    
-    // NEW FUNCTION: Renders the Strategy Map Visualization
-    function renderStrategyMap(data) {
-        // Data extraction and simplification for the map
-        const matlamat = data.matlamatStrategik || 'Tingkatkan penguasaan kefahaman konsep Sejarah dan lonjakkan pencapaian akademik (A > 30%).';
-        const entanglement = data.entanglementMeasure || 'Peningkatan 15% murid Band 4 ke atas dalam PBD, selaras dengan peningkatan penggunaan sumber digital oleh guru.';
-        const strategi = arrayToText(data.strategiList).replace(/\n/g, '<br>') || 'Strategi: Melaksanakan PAK21 konsisten, memperkasa kemahiran KBAT guru, memanfaatkan teknologi DELIMA.';
-        const initiatives = data.pelanTaktikal ? data.pelanTaktikal.map(p => p.namaProgram).join(', ') : 'Program: LITERASI DIGITAL & e-PORTFOLIO, PLC BERFOKUS, BENGKEL TEKNIK MENJAWAB KBAT.';
-
-        strategyMapDisplay.innerHTML = `
-            <div class="strategy-map-container">
-                
-                <!-- I. ULTIMATE IMPACT (RED) -->
-                <div class="strategy-perspective impact">
-                    <div class="perspective-title">I. ULTIMATE IMPACT (Vision Sekolah / Subjek)</div>
-                    <div class="perspective-content">${matlamat}</div>
-                </div>
-
-                <div class="strategy-arrow" title="Dicapai melalui..."></div>
-
-                <!-- II. STUDENT OUTCOME (AMBER) -->
-                <div class="strategy-perspective outcome">
-                    <div class="perspective-title">II. STUDENT OUTCOME (KPI Utama Entanglement Measurement)</div>
-                    <div class="perspective-content">${entanglement}</div>
-                </div>
-
-                <div class="strategy-arrow" title="Memerlukan proses..."></div>
-                
-                <!-- III. INTERNAL PROCESS (BLUE) -->
-                <div class="strategy-perspective process">
-                    <div class="perspective-title">III. INTERNAL PROCESS (Strategi & Pelaksanaan P&P)</div>
-                    <div class="perspective-content">${strategi}</div>
-                </div>
-
-                <div class="strategy-arrow" title="Disokong oleh..."></div>
-
-                <!-- IV. FOUNDATIONAL CAPACITY (GREEN) -->
-                <div class="strategy-perspective capacity">
-                    <div class="perspective-title">IV. FOUNDATIONAL CAPACITY (Program Taktikal / Sumber)</div>
-                    <div class="perspective-content">${initiatives}</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // QSAM CONTENT GENERATION
     function renderQsamAppendix() {
+        const appendixContent = document.getElementById('appendixContent');
+        if (!appendixContent) return; 
         appendixContent.innerHTML = `
             <div class="p-4 space-y-4">
                 <p class="text-sm font-semibold text-indigo-700">QSAM (Quantum Strategic Alignment Matrix) adalah alat pemantauan yang canggih untuk mengukur sumbangan setiap program taktik secara langsung kepada Matlamat Strategik utama ('Entanglement Measurement').</p>
@@ -641,147 +353,50 @@
         `;
     }
 
-    // --- TABLE MANAGEMENT FUNCTIONS (Remainging functions unchanged for brevity in thought process) ---
-    
-    function createTaktikalProgramRow(data = {}) {
-        programCounter++;
-        const row = pelanTaktikalTableBody.insertRow();
-        row.dataset.id = `taktikal-program-${programCounter}`;
+    function createQsamRow(programName, index, existingData = {}) {
+        const qsamMatrixTableBody = document.getElementById('qsamMatrixTableBody');
+        if (!qsamMatrixTableBody) return; 
+        const row = qsamMatrixTableBody.insertRow();
+        row.dataset.programName = programName;
         row.className = 'hover:bg-gray-50';
 
-        const rowData = {
-            bil: pelanTaktikalTableBody.rows.length,
-            namaProgram: data.namaProgram || '',
-            aktiviti: arrayToText(data.aktiviti || ['Aktiviti 1']),
-            tanggungJawab: data.tanggungJawab || '',
-            tempoh: data.tempoh || '',
-            kosSumber: data.kosSumber || '',
-            sasaran: data.sasaran || '',
-            outputOutcome: arrayToText(data.outputOutcome || ['Output/Outcome']),
-            pelanKontengensi: arrayToText(data.pelanKontengensi || ['Pelan Kontengensi']),
-            ...data
+        const data = {
+            bil: index, programName: programName, im: existingData.im || 5, ei: existingData.ei || 3, qra: existingData.qra || 50, tbs: existingData.tbs || 0, statusCatatan: existingData.statusCatatan || '', laporanKemajuan: existingData.laporanKemajuan || '', ...existingData
         };
 
         row.innerHTML = `
-            <td class="text-center font-medium program-bil">${rowData.bil}</td>
-            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="namaProgram">${rowData.namaProgram}</textarea></td>
-            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="aktiviti">${rowData.aktiviti}</textarea></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="tanggungJawab" value="${rowData.tanggungJawab}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="tempoh" value="${rowData.tempoh}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="kosSumber" value="${rowData.kosSumber}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="sasaran" value="${rowData.sasaran}"></td>
-            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="outputOutcome">${rowData.outputOutcome}</textarea></td>
-            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="pelanKontengensi">${rowData.pelanKontengensi}</textarea></td>
-            <td class="text-center">
-                <button type="button" class="text-red-500 hover:text-red-700 delete-program-taktikal-btn" title="Hapus">
-                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg>
-                </button>
-            </td>
+            <td class="text-center font-medium">${data.bil}</td>
+            <td><div class="font-medium text-gray-800">${data.programName}</div></td>
+            <td><input type="number" min="1" max="10" class="w-full focus:outline-none text-center qsam-score bg-yellow-50" data-field="im" value="${data.im}"></td>
+            <td><input type="number" min="0" max="5" class="w-full focus:outline-none text-center qsam-score bg-red-50" data-field="ei" value="${data.ei}"></td>
+            <td><input type="number" min="0" max="100" class="w-full focus:outline-none text-center qsam-score bg-teal-50" data-field="qra" value="${data.qra}"></td>
+            <td><input type="number" min="0" max="100" class="w-full focus:outline-none text-center qsam-score bg-indigo-50" data-field="tbs" value="${data.tbs}"></td>
+            <td><textarea rows="2" class="w-full focus:outline-none resize-none" data-field="statusCatatan">${data.statusCatatan}</textarea></td>
+            <td><textarea rows="2" class="w-full focus:outline-none resize-none" data-field="laporanKemajuan">${data.laporanKemajuan}</textarea></td>
         `;
-
-        row.querySelector('.delete-program-taktikal-btn').addEventListener('click', () => {
-            row.remove();
-            updateTaktikalProgramRowNumbers();
-        });
     }
 
-    function updateTaktikalProgramRowNumbers() {
-        Array.from(pelanTaktikalTableBody.rows).forEach((row, index) => {
-            row.cells[0].textContent = index + 1;
-        });
-    }
-
-    function collectPelanTaktikalData() {
-        const data = [];
-        Array.from(pelanTaktikalTableBody.rows).forEach(row => {
-            const rowData = {};
-            Array.from(row.querySelectorAll('[data-field]')).forEach(input => {
-                const fieldName = input.dataset.field;
-                let value = input.value.trim();
-                
-                if (['aktiviti', 'outputOutcome', 'pelanKontengensi'].includes(fieldName)) {
-                    value = textToArray(value);
-                }
-                rowData[fieldName] = value;
+    function syncQsamMatrix(pelanTaktikal, qsamData) {
+        const qsamMatrixTableBody = document.getElementById('qsamMatrixTableBody');
+        if (!qsamMatrixTableBody) return;
+        qsamMatrixTableBody.innerHTML = '';
+        const qsamMap = (qsamData || []).reduce((acc, item) => {
+            acc[item.programName] = item;
+            return acc;
+        }, {});
+        
+        if (Array.isArray(pelanTaktikal) && pelanTaktikal.length > 0) {
+            pelanTaktikal.forEach((program, index) => {
+                const existingQsam = qsamMap[program.namaProgram];
+                createQsamRow(program.namaProgram, index + 1, existingQsam);
             });
-            rowData.bil = parseInt(row.cells[0].textContent, 10);
-            data.push(rowData);
-        });
-        return data;
+        }
     }
     
-    function createTableRow(data = {}) {
-        const langkah = tableBody.rows.length + 1;
-        const row = tableBody.insertRow();
-        row.dataset.index = langkah;
-        row.className = 'hover:bg-gray-50';
-
-        const rowData = {
-            langkah: langkah,
-            prosesKerja: arrayToText(data.prosesKerja || ["Proses 1", "Proses 2"]),
-            tanggungJawab: data.tanggungJawab || '',
-            tarikhMulaAkhir: data.tarikhMulaAkhir || '',
-            kpi: data.kpi || '',
-            sasaran: data.sasaran || '',
-            status: data.status || 'Jelas',
-            ...data
-        };
-
-        const statusOptions = ['Jelas', 'Belum Mula', 'Sedang Jalan', 'Selesai', 'Laporan disemak'];
-
-        row.innerHTML = `
-            <td class="text-center font-medium">${rowData.langkah}</td>
-            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="prosesKerja">${rowData.prosesKerja}</textarea></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="tanggungJawab" value="${rowData.tanggungJawab}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="tarikhMulaAkhir" value="${rowData.tarikhMulaAkhir}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="kpi" value="${rowData.kpi}"></td>
-            <td><input type="text" class="w-full focus:outline-none" data-field="sasaran" value="${rowData.sasaran}"></td>
-            <td>
-                <select class="w-full p-1 border rounded" data-field="status">
-                    ${statusOptions.map(opt => `<option value="${opt}" ${rowData.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
-                </select>
-            </td>
-            <td class="text-center">
-                <button type="button" class="text-red-500 hover:text-red-700 delete-row-btn" title="Hapus">
-                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg>
-                </button>
-            </td>
-        `;
-
-        row.querySelector('.delete-row-btn').addEventListener('click', () => {
-            row.remove();
-            updateRowNumbers();
-        });
-    }
-
-    function updateRowNumbers() {
-        Array.from(tableBody.rows).forEach((row, index) => {
-            const rowNumber = index + 1;
-            row.cells[0].textContent = rowNumber;
-            row.dataset.index = rowNumber;
-        });
-    }
-
-    function collectTableData() {
-        const data = [];
-        Array.from(tableBody.rows).forEach(row => {
-            const rowData = {};
-            Array.from(row.querySelectorAll('[data-field]')).forEach(input => {
-                const fieldName = input.dataset.field;
-                let value = input.value.trim();
-                
-                if (fieldName === 'prosesKerja') {
-                    value = textToArray(value);
-                }
-                rowData[fieldName] = value;
-            });
-            rowData.langkah = parseInt(row.dataset.index, 10);
-            data.push(rowData);
-        });
-        return data;
-    }
-
     function collectQsamData() {
+        const qsamMatrixTableBody = document.getElementById('qsamMatrixTableBody');
+        if (!qsamMatrixTableBody) return currentPlanData.qsamData || [];
+
         const data = [];
         Array.from(qsamMatrixTableBody.rows).forEach(row => {
             const rowData = {
@@ -803,50 +418,887 @@
         return data;
     }
 
-    // NEW FUNCTION: Syncs QSAM rows with the Pelan Taktikal programs
-    function syncQsamMatrix(pelanTaktikal, qsamData) {
-        qsamMatrixTableBody.innerHTML = '';
-        const qsamMap = (qsamData || []).reduce((acc, item) => {
-            acc[item.programName] = item;
-            return acc;
-        }, {});
-        
-        if (Array.isArray(pelanTaktikal) && pelanTaktikal.length > 0) {
-            pelanTaktikal.forEach((program, index) => {
-                const existingQsam = qsamMap[program.namaProgram];
-                createQsamRow(program.namaProgram, index + 1, existingQsam);
-            });
-        }
-    }
 
-    function createQsamRow(programName, index, existingData = {}) {
-        const row = qsamMatrixTableBody.insertRow();
-        row.dataset.programName = programName;
+    // --- TABLE MANAGEMENT FUNCTIONS ---
+
+    function createTaktikalProgramRow(data = {}) {
+        const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
+        if (!pelanTaktikalTableBody) return;
+        programCounter++;
+        const row = pelanTaktikalTableBody.insertRow();
+        row.dataset.id = `taktikal-program-${programCounter}`;
         row.className = 'hover:bg-gray-50';
 
-        const data = {
-            bil: index,
-            programName: programName,
-            im: existingData.im || 5, // Impact Multiplier (1-10) Default: 5
-            ei: existingData.ei || 3, // Entanglement Index (0-5) Default: 3
-            qra: existingData.qra || 50, // Quantum Resource Allocation (%) Default: 50
-            tbs: existingData.tbs || 0, // T-Bound Score (%) Default: 0
-            statusCatatan: existingData.statusCatatan || '',
-            laporanKemajuan: existingData.laporanKemajuan || ''
+        const rowData = {
+            bil: pelanTaktikalTableBody.rows.length, namaProgram: data.namaProgram || '', aktiviti: arrayToText(data.aktiviti || ['Aktiviti 1']), tanggungJawab: data.tanggungJawab || '', tempoh: data.tempoh || '', kosSumber: data.kosSumber || '', sasaran: data.sasaran || '', outputOutcome: arrayToText(data.outputOutcome || ['Output/Outcome']), pelanKontengensi: arrayToText(data.pelanKontengensi || ['Pelan Kontengensi']), ...data
         };
 
         row.innerHTML = `
-            <td class="text-center font-medium">${data.bil}</td>
-            <td><div class="font-medium text-gray-800">${data.programName}</div></td>
-            <td><input type="number" min="1" max="10" class="w-full focus:outline-none text-center qsam-score bg-yellow-50" data-field="im" value="${data.im}"></td>
-            <td><input type="number" min="0" max="5" class="w-full focus:outline-none text-center qsam-score bg-red-50" data-field="ei" value="${data.ei}"></td>
-            <td><input type="number" min="0" max="100" class="w-full focus:outline-none text-center qsam-score bg-teal-50" data-field="qra" value="${data.qra}"></td>
-            <td><input type="number" min="0" max="100" class="w-full focus:outline-none text-center qsam-score bg-indigo-50" data-field="tbs" value="${data.tbs}"></td>
-            <td><textarea rows="2" class="w-full focus:outline-none resize-none" data-field="statusCatatan">${data.statusCatatan}</textarea></td>
-            <td><textarea rows="2" class="w-full focus:outline-none resize-none" data-field="laporanKemajuan">${data.laporanKemajuan}</textarea></td>
+            <td class="text-center font-medium program-bil">${rowData.bil}</td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="namaProgram">${rowData.namaProgram}</textarea></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="aktiviti">${rowData.aktiviti}</textarea></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tanggungJawab" value="${rowData.tanggungJawab}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tempoh" value="${rowData.tempoh}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="kosSumber" value="${rowData.kosSumber}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="sasaran" value="${rowData.sasaran}"></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="outputOutcome">${rowData.outputOutcome}</textarea></td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="pelanKontengensi">${rowData.pelanKontengensi}</textarea></td>
+            <td class="text-center">
+                <button type="button" class="text-red-500 hover:text-red-700 delete-program-taktikal-btn" title="Hapus"><svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg></button>
+            </td>
+        `;
+
+        row.querySelector('.delete-program-taktikal-btn').addEventListener('click', () => {
+            row.remove();
+            updateTaktikalProgramRowNumbers();
+        });
+    }
+    
+    function collectPelanTaktikalData() {
+        const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
+        if (!pelanTaktikalTableBody) return currentPlanData.pelanTaktikal || [];
+        const data = [];
+        Array.from(pelanTaktikalTableBody.rows).forEach(row => {
+            const rowData = {};
+            Array.from(row.querySelectorAll('[data-field]')).forEach(input => {
+                const fieldName = input.dataset.field;
+                let value = input.value.trim();
+                if (['aktiviti', 'outputOutcome', 'pelanKontengensi'].includes(fieldName)) {
+                    value = textToArray(value);
+                }
+                rowData[fieldName] = value;
+            });
+            rowData.bil = parseInt(row.cells[0].textContent, 10);
+            data.push(rowData);
+        });
+        return data;
+    }
+
+    function updateTaktikalProgramRowNumbers() {
+        const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
+        if (!pelanTaktikalTableBody) return;
+        Array.from(pelanTaktikalTableBody.rows).forEach((row, index) => {
+            row.cells[0].textContent = index + 1;
+        });
+    }
+    
+    function createTableRow(data = {}) {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        const langkah = tableBody.rows.length + 1;
+        const row = tableBody.insertRow();
+        row.dataset.index = langkah;
+        row.className = 'hover:bg-gray-50';
+
+        const rowData = {
+            langkah: langkah, prosesKerja: arrayToText(data.prosesKerja || ["Proses 1", "Proses 2"]), tanggungJawab: data.tanggungJawab || '', tarikhMulaAkhir: data.tarikhMulaAkhir || '', kpi: data.kpi || '', sasaran: data.sasaran || '', status: data.status || 'Jelas', ...data
+        };
+
+        const statusOptions = ['Jelas', 'Belum Mula', 'Sedang Jalan', 'Selesai', 'Laporan disemak'];
+
+        row.innerHTML = `
+            <td class="text-center font-medium">${rowData.langkah}</td>
+            <td><textarea rows="3" class="w-full focus:outline-none resize-none" data-field="prosesKerja">${rowData.prosesKerja}</textarea></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tanggungJawab" value="${rowData.tanggungJawab}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="tarikhMulaAkhir" value="${rowData.tarikhMulaAkhir}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="kpi" value="${rowData.kpi}"></td>
+            <td><input type="text" class="w-full focus:outline-none" data-field="sasaran" value="${rowData.sasaran}"></td>
+            <td>
+                <select class="w-full p-1 border rounded" data-field="status">
+                    ${statusOptions.map(opt => `<option value="${opt}" ${rowData.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+            </td>
+            <td class="text-center">
+                <button type="button" class="text-red-500 hover:text-red-700 delete-row-btn" title="Hapus"><svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg></button>
+            </td>
+        `;
+
+        row.querySelector('.delete-row-btn').addEventListener('click', () => {
+            row.remove();
+            updateRowNumbers();
+        });
+    }
+
+    function updateRowNumbers() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        Array.from(tableBody.rows).forEach((row, index) => {
+            const rowNumber = index + 1;
+            row.cells[0].textContent = rowNumber;
+            row.dataset.index = rowNumber;
+        });
+    }
+
+    function collectTableData() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return currentPlanData.prosesPelaksanaan || [];
+        const data = [];
+        Array.from(tableBody.rows).forEach(row => {
+            const rowData = {};
+            Array.from(row.querySelectorAll('[data-field]')).forEach(input => {
+                const fieldName = input.dataset.field;
+                let value = input.value.trim();
+                if (fieldName === 'prosesKerja') {
+                    value = textToArray(value);
+                }
+                rowData[fieldName] = value;
+            });
+            rowData.langkah = parseInt(row.dataset.index, 10);
+            data.push(rowData);
+        });
+        return data;
+    }
+
+    // --- STRATEGY MAP AND DASHBOARD RENDERING ---
+    
+    function renderStrategyMap(data) {
+        // Data extraction and simplification for the map
+        const matlamat = data.matlamatStrategik || 'Tingkatkan penguasaan kefahaman konsep Sejarah dan lonjakkan pencapaian akademik (A > 30%).';
+        const entanglement = data.entanglementMeasure || 'Peningkatan 15% murid Band 4 ke atas dalam PBD, selaras dengan peningkatan penggunaan sumber digital oleh guru.';
+        const strategi = arrayToText(data.strategiList).replace(/\n/g, '<br>') || 'Strategi: Melaksanakan PAK21 konsisten, memperkasa kemahiran KBAT guru, memanfaatkan teknologi DELIMA.';
+        const initiatives = data.pelanTaktikal ? data.pelanTaktikal.map(p => p.namaProgram).join(', ') : 'Program: LITERASI DIGITAL & e-PORTFOLIO, PLC BERFOKUS, BENGKEL TEKNIK MENJAWAB KBAT.';
+
+        const strategyMapDisplay = document.getElementById('strategyMapDisplay');
+        if (!strategyMapDisplay) return;
+
+        strategyMapDisplay.innerHTML = `
+            <div class="strategy-map-container">
+                
+                <!-- I. ULTIMATE IMPACT (RED) -->
+                <div class="strategy-perspective impact">
+                    <div class="perspective-title font-bold text-red-700 block text-sm">I. ULTIMATE IMPACT (Vision Sekolah / Subjek)</div>
+                    <div class="perspective-content">${matlamat}</div>
+                </div>
+
+                <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+
+                <!-- II. STUDENT OUTCOME (AMBER) -->
+                <div class="strategy-perspective outcome">
+                    <div class="perspective-title font-bold text-yellow-700 block text-sm">II. STUDENT OUTCOME (KPI Utama Entanglement Measurement)</div>
+                    <div class="perspective-content">${entanglement}</div>
+                </div>
+
+                <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+                
+                <!-- III. INTERNAL PROCESS (BLUE) -->
+                <div class="strategy-perspective process">
+                    <div class="perspective-title font-bold text-blue-700 block text-sm">III. INTERNAL PROCESS (Strategi & Pelaksanaan P&P)</div>
+                    <div class="perspective-content">${strategi}</div>
+                </div>
+
+                <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+
+                <!-- IV. FOUNDATIONAL CAPACITY (GREEN) -->
+                <div class="strategy-perspective capacity">
+                    <div class="perspective-title font-bold text-green-700 block text-sm">IV. FOUNDATIONAL CAPACITY (Program Taktikal / Sumber)</div>
+                    <div class="perspective-content">${initiatives}</div>
+                </div>
+            </div>
         `;
     }
 
+    function renderStrategicDashboardView(data) {
+        const matlamat = data.matlamatStrategik || 'Tiada Matlamat Ditetapkan.';
+        const entanglement = data.entanglementMeasure || 'Tiada Metrik Entanglement Ditetapkan.';
+        const strategi = arrayToText(data.strategiList).replace(/\n/g, '<br>') || 'Tiada Strategi Ditetapkan.';
+        const initiatives = data.pelanTaktikal ? data.pelanTaktikal.map(p => p.namaProgram).join(', ') : 'Tiada Program Taktikal Ditetapkan.';
+        
+        const qsam = data.qsamData || [];
+        const totalEI = qsam.reduce((sum, item) => sum + item.ei, 0);
+        const totalQRA = qsam.reduce((sum, item) => sum + item.qra, 0);
+        const totalTBS = qsam.reduce((sum, item) => sum + item.tbs, 0);
+
+        const avgEI = qsam.length > 0 ? (totalEI / qsam.length).toFixed(1) : 0;
+        const avgQRA = qsam.length > 0 ? Math.round(totalQRA / qsam.length) : 0;
+        const avgTBS = qsam.length > 0 ? Math.round(totalTBS / qsam.length) : 0;
+        
+        let healthMessage;
+        let healthColorClass;
+        if (avgTBS > avgQRA + 10) { 
+             healthMessage = `TBS (${avgTBS}%) jauh lebih tinggi dari QRA (${avgQRA}%) - **EFISIENSI TINGGI**`;
+             healthColorClass = 'bg-green-100 text-green-700 border-green-300';
+        } else if (avgTBS < avgQRA - 10) { 
+             healthMessage = `TBS (${avgTBS}%) jauh lebih rendah dari QRA (${avgQRA}%) - **TINDAKAN DIPERLUKAN**`;
+             healthColorClass = 'bg-red-100 text-red-700 border-red-300';
+        } else {
+             healthMessage = `TBS (${avgTBS}%) sejajar dengan QRA (${avgQRA}%) - **DI ATAS LANDASAN**`;
+             healthColorClass = 'bg-yellow-100 text-yellow-700 border-yellow-300';
+        }
+
+        // QSAM Program List Rendering (sorted by EI descending)
+        const qsamProgramListHtml = qsam.sort((a, b) => b.ei - a.ei).map(program => {
+            const eiBadge = program.ei >= 4 ? `<span class="qsam-badge ei-high">EI: ${program.ei}/5</span>` : `<span class="qsam-badge bg-gray-200 text-gray-700">EI: ${program.ei}/5</span>`;
+            const imBadge = program.im >= 7 ? `<span class="qsam-badge im-high">IM: ${program.im}/10</span>` : '';
+            
+            let healthColor;
+            if (program.tbs > program.qra + 10) { healthColor = 'text-green-600'; } 
+            else if (program.tbs < program.qra - 10) { healthColor = 'text-red-600'; } 
+            else { healthColor = 'text-yellow-600'; } 
+
+            return `
+                <div class="qsam-item">
+                    <div class="qsam-name">${program.programName}</div>
+                    <div class="flex items-center text-sm">
+                        ${imBadge}
+                        ${eiBadge}
+                        <span class="ml-4 font-bold ${healthColor}">TBS/QRA: ${program.tbs}% / ${program.qra}%</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Final Dashboard HTML structure
+        return `
+            <div class="dashboard-container grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- COLUMN 1: STRATEGIC FOCUS & FLOW (Strategy Map) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="dashboard-card p-6">
+                        <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13l3.7 3.7a1 1 0 001.4 0L10 14m9-9l-1 1-3.7 3.7a1 1 0 00-1.4 0L10 14m0 0l-7 7"></path></svg>
+                            1. Matlamat Strategik & Entanglement KPI
+                        </h3>
+                        <p class="text-lg font-semibold text-gray-800 mb-4">${matlamat}</p>
+                        <div class="bg-teal-50 p-4 border border-teal-300 rounded-lg">
+                            <p class="font-bold text-teal-700">Entanglement Measurement (KPI Utama):</p>
+                            <p class="text-sm text-teal-600">${entanglement}</p>
+                        </div>
+                    </div>
+
+                    <!-- Strategy Map Visual Flow -->
+                    <div class="dashboard-card p-6 dashboard-map">
+                        <h3 class="text-xl font-bold text-blue-600 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            2. Peta Strategi (Cause & Effect Flow)
+                        </h3>
+                        <div class="flex flex-col items-center">
+                            <div class="strategy-map-perspective impact w-full text-center">
+                                <span class="font-bold text-red-700 block">I. ULTIMATE IMPACT</span>${matlamat}
+                            </div>
+                            <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+                            <div class="strategy-map-perspective outcome w-full text-center">
+                                <span class="font-bold text-yellow-700 block">II. STUDENT OUTCOME (KPI)</span>${entanglement}
+                            </div>
+                            <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+                            <div class="strategy-map-perspective process w-full">
+                                <span class="font-bold text-blue-700 block">III. INTERNAL PROCESS</span><ul class="list-disc list-inside text-sm pl-2">${data.strategiList.map(s => `<li>${s}</li>`).join('')}</ul>
+                            </div>
+                            <div class="map-arrow flex justify-center h-4"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7"></path></svg></div>
+                            <div class="strategy-map-perspective capacity w-full">
+                                <span class="font-bold text-green-700 block">IV. FOUNDATIONAL CAPACITY</span>Program: ${data.pelanTaktikal.map(p => p.namaProgram).join(', ')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 2: QSAM METRICS & HEALTH -->
+                <div class="lg:col-span-1 space-y-6">
+                    
+                    <!-- KPI Average Score Snapshot -->
+                    <div class="dashboard-card p-6">
+                        <h3 class="text-xl font-bold text-indigo-700 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            3. QSAM Health Snapshot (Average)
+                        </h3>
+                        <div class="flex justify-around items-center space-x-4">
+                            <div class="flex flex-col items-center">
+                                <div class="kpi-circle ei-score">${avgEI}</div>
+                                <p class="text-xs mt-2 font-semibold text-gray-600 text-center">Entanglement Index (EI / 5)</p>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="kpi-circle qra-score">${avgQRA}%</div>
+                                <p class="text-xs mt-2 font-semibold text-gray-600 text-center">Resource Allocation (QRA)</p>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="kpi-circle tbs-score">${avgTBS}%</div>
+                                <p class="text-xs mt-2 font-semibold text-gray-600 text-center">T-Bound Score (TBS)</p>
+                            </div>
+                        </div>
+                        <div class="p-3 mt-4 rounded-lg font-semibold text-sm ${healthColorClass}">
+                            **Health Check:** ${healthMessage}.
+                        </div>
+                    </div>
+
+                    <!-- QSAM Program Breakdown -->
+                    <div class="dashboard-card p-6">
+                        <h3 class="text-xl font-bold text-purple-700 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.986.602 2.219.143 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            4. Program Tactical Health (QSAM)
+                        </h3>
+                        <div id="qsamProgramList" class="space-y-2">${qsamProgramListHtml}</div>
+                        <p class="text-xs text-gray-500 mt-4">**Legend:** EI: Entanglement Index (Strategic Alignment). IM: Impact Multiplier (Potential Leverage).</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- DATA HANDLING (Form State and Setters) ---
+
+    function getFormState() {
+        const state = {};
+        
+        // 1. Static Inputs
+        state.smartPrinciple = document.getElementById('smartPrinciple')?.value.trim() || '';
+        state.entanglementMeasure = document.getElementById('entanglementMeasure')?.value.trim() || '';
+        state.matlamatStrategik = document.getElementById('matlamatStrategik')?.value.trim() || '';
+        state.strategiList = textToArray(document.getElementById('strategiList')?.value) || [];
+        
+        state.programName = document.getElementById('programName')?.value.trim() || '';
+        state.objektifProgram = document.getElementById('objektifProgram')?.value.trim() || '';
+        state.aktivitiProgram = textToArray(document.getElementById('aktivitiProgram')?.value) || [];
+        state.penyelarasProgram = document.getElementById('penyelarasProgram')?.value.trim() || '';
+        state.tarikhMulaAkhir = document.getElementById('tarikhMulaAkhir')?.value.trim() || '';
+        state.penyelarasAktiviti = document.getElementById('penyelarasAktiviti')?.value.trim() || '';
+        state.tempat = document.getElementById('tempat')?.value.trim() || '';
+        state.sasaran = document.getElementById('sasaran')?.value.trim() || '';
+        state.kosSumber = document.getElementById('kosSumber')?.value.trim() || '';
+        state.jawatankuasa = document.getElementById('jawatankuasa')?.value.trim() || '';
+        state.ringkasanProgram = document.getElementById('ringkasanProgram')?.value.trim() || '';
+
+        // 2. Dynamic Tables
+        state.pelanTaktikal = collectPelanTaktikalData();
+        state.qsamData = collectQsamData();
+        state.prosesPelaksanaan = collectTableData();
+        state.updatedAt = serverTimestamp();
+        
+        return state;
+    }
+    
+    function setFormState(data) {
+        currentPlanData = data; 
+
+        // 1. Populate static inputs (must be done after dynamic content is rendered)
+        if (document.getElementById('smartPrinciple')) document.getElementById('smartPrinciple').value = data.smartPrinciple || '';
+        if (document.getElementById('entanglementMeasure')) document.getElementById('entanglementMeasure').value = data.entanglementMeasure || '';
+        if (document.getElementById('matlamatStrategik')) document.getElementById('matlamatStrategik').value = data.matlamatStrategik || '';
+        if (document.getElementById('strategiList')) document.getElementById('strategiList').value = arrayToText(data.strategiList) || '';
+        
+        if (document.getElementById('programName')) document.getElementById('programName').value = data.programName || '';
+        if (document.getElementById('objektifProgram')) document.getElementById('objektifProgram').value = data.objektifProgram || '';
+        if (document.getElementById('aktivitiProgram')) document.getElementById('aktivitiProgram').value = arrayToText(data.aktivitiProgram) || '';
+        if (document.getElementById('penyelarasProgram')) document.getElementById('penyelarasProgram').value = data.penyelarasProgram || '';
+        if (document.getElementById('tarikhMulaAkhir')) document.getElementById('tarikhMulaAkhir').value = data.tarikhMulaAkhir || '';
+        if (document.getElementById('penyelarasAktiviti')) document.getElementById('penyelarasAktiviti').value = data.penyelarasAktiviti || '';
+        if (document.getElementById('tempat')) document.getElementById('tempat').value = data.tempat || '';
+        if (document.getElementById('sasaran')) document.getElementById('sasaran').value = data.sasaran || '';
+        if (document.getElementById('kosSumber')) document.getElementById('kosSumber').value = data.kosSumber || '';
+        if (document.getElementById('jawatankuasa')) document.getElementById('jawatankuasa').value = data.jawatankuasa || '';
+        if (document.getElementById('ringkasanProgram')) document.getElementById('ringkasanProgram').value = data.ringkasanProgram || '';
+
+        // 2. Populate dynamic tables (calls to table functions handle innerHTML setting)
+        const pelanTaktikalTableBody = document.getElementById('pelanTaktikalTableBody');
+        if (pelanTaktikalTableBody) {
+             pelanTaktikalTableBody.innerHTML = '';
+             if (Array.isArray(data.pelanTaktikal) && data.pelanTaktikal.length > 0) {
+                 data.pelanTaktikal.forEach(row => createTaktikalProgramRow(row));
+                 updateTaktikalProgramRowNumbers();
+             } else {
+                 createTaktikalProgramRow({});
+                 updateTaktikalProgramRowNumbers();
+             }
+        }
+        
+        syncQsamMatrix(data.pelanTaktikal, data.qsamData);
+
+        const tableBody = document.getElementById('tableBody');
+        if (tableBody) {
+            tableBody.innerHTML = '';
+            if (Array.isArray(data.prosesPelaksanaan) && data.prosesPelaksanaan.length > 0) {
+                data.prosesPelaksanaan.forEach(row => createTableRow(row));
+                updateRowNumbers();
+            } else {
+                createTableRow({prosesKerja: ['']});
+                updateRowNumbers();
+            }
+        }
+
+        // 3. Render visuals
+        if (document.getElementById('strategyMapDisplay')) renderStrategyMap(data);
+    }
+    
+    // --- VIEW MANAGEMENT ---
+
+    function setView(mode) {
+        if (!currentSubject) {
+            showMessage("Sila pilih subjek terlebih dahulu untuk melihat dashboard.", 'error');
+            return;
+        }
+
+        if (mode === 'edit') {
+            dynamicPlanContent.innerHTML = getEditViewHTML();
+            saveSection.classList.remove('hidden');
+            setFormState(currentPlanData); 
+            
+            // Re-attach listeners for dynamic tables
+            if (document.getElementById('addRowButton')) document.getElementById('addRowButton').addEventListener('click', () => { createTableRow({}); updateRowNumbers(); });
+            if (document.getElementById('addTaktikalProgramButton')) document.getElementById('addTaktikalProgramButton').addEventListener('click', () => { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); });
+             
+            if (document.getElementById('syncQsamButton')) document.getElementById('syncQsamButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                const pelanTaktikal = collectPelanTaktikalData();
+                const currentQsam = collectQsamData();
+                syncQsamMatrix(pelanTaktikal, currentQsam);
+                showMessage("Matriks QSAM disegerakkan dengan senarai Program Taktikal.", 'info');
+            });
+
+            // Re-attach input listeners for map update
+            if (document.getElementById('matlamatStrategik')) document.getElementById('matlamatStrategik').addEventListener('input', () => renderStrategyMap(getFormState()));
+            if (document.getElementById('entanglementMeasure')) document.getElementById('entanglementMeasure').addEventListener('input', () => renderStrategyMap(getFormState()));
+            if (document.getElementById('strategiList')) document.getElementById('strategiList').addEventListener('input', () => renderStrategyMap(getFormState()));
+            
+            // Re-attach appendix listener
+            if (document.getElementById('toggleAppendixButton')) document.getElementById('toggleAppendixButton').addEventListener('click', () => {
+                const appendixContent = document.getElementById('appendixContent');
+                const appendixArrow = document.getElementById('appendixArrow');
+                const isOpen = appendixContent.classList.toggle('open');
+                appendixArrow.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+            renderQsamAppendix();
+            
+        } else if (mode === 'dashboard') {
+            dynamicPlanContent.innerHTML = renderStrategicDashboardView(getFormState());
+            saveSection.classList.add('hidden');
+        }
+    }
+
+    // --- HTML TEMPLATES FOR VIEWS ---
+
+    function getEditViewHTML() {
+        return `
+            <!-- Section 0.2: Analisis Quantum SMART (Prinsip Teras) -->
+            <h3 class="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Analisis Quantum SMART (Prinsip Teras)</h3>
+            <div class="overflow-x-auto mb-8 p-4 border border-teal-200 rounded-lg bg-teal-50">
+                <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/5 bg-teal-100 font-medium">Quantum SMART Principle</th>
+                            <td colspan="3"><textarea id="smartPrinciple" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan bagaimana setiap program taktik memenuhi prinsip SMART. Contoh: Semua KPI (Measurable) mestilah boleh dicapai (Achievable) dalam tempoh (Time-bound) yang ditetapkan."></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-teal-100 font-medium">Entanglement Measurement</th>
+                            <td colspan="3"><textarea id="entanglementMeasure" rows="3" class="w-full focus:outline-none resize-none" placeholder="Terangkan metrik utama yang mengukur kejayaan holistik program ini. Contoh: Peningkatan 15% Gred A merentasi semua tingkatan dalam tempoh 6 bulan, diukur melalui ujian PBD dan Peperiksaan Pertengahan Tahun."></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 0.5: Strategic Goals Table -->
+            <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">Matlamat & Strategi</h3>
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/5 bg-red-100 font-medium">MATLAMAT STRATEGIK</th>
+                            <td colspan="3"><textarea id="matlamatStrategik" rows="2" class="w-full focus:outline-none resize-none"></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-red-100 font-medium">STRATEGI</th>
+                            <td colspan="3"><textarea id="strategiList" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- SECTION 0.6: VISUAL STRATEGY MAP (LIVE PREVIEW) -->
+            <h3 class="text-xl font-semibold text-blue-600 mb-4 border-b pb-2">Peta Strategi Visual (Strategic Outcome Flow) - Live Preview</h3>
+            <div id="strategyMapDisplay" class="mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
+                <!-- Content will be rendered here by JS function renderStrategyMap() -->
+            </div>
+
+            <!-- Section 0.7: Pelan Taktikal (Senarai Program) -->
+            <h3 class="text-xl font-semibold text-purple-600 mb-4 border-b pb-2">Pelan Taktikal (Senarai Program)</h3>
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto-layout border-collapse border border-gray-200" id="pelanTaktikalTable" style="width: 1800px;">
+                    <thead>
+                        <tr class="bg-purple-50 text-gray-600 uppercase text-xs">
+                            <th style="width: 30px;" class="text-center">Bil</th>
+                            <th style="width: 150px;">Nama Program</th>
+                            <th style="width: 250px;">Aktiviti</th>
+                            <th style="width: 150px;">Tanggungjawab</th>
+                            <th style="width: 100px;">Tempoh / Hari / Kekerapan</th>
+                            <th style="width: 80px;">Kos / Sumber</th>
+                            <th style="width: 150px;">Sasaran</th>
+                            <th style="width: 200px;">Output / Outcome / Benefit</th>
+                            <th style="width: 200px;">Pelan Kontengensi</th>
+                            <th style="width: 50px;" class="text-center">Padam</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pelanTaktikalTableBody"></tbody>
+                </table>
+                <button id="addTaktikalProgramButton" class="bg-purple-500 text-white px-3 py-1 mt-2 text-sm rounded-lg hover:bg-purple-600 transition duration-150 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Program Taktikal
+                </button>
+            </div>
+            
+            <!-- Quantum Strategic Alignment Matrix (QSAM) -->
+            <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">3. Matriks Penjajaran Strategik Quantum (QSAM) - Pemantauan Outcome</h3>
+            <p class="text-sm text-gray-600 mb-4">QSAM mengukur Entanglement Index (EI) setiap program taktik dengan Matlamat Strategik. Skala EI (0-5), di mana 5 = Impak Tinggi kepada KPI utama.</p>
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto-layout border-collapse border border-gray-200" id="qsamMatrixTable" style="width: 1500px;">
+                    <thead>
+                        <tr class="bg-green-100 text-gray-700 uppercase text-xs">
+                            <th style="width: 30px;" class="text-center">Bil</th>
+                            <th style="width: 250px;">Nama Program Taktikal</th>
+                            <th style="width: 80px;">Impact Multiplier (IM) (1-10)</th>
+                            <th style="width: 150px;">Entanglement Index (EI) (0-5)</th>
+                            <th style="width: 150px;">Quantum Resource Allocation (QRA) (%)</th>
+                            <th style="width: 150px;">T-Bound Score (TBS) (%)</th>
+                            <th style="width: 150px;">Status / Catatan Penjajaran</th>
+                            <th style="width: 150px;">Laporan Kemajuan Output (Terbaru)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qsamMatrixTableBody"></tbody>
+                </table>
+                <button id="syncQsamButton" class="bg-blue-500 text-white px-3 py-1 mt-2 text-sm rounded-lg hover:bg-blue-600 transition duration-150 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Segerak QSAM (Sync Program List)
+                </button>
+            </div>
+
+            <!-- APPENDIX SECTION -->
+            <div class="border-t pt-4 mt-8">
+                <button id="toggleAppendixButton" class="w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700 rounded-lg flex justify-between items-center transition duration-150">
+                    <span>LAMPIRAN A: Penjelasan Matriks Penjajaran Strategik Quantum (QSAM)</span>
+                    <svg id="appendixArrow" class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="appendixContent" class="bg-gray-50 border border-gray-200 rounded-b-lg"></div>
+            </div>
+
+            <!-- Section 1: Butiran Program (Static Header Info - Now less relevant due to tactical table) -->
+            <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2 mt-8">Butiran Program (Untuk Pelan Am)</h3>
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto-layout border-collapse border border-gray-200" style="width: 1000px;">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Nama Program</th>
+                            <td colspan="3"><input type="text" id="programName" class="w-full focus:outline-none" value=""></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Objektif Program</th>
+                            <td colspan="3"><textarea id="objektifProgram" rows="3" class="w-full focus:outline-none resize-none"></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Aktiviti Program</th>
+                            <td colspan="3"><textarea id="aktivitiProgram" rows="5" class="w-full focus:outline-none resize-none"></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Program</th>
+                            <td class="w-2/5"><input type="text" id="penyelarasProgram" class="w-full focus:outline-none" value=""></td>
+                            <th class="w-1/5 bg-gray-100 font-medium">Tarikh Mula - Akhir</th>
+                            <td class="w-1/5"><input type="text" id="tarikhMulaAkhir" class="w-full focus:outline-none" value=""></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Penyelaras Aktiviti</th>
+                            <td><input type="text" id="penyelarasAktiviti" class="w-full focus:outline-none" value=""></td>
+                            <th class="w-1/5 bg-gray-100 font-medium">Tempat</th>
+                            <td><input type="text" id="tempat" class="w-full focus:outline-none" value=""></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Sasaran</th>
+                            <td><input type="text" id="sasaran" class="w-full focus:outline-none" value=""></td>
+                            <th class="w-1/5 bg-gray-100 font-medium">Kos dan Sumber</th>
+                            <td><input type="text" id="kosSumber" class="w-full focus:outline-none" value=""></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Jawatankuasa</th>
+                            <td colspan="3"><input type="text" id="jawatankuasa" class="w-full focus:outline-none" value=""></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/5 bg-gray-100 font-medium">Ringkasan Program</th>
+                            <td colspan="3"><textarea id="ringkasanProgram" rows="4" class="w-full focus:outline-none resize-none"></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 2: Proses Pelaksanaan Table (Proses Kerja) -->
+            <h3 class="text-xl font-semibold text-indigo-600 mb-4 border-b pb-2">Proses Pelaksanaan (Langkah-langkah)</h3>
+            
+            <div class="overflow-x-auto mb-4">
+                <table class="table-auto-layout border-collapse border border-gray-200" id="prosesPelaksanaanTable" style="width: 1200px;">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
+                            <th style="width: 50px;">Langkah</th>
+                            <th style="width: 250px;">Proses Kerja</th>
+                            <th style="width: 150px;">Tanggungjawab</th> 
+                            <th style="width: 150px;">Tarikh Mula-Akhir</th> 
+                            <th style="width: 150px;">KPI</th>
+                            <th style="width: 150px;">Sasaran</th>
+                            <th style="width: 120px;">Status</th> 
+                            <th style="width: 80px;">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            
+            <!-- Table Action Buttons -->
+            <div class="flex justify-between items-center mb-6">
+                <button id="addRowButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition duration-150 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Langkah
+                </button>
+            </div>
+        `;
+    }
+
+    // --- FIREBASE LOAD/SAVE LOGIC ---
+
+    async function loadTemplateData(path, saveIfMissing = false) {
+        try {
+            const docSnap = await getDoc(doc(db, path));
+            if (docSnap.exists()) {
+                masterTemplateCache = docSnap.data();
+                return true;
+            } else {
+                masterTemplateCache = DEFAULT_MASTER_DATA;
+                if (saveIfMissing) {
+                    await savePlan(null, path); 
+                }
+                return false;
+            }
+        } catch (error) {
+             console.error(`Error processing path ${path}:`, error);
+             masterTemplateCache = DEFAULT_MASTER_DATA;
+             return false;
+        }
+    }
+
+
+    async function loadPlan(subject, isAdminTemplateLoad = false) {
+        if (!isAuthReady || !db || !subject) { planEditorContainer.classList.add('hidden'); return; }
+        currentSubject = subject;
+        if (!isAdminTemplateLoad) { pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`; }
+        planEditorContainer.classList.remove('hidden');
+        
+        loadingOverlay.classList.remove('hidden'); 
+        loadingMessage.textContent = `Memuatkan data untuk ${subject}...`;
+        
+        const path = getPlanDocPath(subject);
+        
+        try {
+            const docSnap = await getDoc(doc(db, path));
+            let data;
+            if (docSnap.exists()) {
+                data = docSnap.data();
+                showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan.`, 'success');
+            } else if (!isAdminTemplateLoad) {
+                data = JSON.parse(JSON.stringify(masterTemplateCache)); 
+                showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
+            } else {
+                data = masterTemplateCache;
+            }
+            currentPlanData = data; 
+            setView('edit'); 
+            setFormState(data);
+
+            saveButton.textContent = isAdminTemplateLoad ? 'Simpan Templat Induk' : 'Simpan Pelan Operasi';
+
+        } catch (error) {
+            console.error("Error fetching or loading plan data:", error);
+            showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan templat Master.`, 'error');
+            setView('edit');
+            setFormState(masterTemplateCache);
+        } finally { 
+            loadingOverlay.classList.add('hidden'); 
+            loadingMessage.textContent = 'Memulakan Aplikasi...'; // Reset
+        }
+    }
+
+
+    async function savePlan(e, specificPath = null) {
+        if (e) e.preventDefault();
+        
+        const savePath = specificPath || getPlanDocPath(currentSubject);
+        const subjectName = specificPath === MASTER_TEMPLATE_PATH ? 'Templat Induk' : currentSubject;
+
+        if (!isAuthReady || !db || !subjectName) {
+            showMessage("Sila pilih subjek atau sahkan templat.", 'error');
+            return;
+        }
+        
+        if (!isAuthReady) {
+            showMessage("Gagal menyimpan: Aplikasi berada dalam MOD TEMPATAN (LOCAL MODE). Sambungan pangkalan data diperlukan.", 'error');
+            return;
+        }
+
+
+        saveButton.disabled = true;
+        saveButton.textContent = `Menyimpan ${subjectName}...`;
+
+        try {
+            const staticData = getFormState();
+            currentPlanData = staticData; 
+            
+            const planRef = doc(db, savePath);
+            await setDoc(planRef, staticData);
+            
+            showMessage(`Pelan Strategik untuk ${subjectName} berjaya disimpan!`, 'success');
+
+        } catch (error) {
+            console.error("Error saving plan:", error);
+            showMessage(`Gagal menyimpan: ${error.message}. SEMAK PERATURAN KESELAMATAN FIREBASE.`, 'error');
+        } finally {
+            saveButton.disabled = false;
+            saveButton.textContent = specificPath === MASTER_TEMPLATE_PATH ? 'Simpan Templan Induk' : 'Simpan Pelan Operasi';
+        }
+    }
+    
+    // --- FIREBASE INITIALIZATION AND AUTH ---
+
+    async function loadSubjectList(selectSubject = null) {
+        if (!isAuthReady || !db) return;
+
+        const subjectListMessage = document.getElementById('subjectListMessage');
+        const subjectSelector = document.getElementById('subjectSelector');
+
+        subjectListMessage.classList.remove('hidden');
+        subjectListMessage.textContent = 'Memuatkan senarai subjek...';
+        subjectSelector.innerHTML = '<option value="" disabled selected>--- Memuatkan... ---</option>';
+
+        try {
+            const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
+            const docSnap = await getDoc(subjectsRef);
+            let subjects = [];
+            
+            if (!docSnap.exists() || !Array.isArray(docSnap.data()?.subjects) || docSnap.data().subjects.length === 0) {
+                 subjects = ["Sejarah", "Matematik", "Sains", "Bahasa Inggeris", "Pendidikan Islam"];
+                 await setDoc(subjectsRef, { subjects: subjects });
+            } else {
+                subjects = docSnap.data().subjects;
+            }
+
+            subjectSelector.innerHTML = '<option value="" disabled selected>--- Sila Pilih Subjek ---</option>';
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelector.appendChild(option);
+            });
+            
+            subjectListMessage.classList.add('hidden');
+
+            if (selectSubject) {
+                subjectSelector.value = selectSubject;
+                loadPlan(selectSubject, false);
+            }
+
+        } catch (error) {
+            console.error("Error loading senarai subjek (Check Firestore Rules!):", error);
+            subjectListMessage.textContent = 'Ralat memuatkan senarai subjek.';
+            showMessage('Ralat memuatkan senarai subjek. SEMAK PERATURAN KESELAMATAN FIREBASE.', 'error', ADMIN_ELEMENTS.newSubjectMessageBox);
+            // Crucial: Fail-safe loading the default list even on rule error
+            subjectSelector.innerHTML = '<option value="" selected>Sejarah</option>';
+            subjectSelector.innerHTML += ['Matematik', 'Sains', 'Bahasa Inggeris', 'Pendidikan Islam'].map(s => `<option value="${s}">${s}</option>`).join('');
+            
+        }
+    }
+
+    async function initializeFirebaseAndAuth() {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app); 
+
+            let authSuccess = false;
+            try {
+                // Attempt authentication
+                await signInAnonymously(auth);
+                userId = auth.currentUser?.uid;
+                isAuthReady = true;
+                authSuccess = true;
+            } catch (e) {
+                console.warn("Authentication failed, proceeding to read-only mode.");
+            }
+
+            // Step 2: Load templates and lists
+            loadingMessage.textContent = 'Memuatkan templat dan senarai subjek...';
+            await loadTemplateData(MASTER_TEMPLATE_PATH, false);
+            await loadSubjectList();
+            
+            // Step 3: Final UI setup
+            if (!authSuccess) {
+                 throw new Error("AUTH_FAIL_PROCEED_LOCAL"); // Trigger local mode if auth failed
+            }
+            
+            setAdminMode(false);
+            hideLoadingOverlay();
+
+        } catch (error) {
+            console.error("Initialization failed:", error);
+            
+            // --- CATASTROPHIC FAILURE HANDLING (LOCAL MODE) ---
+            isAuthReady = false;
+            currentPlanData = DEFAULT_MASTER_DATA; 
+            currentSubject = 'Sejarah (Default)'; 
+            
+            // 1. Set the UI state to a functioning default view
+            pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **Sejarah (Default)**`;
+            ADMIN_ELEMENTS.headerSubtitle.textContent = 'Sambungan ke pangkalan data gagal. Menggunakan data tempatan (LOCAL MODE).';
+            
+            // 2. Render the default plan content
+            dynamicPlanContent.innerHTML = getEditViewHTML();
+            setFormState(currentPlanData); 
+            
+            // 3. Clean up the Subject Management Section in LOCAL MODE
+            document.getElementById('subjectSelectorContainer').classList.add('hidden');
+            document.getElementById('addNewSubjectContainer').classList.add('hidden');
+            document.getElementById('switchSubjectButton').classList.add('hidden');
+
+
+            // 4. Final actions
+            hideLoadingOverlay();
+            showMessage(`Ralat Kritikal: Gagal menyambung ke pangkalan data. Bekerja dalam MOD TEMPATAN (Perubahan tidak akan disimpan).`, 'error');
+
+            // Disable save button and enable export button
+            saveButton.disabled = true;
+            saveButton.textContent = 'Gagal Sambungan - Simpanan Dinonaktifkan';
+            downloadPlanButton.classList.remove('hidden');
+            planEditorContainer.classList.remove('hidden');
+
+            // Initialize event listeners for the local view
+             if (document.getElementById('addRowButton')) document.getElementById('addRowButton').addEventListener('click', () => { createTableRow({}); updateRowNumbers(); });
+             if (document.getElementById('addTaktikalProgramButton')) document.getElementById('addTaktikalProgramButton').addEventListener('click', () => { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); });
+             if (document.getElementById('toggleAppendixButton')) document.getElementById('toggleAppendixButton').addEventListener('click', () => {
+                const appendixContent = document.getElementById('appendixContent');
+                const appendixArrow = document.getElementById('appendixArrow');
+                const isOpen = appendixContent.classList.toggle('open');
+                appendixArrow.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+            renderQsamAppendix();
+
+        }
+    }
+    
+    // --- Direct Execution Call ---
+    // Start initialization flow with slight delay to ensure UI threads are responsive
+    window.addEventListener('load', () => {
+        setTimeout(initializeFirebaseAndAuth, 100);
+    });
+    
+    // --- DOWNLOAD FUNCTION ---
+
+    downloadPlanButton.addEventListener('click', () => {
+        const data = getFormState();
+        // Remove transient data before export
+        delete data.updatedAt; 
+        
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const subjectNameSlug = currentSubject ? currentSubject.toLowerCase().replace(/ /g, '_') : 'local_plan';
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${subjectNameSlug}_strategic_plan.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showMessage('Pelan berjaya dieksport!', 'success');
+    });
 
     // --- DEFAULT MASTER CONTENT (SEJARAH) ---
     const DEFAULT_MASTER_DATA = {
@@ -861,19 +1313,19 @@
             { namaProgram: 'PLC BERFOKUS (Penjajaran Kurikulum)', aktiviti: ['Mesyuarat Panitia Penjajaran DSKP', 'Peer Coaching', 'Lesson Study'], tanggungJawab: 'Ketua Panitia & Guru Kanan Mata Pelajaran', tempoh: 'Feb - Okt', kosSumber: 'PCG Panitia', sasaran: 'Semua Guru', outputOutcome: ['100% guru menyelaraskan RPH', 'Peningkatan mutu pengajaran'], pelanKontengensi: ['Sesi bimbingan individu'] },
             { namaProgram: 'BENGKEL TEKNIK MENJAWAB KBAT', aktiviti: ['Klinik Skor A', 'Latih tubi berfokus KBAT', 'Modul F4/F5 berpusat'], tanggungJawab: 'Semua guru Sejarah (Master)', tempoh: 'Apr - Okt', kosSumber: 'Dana Panitia', sasaran: 'Murid Tingkatan 4 & 5', outputOutcome: ['90% murid mahir jawab KBAT', 'Peningkatan % lulus peperiksaan'], pelanKontengensi: ['Modul alternatif secara atas talian'] },
             { namaProgram: 'AUDIT DATA PBD BERSEPADU', aktiviti: ['Analisis jurang PBD bulanan', 'Sesi intervensi data silang panitia', 'Penetapan sasaran gred berdasarkan data awal'], tanggungJawab: 'SU Peperiksaan & Ketua Panitia', tempoh: 'Sepanjang Tahun (Suku Tahun)', kosSumber: 'Tiada', sasaran: 'Semua Guru Tingkatan', outputOutcome: ['Laporan tren pencapaian murid', 'Intervensi segera untuk murid kritikal (bottom 10%)'], pelanKontengensi: ['Pengumpulan data PBD manual'] },
-            { namaProgram: 'PUSAT SUMBER DIGITAL INTERAKTIF', aktiviti: ['Penciptaan repositori video PdP', 'Mengintegrasi AR/VR dalam Sejarah/Sains', 'Penyediaan modul interaktif Delima'], tanggungJawab: 'Guru Media/ICT', tempoh: 'Sepanjang Tahun', kosSumber: 'PCG/ Sumbangan PIBG', sasaran: 'Semua Murid & Guru', outputOutcome: ['50+ bahan P&P interaktif tersedia', 'Peningkatan penggunaan Bilik Komputer'], pelanKontengensi: ['Penggunaan bahan bercetak'] },
+            { namaProgram: 'PUSAT SUMBER DIGITAL INTERAKTIF', aktiviti: ['Penciptaan repositori video PdP', 'Mengintegrasi AR/VR dalam Sejarah/Sains', 'Penyediaan modul interaktif Delima'], tanggungJielasan: 'Guru Media/ICT', tempoh: 'Sepanjang Tahun', kosSumber: 'PCG/ Sumbangan PIBG', sasaran: 'Semua Murid & Guru', outputOutcome: ['50+ bahan P&P interaktif tersedia', 'Peningkatan penggunaan Bilik Komputer'], pelanKontengensi: ['Penggunaan bahan bercetak'] },
             { namaProgram: 'KAPSUL MIKRO SEJARAH (Video Content)', aktiviti: ['Bengkel ringkas penciptaan video PdP', 'Muat naik video 5 minit ke platform sekolah (untuk ulangkaji)', 'Pertandingan Video Sejarah Murid'], tanggungJawab: 'Penyelaras Media Panitia', tempoh: 'Mac - Sep', kosSumber: 'Tiada', sasaran: 'Murid Menengah Rendah', outputOutcome: ['20+ video ulangkaji tersedia', 'Peningkatan kefahaman konsep sukar'], pelanKontengensi: ['Penggunaan infografik statik'] },
             { namaProgram: 'BIMBINGAN RAKAN SEBAYA DIGITAL (e-Mentoring)', aktiviti: ['Memadankan guru pakar digital dengan guru baharu', 'Sesi bimbingan 1:1', 'Rekod sesi bimbingan dalam talian'], tanggungJawab: 'Penyelaras LDP & SU Kurikulum', tempoh: 'Sepanjang Tahun', kosSumber: 'Tiada', sasaran: 'Guru Baharu & Guru Kurang Mahir Digital', outputOutcome: ['Peningkatan 80% keyakinan digital guru', 'Guru baharu mencapai standard Delima'], pelanKontengensi: ['Sesi bimbingan bersemuka'] },
         ],
         
         qsamData: [ // Default QSAM Data aligned with Pelan Taktikal
-            { programName: 'LITERASI DIGITAL & e-PORTFOLIO (Cross-Curricular)', bil: 1, im: 8, ei: 5, qra: 75, tbs: 0, statusCatatan: 'Projek kritikal - Pemanfaatan DELIMA/VLE. Penjajaran tinggi dengan KPI Entanglement.', laporanKemajuan: 'Pembangunan e-Portfolio 40% siap. Kehadiran bengkel 95%.' },
-            { programName: 'PLC BERFOKUS (Penjajaran Kurikulum)', bil: 2, im: 7, ei: 4, qra: 60, tbs: 0, statusCatatan: 'Kunci kepada kualiti P&P. Penjajaran sederhana tinggi.', laporanKemajuan: '3 sesi PLC telah selesai, fokus kepada KBAT.' },
-            { programName: 'BENGKEL TEKNIK MENJAWAB KBAT', bil: 3, im: 9, ei: 5, qra: 90, tbs: 0, statusCatatan: 'Impak tertinggi kepada skor A. Penjajaran langsung kepada Matlamat Strategik.', laporanKemajuan: 'Modul F4 siap. Bengkel pertama diadakan Apr, Kehadiran 98%.' },
-            { programName: 'AUDIT DATA PBD BERSEPADU', bil: 4, im: 6, ei: 3, qra: 80, tbs: 0, statusCatatan: 'Sokongan data. Penjajaran kepada keupayaan guru mengenal pasti jurang.', laporanKemajuan: 'Laporan suku pertama dibentangkan & tindakan intervensi dimulakan.' },
-            { programName: 'PUSAT SUMBER DIGITAL INTERAKTIF', bil: 5, im: 5, ei: 2, qra: 40, tbs: 0, statusCatatan: 'Sokongan aset. Penjajaran kepada penyediaan bahan PdP.', laporanKemajuan: '10 video PdP telah dimuat naik ke platform sekolah.' },
-            { programName: 'KAPSUL MIKRO SEJARAH (Video Content)', bil: 6, im: 7, ei: 4, qra: 65, tbs: 0, statusCatatan: 'Memperkukuh kefahaman konsep. Penjajaran kepada penguasaan kefahaman konsep.', laporanKemajuan: '5 murid telah menghantar draf video pertama.' },
-            { programName: 'BIMBINGAN RAKAN SEBAYA DIGITAL (e-Mentoring)', bil: 7, im: 4, ei: 1, qra: 30, tbs: 0, statusCatatan: 'Fokus kepada pembangunan guru. Penjajaran rendah kepada Entanglement KPI, tetapi tinggi kepada Foundational Capacity.', laporanKemajuan: '2 sesi mentor-mentee telah direkodkan.' }
+            { programName: 'LITERASI DIGITAL & e-PORTFOLIO (Cross-Curricular)', bil: 1, im: 8, ei: 5, qra: 75, tbs: 80, statusCatatan: 'Projek kritikal - Pemanfaatan DELIMA/VLE. Penjajaran tinggi dengan KPI Entanglement.', laporanKemajuan: 'Pembangunan e-Portfolio 40% siap. Kehadiran bengkel 95%.' },
+            { programName: 'PLC BERFOKUS (Penjajaran Kurikulum)', bil: 2, im: 7, ei: 4, qra: 60, tbs: 55, statusCatatan: 'Kunci kepada kualiti P&P. Penjajaran sederhana tinggi.', laporanKemajuan: '3 sesi PLC telah selesai, fokus kepada KBAT.' },
+            { programName: 'BENGKEL TEKNIK MENJAWAB KBAT', bil: 3, im: 9, ei: 5, qra: 90, tbs: 95, statusCatatan: 'Impak tertinggi kepada skor A. Penjajaran langsung kepada Matlamat Strategik.', laporanKemajuan: 'Modul F4 siap. Bengkel pertama diadakan Apr, Kehadiran 98%.' },
+            { programName: 'AUDIT DATA PBD BERSEPADU', bil: 4, im: 6, ei: 3, qra: 80, tbs: 60, statusCatatan: 'Sokongan data. Penjajaran kepada keupayaan guru mengenal pasti jurang.', laporanKemajuan: 'Laporan suku pertama dibentangkan & tindakan intervensi dimulakan.' },
+            { programName: 'PUSAT SUMBER DIGITAL INTERAKTIF', bil: 5, im: 5, ei: 2, qra: 40, tbs: 45, statusCatatan: 'Sokongan aset. Penjajaran kepada penyediaan bahan PdP.', laporanKemajuan: '10 video PdP telah dimuat naik ke platform sekolah.' },
+            { programName: 'KAPSUL MIKRO SEJARAH (Video Content)', bil: 6, im: 7, ei: 4, qra: 65, tbs: 70, statusCatatan: 'Memperkukuh kefahaman konsep. Penjajaran kepada penguasaan kefahaman konsep.', laporanKemajuan: '5 murid telah menghantar draf video pertama.' },
+            { programName: 'BIMBINGAN RAKAN SEBAYA DIGITAL (e-Mentoring)', bil: 7, im: 4, ei: 1, qra: 30, tbs: 35, statusCatatan: 'Fokus kepada pembangunan guru. Penjajaran rendah kepada Entanglement KPI, tetapi tinggi kepada Foundational Capacity.', laporanKemajuan: '2 sesi mentor-mentee telah direkodkan.' }
         ],
         
         programName: 'Program Peningkatan Prestasi Sejarah Menyeluruh',
@@ -899,304 +1351,6 @@
             { langkah: 7, prosesKerja: ["Post-Mortem Program Akhir Tahun", "Laporan Penilaian Keseluruhan & Cadangan Penambahbaikan"], tanggungjawab: 'KP Panitia', tarikhMulaAkhir: 'November', kpi: 'Laporan disemak dan disahkan', sasaran: 'JK Panitia', status: 'Belum Mula' }
         ]
     };
-
-
-    // --- FIREBASE LOAD/SAVE LOGIC (UNCHANGED) ---
-
-    async function loadTemplateData(path, saveIfMissing = false) {
-        try {
-            const docSnap = await getDoc(doc(db, path));
-            
-            if (docSnap.exists()) {
-                masterTemplateCache = docSnap.data();
-                setFormState(masterTemplateCache);
-                return true;
-            } else {
-                masterTemplateCache = DEFAULT_MASTER_DATA;
-                setFormState(DEFAULT_MASTER_DATA);
-                if (saveIfMissing) {
-                    await savePlan(null, path);
-                }
-                return false;
-            }
-        } catch (error) {
-             console.error(`Error processing path ${path}:`, error);
-             masterTemplateCache = DEFAULT_MASTER_DATA;
-             setFormState(DEFAULT_MASTER_DATA);
-             return false;
-        }
-    }
-
-
-    async function loadPlan(subject, isAdminTemplateLoad = false) {
-        if (!isAuthReady || !db || !subject) { planEditorContainer.classList.add('hidden'); return; }
-        currentSubject = subject;
-        if (!isAdminTemplateLoad) { pageMainTitle.innerHTML = `Pelan Strategik Mata Pelajaran **${subject}**`; }
-        planEditorContainer.classList.remove('hidden');
-        loadingOverlay.classList.remove('hidden'); 
-        
-        const path = getPlanDocPath(subject);
-        
-        try {
-            const docSnap = await getDoc(doc(db, path));
-            
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                setFormState(data);
-                showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
-            } else if (!isAdminTemplateLoad) {
-                // Load from cache/master template for new subject
-                setFormState(JSON.parse(JSON.stringify(masterTemplateCache))); 
-                showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
-            }
-            
-            saveButton.textContent = isAdminTemplateLoad ? 'Simpan Templat Induk' : 'Simpan Pelan Operasi';
-
-        } catch (error) {
-            console.error("Error fetching or loading plan data:", error);
-            showMessage(`Ralat memuatkan data: ${error.message}. Memuatkan templat Master.`, 'error');
-            setFormState(masterTemplateCache); // Fallback to current cache content
-        } finally { loadingOverlay.classList.add('hidden'); }
-    }
-
-
-    async function savePlan(e, specificPath = null) {
-        if (e) e.preventDefault();
-        
-        const savePath = specificPath || getPlanDocPath(currentSubject);
-        const subjectName = specificPath === MASTER_TEMPLATE_PATH ? 'Templat Induk' : currentSubject;
-
-        if (!isAuthReady || !db || !subjectName) {
-            showMessage("Sila pilih subjek atau sahkan templat.", 'error');
-            return;
-        }
-
-        saveButton.disabled = true;
-        saveButton.textContent = `Menyimpan ${subjectName}...`;
-
-        try {
-            const staticData = getFormState();
-            
-            const planRef = doc(db, savePath);
-            await setDoc(planRef, staticData);
-            
-            showMessage(`Pelan Strategik untuk ${subjectName} berjaya disimpan!`, 'success');
-
-        } catch (error) {
-            console.error("Error saving plan:", error);
-            showMessage(`Gagal menyimpan: ${error.message}`, 'error');
-        } finally {
-            saveButton.disabled = false;
-            saveButton.textContent = specificPath === MASTER_TEMPLATE_PATH ? 'Simpan Templat Induk' : 'Simpan Pelan Operasi';
-        }
-    }
-    
-    // --- FIREBASE INITIALIZATION AND APP STARTUP (UNCHANGED) ---
-
-    async function loadSubjectList(selectSubject = null) {
-        if (!isAuthReady || !db) return;
-
-        subjectListMessage.classList.remove('hidden');
-        subjectListMessage.textContent = 'Memuatkan senarai subjek...';
-        subjectSelector.innerHTML = '<option value="" disabled selected>--- Memuatkan... ---</option>';
-
-        try {
-            const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
-            const docSnap = await getDoc(subjectsRef);
-            let subjects = [];
-            
-            if (!docSnap.exists() || !Array.isArray(docSnap.data().subjects) || docSnap.data().subjects.length === 0) {
-                 subjects = ["Sejarah", "Matematik", "Sains", "Bahasa Inggeris", "Pendidikan Islam"];
-                 await setDoc(subjectsRef, { subjects: subjects });
-            } else {
-                subjects = docSnap.data().subjects;
-            }
-
-            subjectSelector.innerHTML = '<option value="" disabled selected>--- Sila Pilih Subjek ---</option>';
-            subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelector.appendChild(option);
-            });
-            
-            subjectListMessage.classList.add('hidden');
-
-            if (selectSubject) {
-                subjectSelector.value = selectSubject;
-                loadPlan(selectSubject, false);
-            }
-
-        } catch (error) {
-            console.error("Error loading senarai subjek:", error);
-            subjectListMessage.textContent = 'Ralat memuatkan senarai subjek.';
-            showMessage('Ralat memuatkan senarai subjek.', 'error', newSubjectMessageBox);
-        }
-    }
-
-    async function initializeFirebaseAndAuth() {
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            
-            await signInAnonymously(auth); 
-            userId = auth.currentUser?.uid;
-            isAuthReady = true;
-
-            ensureUIVisible(); 
-            // Initialize Appendix content once
-            renderQsamAppendix(); 
-            
-            await loadTemplateData(MASTER_TEMPLATE_PATH, false);
-            await loadSubjectList();
-            setAdminMode(false);
-
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            ensureUIVisible();
-            showMessage(`Ralat Sistem (Firebase): ${error.message}. SILA SEMAK PERATURAN KESELAMATAN FIREBASE ANDA.`, 'error');
-        }
-    }
-    
-    // --- COMPONENT LOGIC ---
-
-    function setAdminMode(enable) {
-        isAdminMode = enable;
-        subjectSelector.value = '';
-        pelanTaktikalTableBody.innerHTML = ''; 
-
-        if (isAdminMode) {
-            subjectManagementSection.classList.add('hidden');
-            templateAdminGate.classList.remove('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Templat Induk Pelan Strategik';
-            headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
-            currentSubject = null; 
-            addTaktikalProgramButton.classList.remove('hidden');
-            renderStrategyMap(masterTemplateCache); // Render template map
-        } else {
-            subjectManagementSection.classList.remove('hidden');
-            templateAdminGate.classList.add('hidden');
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
-            headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
-            addTaktikalProgramButton.classList.add('hidden');
-            strategyMapDisplay.innerHTML = ''; // Clear map when no subject is selected
-        }
-    }
-
-    function createSubjectSlug(subjectName) {
-        return subjectName.toLowerCase().replace(/[^a-z0-9]+/g, '_').trim('_');
-    }
-    
-    function getPlanDocPath(subject) {
-        if (subject === MASTER_TEMPLATE_PATH) return MASTER_TEMPLATE_PATH;
-        const slug = createSubjectSlug(subject);
-        return `${PLAN_COLLECTION_BASE}/${slug}_plan`;
-    }
-    
-    // --- EVENT HANDLERS ---
-    
-    document.addEventListener('DOMContentLoaded', initializeFirebaseAndAuth); 
-    document.getElementById('addRowButton').addEventListener('click', () => { createTableRow({}); updateRowNumbers(); });
-    document.getElementById('addTaktikalProgramButton').addEventListener('click', () => { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); });
-    
-    // Manual QSAM Sync
-    syncQsamButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        const pelanTaktikal = collectPelanTaktikalData();
-        const currentQsam = collectQsamData();
-        syncQsamMatrix(pelanTaktikal, currentQsam);
-        showMessage("Matriks QSAM disegerakkan dengan senarai Program Taktikal.", 'info');
-    });
-
-    document.getElementById('saveButton').addEventListener('click', async (e) => {
-        await savePlan(e);
-        // Re-render the map after saving to reflect the latest state
-        renderStrategyMap(getFormState());
-    });
-    
-    document.getElementById('adminFooterToggle').addEventListener('click', () => { setAdminMode(true); });
-    
-    document.getElementById('switchSubjectButton').addEventListener('click', () => {
-        setAdminMode(false); 
-        currentSubject = null;
-        subjectSelector.value = ''; 
-        pelanTaktikalTableBody.innerHTML = '';
-        qsamMatrixTableBody.innerHTML = ''; // Clear QSAM table on switch
-        document.getElementById('addTaktikalProgramButton').classList.add('hidden');
-    });
-
-    // Add change listeners to core strategic elements to update the map dynamically
-    matlamatStrategik.addEventListener('input', () => renderStrategyMap(getFormState()));
-    entanglementMeasure.addEventListener('input', () => renderStrategyMap(getFormState()));
-    strategiList.addEventListener('input', () => renderStrategyMap(getFormState()));
-    
-    // Appendix Toggle Handler
-    toggleAppendixButton.addEventListener('click', () => {
-        const isOpen = appendixContent.classList.toggle('open');
-        appendixArrow.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-    });
-
-
-    // Listener for adding new subject (unchanged)
-    document.getElementById('addNewSubjectButton').addEventListener('click', async () => {
-        if (!isAuthReady || !db) return;
-        const newSubjectInput = document.getElementById('newSubjectInput');
-        const newSubjectName = newSubjectInput.value.trim();
-        if (!newSubjectName) { showMessage('Sila masukkan nama subjek.', 'error', newSubjectMessageBox); return; }
-
-        const addSubjectButton = addNewSubjectButton;
-        addSubjectButton.disabled = true;
-        addSubjectButton.textContent = 'Menambah...';
-
-        try {
-            const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
-            const docSnap = await getDoc(subjectsRef);
-            if (docSnap.exists() && docSnap.data().subjects.includes(newSubjectName)) {
-                showMessage(`Subjek '${newSubjectName}' sudah wujud.`, 'error', newSubjectMessageBox);
-            } else {
-                await updateDoc(subjectsRef, { subjects: arrayUnion(newSubjectName) });
-                newSubjectInput.value = '';
-                showMessage(`Subjek '${newSubjectName}' berjaya ditambah!`, 'success', newSubjectMessageBox);
-                await loadSubjectList(newSubjectName);
-            }
-        } catch (error) {
-            console.error("Error adding new subject:", error);
-            showMessage(`Gagal menambah subjek: ${error.message}`, 'error', newSubjectMessageBox);
-        } finally {
-            addSubjectButton.disabled = false;
-            addSubjectButton.textContent = 'Tambah';
-        }
-    });
-
-    subjectSelector.addEventListener('change', (e) => {
-        const selectedSubject = e.target.value;
-        if (selectedSubject) {
-            loadPlan(selectedSubject, false);
-            saveButton.textContent = 'Simpan Pelan Operasi'; 
-        } else {
-            planEditorContainer.classList.add('hidden');
-            pageMainTitle.innerHTML = 'Pelan Strategik Mata Pelajaran';
-        }
-    });
-
-    templateAdminLoginButton.addEventListener('click', async () => {
-        const key = templateAdminKeyInput.value.trim();
-        if (!key) {
-            showMessage('Sila masukkan kunci pentadbir.', 'error', templateAdminMessage);
-            return;
-        }
-        if (key !== ADMIN_SECRET_KEY) {
-            showMessage('Kunci tidak sah. Akses dinafikan.', 'error', templateAdminMessage);
-            return;
-        }
-        templateAdminMessage.classList.add('hidden');
-        pageMainTitle.textContent = 'Templat Induk Pelan Strategik (Master)';
-        headerSubtitle.textContent = 'Anda mengedit templat asas yang akan digunakan untuk semua subjek baharu.';
-        await loadPlan(MASTER_TEMPLATE_PATH, true);
-    });
 </script>
 
 </body>
