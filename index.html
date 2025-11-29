@@ -42,6 +42,73 @@
         .overflow-x-auto {
             overflow-x: auto;
         }
+        
+        /* --- Strategy Map Specific Styles --- */
+        .strategy-map-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px; /* Space between perspectives */
+            padding: 20px 0;
+            border-radius: 12px;
+            background-color: #ffffff;
+        }
+        .strategy-perspective {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .perspective-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        .perspective-content {
+            font-size: 0.95rem;
+            font-weight: 500;
+            min-height: 30px;
+        }
+        /* Arrow Styling (for visual flow) */
+        .strategy-arrow {
+            width: 4px;
+            height: 16px;
+            background-color: #3b82f6; /* Blue-500 */
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .strategy-arrow::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #3b82f6;
+        }
+        /* Specific Colors */
+        .impact { background-color: #fef2f2; border: 2px solid #ef4444; } /* Red-100 */
+        .impact .perspective-title { color: #ef4444; }
+        .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } /* Amber-100 */
+        .outcome .perspective-title { color: #f59e0b; }
+        .process { background-color: #eff6ff; border: 2px solid #3b82f6; } /* Blue-100 */
+        .process .perspective-title { color: #3b82f6; }
+        .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } /* Green-100 */
+        .capacity .perspective-title { color: #10b981; }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 640px) {
+            .strategy-perspective {
+                max-width: 100%;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -152,6 +219,12 @@
             </table>
         </div>
         
+        <!-- SECTION 0.6: VISUAL STRATEGY MAP -->
+        <h3 class="text-xl font-semibold text-blue-600 mb-4 border-b pb-2">Peta Strategi Visual (Strategic Outcome Flow)</h3>
+        <div id="strategyMapDisplay" class="mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
+            <!-- Content will be rendered here by JS function renderStrategyMap() -->
+        </div>
+
         <!-- Section 0.7: Pelan Taktikal (Senarai Program) - NEW COMPREHENSIVE TABLE -->
         <h3 class="text-xl font-semibold text-purple-600 mb-4 border-b pb-2">Pelan Taktikal (Senarai Program)</h3>
         <div class="overflow-x-auto mb-8">
@@ -341,6 +414,7 @@
     const addTaktikalProgramButton = document.getElementById('addTaktikalProgramButton');
     const smartPrinciple = document.getElementById('smartPrinciple');
     const entanglementMeasure = document.getElementById('entanglementMeasure');
+    const strategyMapDisplay = document.getElementById('strategyMapDisplay'); // New DOM element
 
     let programCounter = 0;
 
@@ -424,9 +498,55 @@
             createTableRow({prosesKerja: ['']});
             updateRowNumbers();
         }
+
+        // Render Strategy Map after data is loaded
+        renderStrategyMap(data);
     }
 
+    // NEW FUNCTION: Renders the Strategy Map Visualization
+    function renderStrategyMap(data) {
+        // Data extraction and simplification for the map
+        const matlamat = data.matlamatStrategik || 'Tingkatkan penguasaan kefahaman konsep Sejarah dan lonjakkan pencapaian akademik (A > 30%).';
+        const entanglement = data.entanglementMeasure || 'Peningkatan 15% murid Band 4 ke atas dalam PBD, selaras dengan peningkatan penggunaan sumber digital oleh guru.';
+        const strategi = arrayToText(data.strategiList).replace(/\n/g, '<br>') || 'Strategi: Melaksanakan PAK21 konsisten, memperkasa kemahiran KBAT guru, memanfaatkan teknologi DELIMA.';
+        const initiatives = data.pelanTaktikal ? data.pelanTaktikal.map(p => p.namaProgram).join(', ') : 'Program: LITERASI DIGITAL & e-PORTFOLIO, PLC BERFOKUS, BENGKEL TEKNIK MENJAWAB KBAT.';
 
+        strategyMapDisplay.innerHTML = `
+            <div class="strategy-map-container">
+                
+                <!-- I. ULTIMATE IMPACT (RED) -->
+                <div class="strategy-perspective impact">
+                    <div class="perspective-title">I. ULTIMATE IMPACT (Vision Sekolah / Subjek)</div>
+                    <div class="perspective-content">${matlamat}</div>
+                </div>
+
+                <div class="strategy-arrow" title="Dicapai melalui..."></div>
+
+                <!-- II. STUDENT OUTCOME (AMBER) -->
+                <div class="strategy-perspective outcome">
+                    <div class="perspective-title">II. STUDENT OUTCOME (KPI Utama Entanglement Measurement)</div>
+                    <div class="perspective-content">${entanglement}</div>
+                </div>
+
+                <div class="strategy-arrow" title="Memerlukan proses..."></div>
+                
+                <!-- III. INTERNAL PROCESS (BLUE) -->
+                <div class="strategy-perspective process">
+                    <div class="perspective-title">III. INTERNAL PROCESS (Strategi & Pelaksanaan P&P)</div>
+                    <div class="perspective-content">${strategi}</div>
+                </div>
+
+                <div class="strategy-arrow" title="Disokong oleh..."></div>
+
+                <!-- IV. FOUNDATIONAL CAPACITY (GREEN) -->
+                <div class="strategy-perspective capacity">
+                    <div class="perspective-title">IV. FOUNDATIONAL CAPACITY (Program Taktikal / Sumber)</div>
+                    <div class="perspective-content">${initiatives}</div>
+                </div>
+            </div>
+        `;
+    }
+    
     // --- TABLE MANAGEMENT FUNCTIONS ---
     
     function createTaktikalProgramRow(data = {}) {
@@ -651,9 +771,11 @@
             const docSnap = await getDoc(doc(db, path));
             
             if (docSnap.exists()) {
-                setFormState(docSnap.data());
+                const data = docSnap.data();
+                setFormState(data);
                 showMessage(`Pelan Strategik untuk ${subject} berjaya dimuatkan untuk pengeditan.`, 'success');
             } else if (!isAdminTemplateLoad) {
+                // Load from cache/master template for new subject
                 setFormState(JSON.parse(JSON.stringify(masterTemplateCache))); 
                 showMessage(`Memuatkan templat Master untuk subjek baharu: ${subject}.`, 'info');
             }
@@ -753,7 +875,7 @@
             isAuthReady = true;
 
             ensureUIVisible(); 
-            await loadTemplateData(MASTER_TEMPLATE_PATH, true);
+            await loadTemplateData(MASTER_TEMPLATE_PATH, false);
             await loadSubjectList();
             setAdminMode(false);
 
@@ -779,6 +901,7 @@
             headerSubtitle.textContent = 'Anda kini dalam Mod Pentadbir. Sila buka kunci untuk mengedit templat asas.';
             currentSubject = null; 
             addTaktikalProgramButton.classList.remove('hidden');
+            renderStrategyMap(masterTemplateCache); // Render template map
         } else {
             subjectManagementSection.classList.remove('hidden');
             templateAdminGate.classList.add('hidden');
@@ -786,6 +909,7 @@
             pageMainTitle.textContent = 'Pelan Strategik Mata Pelajaran';
             headerSubtitle.textContent = 'Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.';
             addTaktikalProgramButton.classList.add('hidden');
+            strategyMapDisplay.innerHTML = ''; // Clear map when no subject is selected
         }
     }
 
@@ -799,12 +923,18 @@
         return `${PLAN_COLLECTION_BASE}/${slug}_plan`;
     }
     
-    // --- EVENT HANDLERS ---
+    // --- EVENT HANDLERS (UPDATED TO CALL renderStrategyMap ON SAVE/CHANGE) ---
     
     document.addEventListener('DOMContentLoaded', initializeFirebaseAndAuth); 
     document.getElementById('addRowButton').addEventListener('click', () => { createTableRow({}); updateRowNumbers(); });
     document.getElementById('addTaktikalProgramButton').addEventListener('click', () => { createTaktikalProgramRow({}); updateTaktikalProgramRowNumbers(); });
-    document.getElementById('saveButton').addEventListener('click', savePlan);
+    
+    document.getElementById('saveButton').addEventListener('click', async (e) => {
+        await savePlan(e);
+        // Re-render the map after saving to reflect the latest state
+        renderStrategyMap(getFormState());
+    });
+    
     document.getElementById('adminFooterToggle').addEventListener('click', () => { setAdminMode(true); });
     
     document.getElementById('switchSubjectButton').addEventListener('click', () => {
@@ -814,6 +944,12 @@
         pelanTaktikalTableBody.innerHTML = '';
         document.getElementById('addTaktikalProgramButton').classList.add('hidden');
     });
+
+    // Add change listeners to core strategic elements to update the map dynamically
+    matlamatStrategik.addEventListener('input', () => renderStrategyMap(getFormState()));
+    entanglementMeasure.addEventListener('input', () => renderStrategyMap(getFormState()));
+    strategiList.addEventListener('input', () => renderStrategyMap(getFormState()));
+    // Note: Tactical program list updates on table change or save.
 
     document.getElementById('addNewSubjectButton').addEventListener('click', async () => {
         if (!isAuthReady || !db) return;
@@ -863,18 +999,12 @@
             return;
         }
         if (key !== ADMIN_SECRET_KEY) {
-            templateAdminKeyInput.value = '';
             showMessage('Kunci tidak sah. Akses dinafikan.', 'error', templateAdminMessage);
             return;
         }
-        
-        // Success Logic
         templateAdminMessage.classList.add('hidden');
-        templateAdminKeyInput.value = ''; // Clear password on success
         pageMainTitle.textContent = 'Templat Induk Pelan Strategik (Master)';
         headerSubtitle.textContent = 'Anda mengedit templat asas yang akan digunakan untuk semua subjek baharu.';
-        
-        // Load the template content into the form
         await loadPlan(MASTER_TEMPLATE_PATH, true);
     });
 </script>
