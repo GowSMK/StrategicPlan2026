@@ -148,9 +148,9 @@
         .tbs-score { background-color: #60a5fa; } 
         .qsam-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px dashed #e2e8f0;
+            padding: 12px 0; border-bottom: 1px dashed #e2e8f0;
         }
-        .qsam-name { font-weight: 600; color: #1e293b; font-size: 0.9rem; width: 50%; }
+        .qsam-name { font-weight: 600; color: #1e293b; font-size: 0.9rem; width: 40%; }
         .qsam-badge {
             font-size: 0.75rem; font-weight: 700;
             padding: 2px 8px; border-radius: 9999px; margin-left: 8px;
@@ -318,9 +318,23 @@
     // --------------------------------------------------------------------------
     // Define a default template for the master data.
     const DEFAULT_MASTER_DATA = {
+        // Executive Summary Defaults
+        misi: "Melestarikan Sistem Pendidikan Yang Berkualiti Untuk Membangunkan Potensi Individu Bagi Memenuhi Aspirasi Negara.",
+        visi: "Pendidikan Berkualiti Insan Terdidik Negara Sejahtera.",
+        bhag: "Mencapai kedudukan Top 3 Daerah dalam SPM 2026 dengan Gred Purata Sekolah (GPS) di bawah 4.0.",
+
         smartPrinciple: 'Quantum SMART Principle Example: Semua KPI (Measurable) mestilah boleh dicapai (Achievable) dalam tempoh (Time-bound) yang ditetapkan.',
         // NOTE: The placeholders {SUBJECT_NAME} will be automatically replaced by the new subject name on load.
         entanglementMeasure: `Peningkatan 15% murid Band 4 ke atas dalam PBD subjek ${TEMPLATE_SUBJECT_NAME}, selaras dengan peningkatan penggunaan sumber digital oleh guru.`,
+        
+        // SWOT Default Data - UPDATED WITH 5 COMMON CHALLENGES PER QUADRANT
+        swot: {
+            s: "- Barisan pentadbir yang komited dan berwawasan.\n- Lebih 85% guru adalah terlatih dan berpengalaman (>5 tahun).\n- Kemudahan infrastruktur dan ICT yang kondusif untuk PdP.\n- Disiplin murid yang terkawal dan budaya sekolah yang positif.\n- Pencapaian kokurikulum yang cemerlang di peringkat daerah/negeri.",
+            w: "- Capaian internet yang lemah di beberapa blok akademik.\n- Masalah kehadiran murid tegar yang menjejaskan prestasi kelas.\n- Beban tugas perkeranian guru yang tinggi mengurangkan masa rancang PdP.\n- Penguasaan murid dalam kemahiran asas (3M) bagi tingkatan peralihan.\n- Kekurangan dana untuk program pembangunan sahsiah secara berskala besar.",
+            o: "- Hubungan erat dan sokongan kewangan yang padu daripada PIBG.\n- Jalinan kerjasama strategik dengan IPTA/IPTS tempatan.\n- Sumbangan dana dan kepakaran daripada Alumni sekolah.\n- Peluang geran dan sumbangan CSR daripada syarikat korporat berhampiran.\n- Sokongan padu komuniti setempat dalam program sarana sekolah.",
+            c: "- Pengaruh gajet dan media sosial yang melalaikan murid di rumah.\n- Gejala sosial persekitaran (cybercafe/lepak) yang mempengaruhi murid.\n- Kurangnya pemantauan ibu bapa terhadap pembelajaran anak di rumah.\n- Ekspektasi ibu bapa yang terlalu tinggi tanpa sokongan realistik.\n- Kos sara hidup keluarga B40 yang menjejaskan fokus murid (bekerja sambilan)."
+        },
+
         matlamatStrategik: `Tingkatkan penguasaan kefahaman konsep ${TEMPLATE_SUBJECT_NAME} dan lonjakkan pencapaian akademik (A > 30%).`,
         strategiList: [
             "Melaksanakan PAK21 konsisten", 
@@ -409,8 +423,22 @@
         // Collects data regardless of which view is currently rendered
         // Prioritize data from form elements if they exist, otherwise use in-memory cache
         return {
+            // Executive Summary Data
+            misi: document.getElementById('misiInput')?.value.trim() || currentPlanData.misi || '',
+            visi: document.getElementById('visiInput')?.value.trim() || currentPlanData.visi || '',
+            bhag: document.getElementById('bhagInput')?.value.trim() || currentPlanData.bhag || '',
+
             smartPrinciple: document.getElementById('smartPrinciple')?.value.trim() || currentPlanData.smartPrinciple || '',
             entanglementMeasure: document.getElementById('entanglementMeasure')?.value.trim() || currentPlanData.entanglementMeasure || '',
+            
+            // SWOT Data
+            swot: {
+                s: document.getElementById('swot_s')?.value.trim() || currentPlanData.swot?.s || '',
+                w: document.getElementById('swot_w')?.value.trim() || currentPlanData.swot?.w || '',
+                o: document.getElementById('swot_o')?.value.trim() || currentPlanData.swot?.o || '',
+                c: document.getElementById('swot_c')?.value.trim() || currentPlanData.swot?.c || '',
+            },
+
             matlamatStrategik: document.getElementById('matlamatStrategik')?.value.trim() || currentPlanData.matlamatStrategik || '',
             strategiList: textToArray(document.getElementById('strategiList')?.value) || currentPlanData.strategiList || [],
             // Use collected table data if rows exist, otherwise fall back to currentPlanData
@@ -439,9 +467,22 @@
         
         // Only attempt to set the state if the elements for the current view exist
         if (currentView === 'edit') {
+            // Populate Executive Summary - FALLBACK TO DEFAULT_MASTER_DATA IF EMPTY
+            if (document.getElementById('misiInput')) document.getElementById('misiInput').value = data.misi || DEFAULT_MASTER_DATA.misi;
+            if (document.getElementById('visiInput')) document.getElementById('visiInput').value = data.visi || DEFAULT_MASTER_DATA.visi;
+            if (document.getElementById('bhagInput')) document.getElementById('bhagInput').value = data.bhag || DEFAULT_MASTER_DATA.bhag;
+
             // 1. Populate static inputs
             if (document.getElementById('smartPrinciple')) document.getElementById('smartPrinciple').value = data.smartPrinciple || '';
             if (document.getElementById('entanglementMeasure')) document.getElementById('entanglementMeasure').value = data.entanglementMeasure || '';
+
+            // Populate SWOT Inputs - FALLBACK TO DEFAULT_MASTER_DATA IF EMPTY
+            // This fixes the issue where existing saved plans without SWOT data showed up blank.
+            if (document.getElementById('swot_s')) document.getElementById('swot_s').value = data.swot?.s || DEFAULT_MASTER_DATA.swot.s;
+            if (document.getElementById('swot_w')) document.getElementById('swot_w').value = data.swot?.w || DEFAULT_MASTER_DATA.swot.w;
+            if (document.getElementById('swot_o')) document.getElementById('swot_o').value = data.swot?.o || DEFAULT_MASTER_DATA.swot.o;
+            if (document.getElementById('swot_c')) document.getElementById('swot_c').value = data.swot?.c || DEFAULT_MASTER_DATA.swot.c;
+
             if (document.getElementById('matlamatStrategik')) document.getElementById('matlamatStrategik').value = data.matlamatStrategik || '';
             if (document.getElementById('strategiList')) document.getElementById('strategiList').value = arrayToText(data.strategiList) || '';
             
@@ -574,6 +615,22 @@
             <div class="dashboard-container">
                 <h3 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Dashboard Prestasi Quantum Strategik</h3>
                 
+                <!-- Executive Summary Card in Dashboard (Read-Only View) -->
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-6 rounded-xl shadow-lg mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-indigo-100 uppercase tracking-wide text-xs mb-1">Visi</h4>
+                            <p class="font-semibold text-lg leading-tight" id="dashVisi">Loading...</p>
+                            <h4 class="font-bold text-indigo-100 uppercase tracking-wide text-xs mt-4 mb-1">Misi</h4>
+                            <p class="font-semibold text-lg leading-tight" id="dashMisi">Loading...</p>
+                        </div>
+                        <div class="border-l border-indigo-400 pl-6 flex flex-col justify-center">
+                            <h4 class="font-bold text-yellow-300 uppercase tracking-wide text-xs mb-2">Matlamat Utama (BHAG)</h4>
+                            <p class="font-extrabold text-2xl italic leading-tight" id="dashBhag">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KPI Summary Row -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
                     
@@ -606,11 +663,12 @@
                 <h4 class="text-xl font-bold text-green-700 mb-4">Status & Penjajaran Program Taktikal (QSAM)</h4>
                 <div class="dashboard-card">
                     <div id="qsamDashboardList" class="divide-y divide-gray-100">
+                        <!-- Header -->
                         <div class="qsam-item font-bold text-xs text-gray-600">
-                            <span class="w-1/2">Nama Program</span>
+                            <span class="w-2/5">Nama Program</span>
                             <span class="w-1/6 text-center">EI (0-5)</span>
-                            <span class="w-1/6 text-center">QRA (%)</span>
-                            <span class="w-1/6 text-center">TBS (%)</span>
+                            <span class="w-1/5 text-center">QRA (Sumber)</span>
+                            <span class="w-1/5 text-center">TBS (Progress)</span>
                         </div>
                         <!-- List items injected by renderDashboard() -->
                         <p id="noQsamData" class="py-4 text-center text-gray-400 hidden">Tiada data QSAM dijumpai. Sila masukkan data dalam Mod Edit.</p>
@@ -622,8 +680,13 @@
 
     // NEW FUNCTION: Renders the Dashboard Data
     function renderDashboard(data) {
-        // Renders Strategy Map
+        // Render Strategy Map
         renderStrategyMap(data);
+
+        // Render Executive Summary Fields - Fallback to Default if Empty
+        if (document.getElementById('dashVisi')) document.getElementById('dashVisi').textContent = data.visi || DEFAULT_MASTER_DATA.visi;
+        if (document.getElementById('dashMisi')) document.getElementById('dashMisi').textContent = data.misi || DEFAULT_MASTER_DATA.misi;
+        if (document.getElementById('dashBhag')) document.getElementById('dashBhag').textContent = data.bhag || DEFAULT_MASTER_DATA.bhag;
 
         // Calculate and Render KPI Averages
         const qsamData = data.qsamData || [];
@@ -649,17 +712,17 @@
         if (qraAvgElement) qraAvgElement.textContent = `${avgQra}%`;
         if (tbsAvgElement) tbsAvgElement.textContent = `${avgTbs}%`;
 
-        // Render QSAM List
+        // Render QSAM List with VISUAL PROGRESS BARS
         const qsamListContainer = document.getElementById('qsamDashboardList');
         if (!qsamListContainer) return; // Exit if container not found
 
         // Reset list, keep header structure
         qsamListContainer.innerHTML = `
             <div class="qsam-item font-bold text-xs text-gray-600">
-                <span class="w-1/2">Nama Program</span>
+                <span class="w-2/5">Nama Program</span>
                 <span class="w-1/6 text-center">EI (0-5)</span>
-                <span class="w-1/6 text-center">QRA (%)</span>
-                <span class="w-1/6 text-center">TBS (%)</span>
+                <span class="w-1/5 text-center">QRA (Sumber)</span>
+                <span class="w-1/5 text-center">TBS (Progress)</span>
             </div>
         `; 
 
@@ -675,13 +738,36 @@
                 
                 const statusText = isLagging ? ' (LAGGING)' : '';
                 const statusClass = isLagging ? 'text-red-600 font-bold' : 'text-gray-700';
+                
+                const qra = item.qra || 0;
+                const tbs = item.tbs || 0;
 
                 const itemHtml = `
                     <div class="qsam-item">
-                        <span class="w-1/2 ${statusClass} text-sm">${item.programName}${statusText}</span>
+                        <span class="w-2/5 ${statusClass} text-sm pr-2">${item.programName}${statusText}</span>
                         <span class="w-1/6 text-center"><span class="qsam-badge ${isHighEi ? 'ei-badge' : 'bg-gray-100 text-gray-500'}">${item.ei || 0}</span></span>
-                        <span class="w-1/6 text-center text-gray-600">${item.qra || 0}%</span>
-                        <span class="w-1/6 text-center text-gray-600">${item.tbs || 0}%</span>
+                        
+                        <!-- Visual Bar for QRA -->
+                        <div class="w-1/5 flex flex-col justify-center px-2">
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Used</span>
+                                <span>${qra}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-teal-500 h-2 rounded-full transition-all duration-500" style="width: ${qra}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Bar for TBS -->
+                        <div class="w-1/5 flex flex-col justify-center px-2">
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Done</span>
+                                <span class="${isLagging ? 'text-red-500 font-bold' : ''}">${tbs}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="${isLagging ? 'bg-red-500' : 'bg-blue-500'} h-2 rounded-full transition-all duration-500" style="width: ${tbs}%"></div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 qsamListContainer.insertAdjacentHTML('beforeend', itemHtml);
@@ -1281,6 +1367,25 @@
     // This HTML template generates all the dynamic inputs and buttons
     function getEditViewHTML() {
         return `
+            <!-- NEW SECTION: Executive Summary (Ringkasan Eksekutif) - EDIT MODE -->
+            <div class="mb-8 p-6 bg-white border border-indigo-200 rounded-xl shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4 border-b pb-2">Ringkasan Eksekutif (Executive Summary)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Visi Sekolah/Panitia</label>
+                        <textarea id="visiInput" rows="2" class="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Contoh: Pendidikan Berkualiti Insan Terdidik..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Misi Sekolah/Panitia</label>
+                        <textarea id="misiInput" rows="2" class="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Contoh: Melestarikan Sistem Pendidikan Yang Berkualiti..."></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-yellow-600 mb-1">Matlamat Utama (Big Hairy Audacious Goal - BHAG)</label>
+                        <input type="text" id="bhagInput" class="w-full p-3 border border-yellow-400 bg-yellow-50 rounded focus:ring-yellow-500 focus:border-yellow-500 font-bold text-gray-800" placeholder="Contoh: Mencapai kedudukan Top 3 Daerah dalam SPM 2026...">
+                    </div>
+                </div>
+            </div>
+
             <!-- Section 0.2: Analisis Quantum SMART (Prinsip Teras) -->
             <h3 class="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Analisis Quantum SMART (Prinsip Teras)</h3>
             
@@ -1304,6 +1409,53 @@
                 </table>
             </div>
 
+            <!-- MOVED IMAGE: Strategic Process Flow -->
+            <div class="mb-6 flex justify-center">
+                <img src="https://raw.githubusercontent.com/GowSMK/StrategicPlan2026/refs/heads/main/flow.JPG" alt="Strategic Process Flow" class="rounded-lg shadow-lg max-w-full h-auto border border-gray-200">
+            </div>
+
+            <!-- NEW SECTION: SWOT/SWOC Analysis (Analisis Persekitaran) -->
+            <h3 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Analisis Persekitaran (SWOT/SWOC Analysis)</h3>
+            <p class="text-sm text-gray-500 mb-4">Kenal pasti Kekuatan (S), Kelemahan (W), Peluang (O), dan Cabaran/Ancaman (C/T) sebagai asas kepada penetapan strategi.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Strengths -->
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold mr-2">S</div>
+                        <h4 class="font-bold text-green-800">Strengths (Kekuatan)</h4>
+                    </div>
+                    <textarea id="swot_s" rows="4" class="w-full p-2 border border-green-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" placeholder="Senaraikan kekuatan dalaman (e.g., Guru berpengalaman, Fasiliti ICT lengkap)..."></textarea>
+                </div>
+
+                <!-- Weaknesses -->
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold mr-2">W</div>
+                        <h4 class="font-bold text-red-800">Weaknesses (Kelemahan)</h4>
+                    </div>
+                    <textarea id="swot_w" rows="4" class="w-full p-2 border border-red-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm" placeholder="Senaraikan kelemahan dalaman (e.g., Beban tugas guru, Motivasi murid rendah)..."></textarea>
+                </div>
+
+                <!-- Opportunities -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mr-2">O</div>
+                        <h4 class="font-bold text-blue-800">Opportunities (Peluang)</h4>
+                    </div>
+                    <textarea id="swot_o" rows="4" class="w-full p-2 border border-blue-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Senaraikan peluang luaran (e.g., Sokongan PIBG, Dana komuniti, Jaringan IPTA)..."></textarea>
+                </div>
+
+                <!-- Challenges/Threats -->
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold mr-2">C</div>
+                        <h4 class="font-bold text-yellow-800">Challenges/Threats (Cabaran/Ancaman)</h4>
+                    </div>
+                    <textarea id="swot_c" rows="4" class="w-full p-2 border border-yellow-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm" placeholder="Senaraikan ancaman luaran (e.g., Pengaruh gajet, Masalah sosial setempat)..."></textarea>
+                </div>
+            </div>
+
             <!-- Section 0.5: Strategic Goals Table -->
             <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">Matlamat & Strategi</h3>
             <div class="overflow-x-auto mb-8">
@@ -1321,11 +1473,6 @@
                 </table>
             </div>
             
-            <!-- MOVED IMAGE: Strategic Process Flow -->
-            <div class="mb-6 flex justify-center">
-                <img src="https://raw.githubusercontent.com/GowSMK/StrategicPlan2026/refs/heads/main/flow.JPG" alt="Strategic Process Flow" class="rounded-lg shadow-lg max-w-full h-auto border border-gray-200">
-            </div>
-
             <!-- SECTION 0.6: VISUAL STRATEGY MAP (LIVE PREVIEW) -->
             <h3 class="text-xl font-semibold text-blue-600 mb-4 border-b pb-2">Peta Strategi Visual (Strategic Outcome Flow) - Live Preview</h3>
             <div id="strategyMapDisplay" class="mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
