@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Intervensi Transformasi Sekolah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 700; background-color: #eef2ff; }
+        .tab-inactive { color: #6b7280; font-weight: 500; }
+        .tab-inactive:hover { color: #374151; background-color: #f9fafb; }
+        
+        /* Table Styles for PInTaS Matrix */
+        .pintas-table { min-width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .pintas-table th { background-color: #1f2937; color: white; padding: 12px; border: 1px solid #374151; text-align: center; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.025em; }
+        .pintas-table td { border: 1px solid #d1d5db; padding: 8px; vertical-align: top; background-color: white; }
+        .pintas-table textarea { width: 100%; min-height: 100px; resize: vertical; border: 1px solid #e5e7eb; border-radius: 4px; padding: 8px; font-size: 0.85rem; transition: border-color 0.2s; line-height: 1.5; color: #1f2937; }
+        .pintas-table textarea:focus { outline: none; border-color: #6366f1; ring: 2px solid #e0e7ff; background-color: #fcfaff; }
+        
+        /* SWOT Quadrant Styles */
+        .swot-box { padding: 15px; border-radius: 8px; border: 1px solid; height: 100%; }
+        .swot-s { background-color: #ecfdf5; border-color: #10b981; } /* Green */
+        .swot-w { background-color: #fef2f2; border-color: #ef4444; } /* Red */
+        .swot-o { background-color: #eff6ff; border-color: #3b82f6; } /* Blue */
+        .swot-c { background-color: #fffbeb; border-color: #f59e0b; } /* Yellow */
+        
+        /* Highlight the Initiatives Column */
+        .col-initiative { background-color: #f5f3ff; font-weight: 600; border-left: 2px solid #6366f1 !important; border-right: 2px solid #6366f1 !important; }
+
+        .print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #printSection, #printSection * { visibility: visible; }
+            #printSection { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+            .pintas-table th { background-color: #e5e7eb !important; color: black !important; }
+            textarea { border: none !important; resize: none !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+        <div class="text-center">
+            <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 class="text-xl font-bold text-indigo-900">Memuatkan Strategi...</h2>
+            <p class="text-sm text-gray-500">Menjana Program Intervensi (8 Mata/KRA)</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="max-w-[1900px] mx-auto p-4 md:p-6 opacity-0 transition-opacity duration-500">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            <div>
+                <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">Plan Intervensi Transformasi Sekolah</h1>
+                <p class="text-xs text-gray-500 mt-1 font-semibold text-indigo-600">SMK Seri Pulai Perdana (2025-2027) &bull; Edisi Pemerkasaan</p>
+                <!-- Connection Status Indicator -->
+                <div id="connectionStatus" class="mt-2 text-xs font-bold text-gray-400">Menyemak sambungan...</div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="saveData()" id="saveBtn" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-bold text-sm transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Save
+                </button>
+                <button onclick="window.print()" class="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-bold text-sm transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 00-2 2v4h10z"></path></svg>
+                    PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- KRA Navigation Tabs -->
+        <div class="flex space-x-1 border-b border-gray-200 mb-6 overflow-x-auto pb-1" id="kraTabs">
+            <!-- Tabs injected via JS -->
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="contentArea" class="space-y-6">
+            
+            <!-- SECTION 1: Environmental Analysis (SWOT) -->
+            <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Fasa 1</span>
+                        Analisis Persekitaran (SWOT)
+                    </h2>
+                    <span id="currentKraTitle" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full uppercase"></span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Strengths -->
+                    <div class="swot-box swot-s">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-sm text-green-800">KEKUATAN (S)</h3>
+                            <span class="text-[10px] text-green-600 font-mono bg-white px-1 rounded border border-green-200">INTERNAL</span>
+                        </div>
+                        <textarea id="input_s" class="w-full bg-transparent border-none focus:ring-0 text-sm h-full min-h-[100px]" placeholder="Senaraikan kekuatan..."></textarea>
+                    </div>
+                    
+                    <!-- Weaknesses -->
+                    <div class="swot-box swot-w">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-sm text-red-800">KELEMAHAN (W)</h3>
+                            <span class="text-[10px] text-red-600 font-mono bg-white px-1 rounded border border-red-200">INTERNAL</span>
+                        </div>
+                        <textarea id="input_w" class="w-full bg-transparent border-none focus:ring-0 text-sm h-full min-h-[100px]" placeholder="Senaraikan kelemahan..."></textarea>
+                    </div>
+                    
+                    <!-- Opportunities -->
+                    <div class="swot-box swot-o">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-sm text-blue-800">PELUANG (O)</h3>
+                            <span class="text-[10px] text-blue-600 font-mono bg-white px-1 rounded border border-blue-200">EXTERNAL</span>
+                        </div>
+                        <textarea id="input_o" class="w-full bg-transparent border-none focus:ring-0 text-sm h-full min-h-[100px]" placeholder="Senaraikan peluang..."></textarea>
+                    </div>
+                    
+                    <!-- Challenges/Threats -->
+                    <div class="swot-box swot-c">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-sm text-yellow-800">ANCAMAN (T)</h3>
+                            <span class="text-[10px] text-yellow-600 font-mono bg-white px-1 rounded border border-yellow-200">EXTERNAL</span>
+                        </div>
+                        <textarea id="input_c" class="w-full bg-transparent border-none focus:ring-0 text-sm h-full min-h-[100px]" placeholder="Senaraikan ancaman..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: Intervention Matrix (The Table) -->
+            <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Fasa 2</span>
+                        Matriks Intervensi (PInTaS)
+                    </h2>
+                    <button onclick="addInterventionRow()" class="text-xs font-bold bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded transition flex items-center gap-1 shadow-sm">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Tambah Inisiatif
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto pb-4">
+                    <table class="pintas-table min-w-[2000px]">
+                        <thead>
+                            <tr>
+                                <th class="w-8">Bil</th>
+                                <th class="w-40">1. Bidang Fokus</th>
+                                <th class="w-40">2. Data Dikumpul</th>
+                                <th class="w-40">3. TOV / Baseline</th>
+                                <th class="w-40">4. Kriteria Kejayaan (KPI)</th>
+                                <th class="w-64 bg-indigo-900 text-yellow-300 border-indigo-700 shadow-inner">5. Inisiatif / Program (8+ Points)</th>
+                                <th class="w-40">6. Pihak Bertanggungjawab</th>
+                                <th class="w-32">7. Tempoh Masa</th>
+                                <th class="w-32">8. Keperluan Sumber</th>
+                                <th class="w-32">9. Evidens</th>
+                                <th class="w-32">10. Dapatan Penilaian</th>
+                                <th class="w-24">11. Kos Sebenar</th>
+                                <th class="w-8 text-red-400 bg-gray-800 border-gray-700">X</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interventionTableBody">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Status Bar -->
+        <div id="statusMsg" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm hidden transition-opacity z-50"></div>
+
+    </div>
+
+    <!-- Hidden Print Section (Clone of content for clean printing) -->
+    <div id="printSection" class="print-area p-8">
+        <h1 class="text-3xl font-bold text-center mb-2">PLAN INTERVENSI TRANSFORMASI SEKOLAH (PInTaS)</h1>
+        <h2 class="text-xl font-semibold text-center mb-8">SMK Seri Pulai Perdana (2025-2027)</h2>
+        <div id="printContent"></div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU",
+            authDomain: "strategic2026.firebaseapp.com",
+            projectId: "strategic2026",
+            storageBucket: "strategic2026.firebasestorage.app",
+            messagingSenderId: "642605714672",
+            appId: "1:642605714672:web:5dcdfbf351c36ca6084635"
+        };
+
+        const appId = 'strategic2026';
+        const PINTAS_DOC_PATH = `artifacts/${appId}/public/data/pintas/main_plan`;
+
+        // --- ENRICHED 8+ POINTS INTERVENTION DATA ---
+        // This data will be used if Firebase fails to load (Offline Fallback)
+        const DEFAULT_PINTAS_DATA = {
+            "KRA1": {
+                id: "KRA1",
+                title: "KRA 1: Pemimpin Berkesan",
+                swot: {
+                    s: "S1. Barisan SLT yang proaktif dan mempunyai visi yang jelas.\nS2. 100% GKMP mempunyai pengalaman pengurusan melebihi 5 tahun.\nS3. Hubungan kolaboratif yang erat antara pentadbir dan MLT.",
+                    w: "W1. Pencerapan kendiri MLT (Middle Leaders) belum mencapai tahap instruksional maksimum.\nW2. Analisis data sekolah belum digunakan sepenuhnya untuk intervensi segera (Real-time data).",
+                    o: "O1. Jaringan Rakan Elit (SIP+/SISC+) yang sedia membantu.\nO2. Akses kepada geran latihan kepimpinan daerah/negeri.",
+                    c: "T1. Kekangan masa pentadbir akibat tugas-tugas operasi luar jangka.\nT2. Perubahan dasar pendidikan yang memerlukan adaptasi pantas."
+                },
+                interventions: [
+                    { fokus: "Kepimpinan Instruksional", data: "Skor Pencerapan SKPMg2", tov: "Skor 88%", etr: "Skor 95%", inisiatif: "1. SPP LEADFORCE: BENGKEL COACHING & MENTORING\nLatihan intensif bimbingan instruksional untuk SLT/GKMP.", tanggungjawab: "Pengetua, PK", tempoh: "Jan 2025", sumber: "RM 1000", evidens: "Laporan Bengkel", penilaian: "", kos: "" },
+                    { fokus: "Pengurusan Data", data: "Data Kehadiran/Exam", tov: "Analisis manual", etr: "Dashboard Automatik", inisiatif: "2. SPP DATA COMMAND CENTER\nPasukan petugas khas untuk analisis data masa nyata.", tanggungjawab: "Guru Data", tempoh: "Feb 2025", sumber: "Internal", evidens: "Dashboard", penilaian: "", kos: "" },
+                    { fokus: "Pembangunan MLT", data: "Kualiti RPH Guru", tov: "Bimbingan Sederhana", etr: "Bimbingan Cemerlang", inisiatif: "3. MLT EMPOWERMENT CAMP\nKursus pemantapan untuk Ketua Panitia menjadi pembimbing pedagogi.", tanggungjawab: "PK Pentadbiran", tempoh: "Mac 2025", sumber: "RM 500", evidens: "Modul Latihan", penilaian: "", kos: "" },
+                    { fokus: "Learning Walk", data: "Frekuensi LW", tov: "1 kali/bulan", etr: "4 kali/bulan", inisiatif: "4. LEARNING WALK 2.0 (DIGITAL)\nJelajah pembelajaran menggunakan aplikasi pengumpulan data mudah alih.", tanggungjawab: "GKMP", tempoh: "Bulanan", sumber: "Tiada", evidens: "Rekod Digital", penilaian: "", kos: "" },
+                    { fokus: "Kewangan Strategik", data: "Audit Kewangan", tov: "Baik", etr: "Cemerlang", inisiatif: "5. BENGKEL KEWANGAN STRATEGIK\nLatihan pengurusan PCG berimpak tinggi untuk Ketua Panitia.", tanggungjawab: "KPT, PK", tempoh: "April 2025", sumber: "Internal", evidens: "Minit Curai", penilaian: "", kos: "" },
+                    { fokus: "Iklim Staf", data: "Soal Selidik Guru", tov: "Kepuasan 80%", etr: "Kepuasan 90%", inisiatif: "6. SESI 'COFFEE TALK' EKSEKUTIF\nSesi santai dua hala antara Pengetua dan guru-guru untuk mendengar suara hati.", tanggungjawab: "Pengetua", tempoh: "Dwibulanan", sumber: "Kenyalang", evidens: "Laporan Program", penilaian: "", kos: "" },
+                    { fokus: "Pengurusan Perubahan", data: "Adaptasi Dasar", tov: "Sederhana", etr: "Cepat", inisiatif: "7. KURSUS KEPIMPINAN PERUBAHAN (CHANGE MANAGEMENT)\nPersediaan mental untuk menerima dasar baharu KPM.", tanggungjawab: "Kaunselor", tempoh: "Mei 2025", sumber: "LADAP", evidens: "Kehadiran", penilaian: "", kos: "" },
+                    { fokus: "Jaminan Kualiti", data: "Audit Dalaman", tov: "1 kali/tahun", etr: "2 kali/tahun", inisiatif: "8. AUDIT KUALITI DALAMAN BERTERUSAN\nPasukan audit kecil untuk menyemak pematuhan SOP secara berkala.", tanggungjawab: "PK HEM/Koko", tempoh: "Jun & Nov", sumber: "Tiada", evidens: "Laporan Audit", penilaian: "", kos: "" }
+                ]
+            },
+            "KRA2": {
+                id: "KRA2",
+                title: "KRA 2: Guru Berkualiti",
+                swot: {
+                    s: "S1. 85% guru adalah terlatih dan berpengalaman.\nS2. Kemudahan infrastruktur ICT yang lengkap.\nS3. Budaya kerja berpasukan yang tinggi.",
+                    w: "W1. Aplikasi KBAT dalam PdPc masih di tahap sederhana.\nW2. Amalan Lesson Study (PLC) belum menyeluruh.\nW3. Pengintegrasian digital terganggu capaian internet.",
+                    o: "O1. Peluang latihan kompetensi digital.\nO2. Sumber pendidikan terbuka (OER).",
+                    c: "T1. Beban tugas perkeranian.\nT2. Tahap kesediaan murid yang pelbagai (Learning gap)."
+                },
+                interventions: [
+                    { fokus: "Pedagogi Digital", data: "Skor Std 4 (ICT)", tov: "70% Guru", etr: "100% Guru", inisiatif: "1. PROGRAM CIKGU TECH-SAVVY 360\nLatihan penggunaan alatan digital 'offline' (ClassPoint/Plickers) tanpa bergantung internet.", tanggungjawab: "Penyelaras ICT", tempoh: "Feb 2025", sumber: "RM 500", evidens: "Bahan Bantu", penilaian: "", kos: "" },
+                    { fokus: "Perkongsian Amalan", data: "Laporan PLC", tov: "Tertutup", etr: "Terbuka", inisiatif: "2. OPEN CLASSROOM SERIES\nMembuka kelas guru pakar untuk pemerhatian rakan sejawat (Peer Observation).", tanggungjawab: "Ketua Panitia", tempoh: "Mac - Okt", sumber: "Tiada", evidens: "Video PdPc", penilaian: "", kos: "" },
+                    { fokus: "Pembelajaran Terbeza", data: "Jurang TP", tov: "Jurang Besar", etr: "Jurang Minima", inisiatif: "3. MODUL ANJAL (DIFFERENTIATED LEARNING)\nPenyediaan modul berbeza aras (Tiered Modules) untuk menyantuni murid lemah dan cemerlang.", tanggungjawab: "GKMP", tempoh: "Sepanjang Tahun", sumber: "RM 2000", evidens: "Modul", penilaian: "", kos: "" },
+                    { fokus: "PLC Berfokus", data: "Kualiti PdPc", tov: "Sederhana", etr: "Tinggi", inisiatif: "4. PLC: VIDEO CRITIQUE\nMerakam sesi PdPc dan menganalisanya bersama ahli panitia untuk penambahbaikan.", tanggungjawab: "KP Teras", tempoh: "Suku Tahun", sumber: "Tiada", evidens: "Rakaman", penilaian: "", kos: "" },
+                    { fokus: "Inovasi Guru", data: "Penyertaan Inovasi", tov: "2 Penyertaan", etr: "5 Penyertaan", inisiatif: "5. GERAN GURU INOVATIF\nPeruntukan kecil (seed fund) untuk guru membangunkan BBM kreatif.", tanggungjawab: "PK Koko", tempoh: "Apr 2025", sumber: "PIBG", evidens: "Produk Inovasi", penilaian: "", kos: "" },
+                    { fokus: "Kemahiran KBAT", data: "Skor KBAT Murid", tov: "Rendah", etr: "Sederhana Tinggi", inisiatif: "6. BENGKEL TEKNIK PENYOALAN KBAT\nLatihan membina soalan aras tinggi yang merangsang pemikiran kritis.", tanggungjawab: "SISC+", tempoh: "Mei 2025", sumber: "LADAP", evidens: "RPH", penilaian: "", kos: "" },
+                    { fokus: "Psikologi Murid", data: "Aduan Murid", tov: "Ada", etr: "Tiada", inisiatif: "7. PROGRAM 'GURU PENYAYANG'\nKursus asas kaunseling dan psikologi remaja untuk guru kelas.", tanggungjawab: "UBK", tempoh: "Jun 2025", sumber: "LADAP", evidens: "Log Mentor", penilaian: "", kos: "" },
+                    { fokus: "Project Based Learning", data: "Projek Murid", tov: "Kurang", etr: "1 Projek/Tahun", inisiatif: "8. PBL SHOWCASE\nPameran hasil kerja projek murid (PBL) merentas kurikulum.", tanggungjawab: "GKMP Sains/Tek", tempoh: "Ogos 2025", sumber: "RM 1000", evidens: "Pameran", penilaian: "", kos: "" }
+                ]
+            },
+            "KRA3": {
+                id: "KRA3",
+                title: "KRA 3: Persekitaran Pembelajaran",
+                swot: {
+                    s: "S1. Fizikal sekolah kondusif.\nS2. Kemudahan sukan baik.\nS3. Bilik khas berfungsi.",
+                    w: "W1. Kelas kurang ceria.\nW2. Tandas murid perlu naik taraf.",
+                    o: "O1. Sumbangan komuniti.\nO2. Gotong-royong PIBG.",
+                    c: "T1. Kos penyelenggaraan tinggi.\nT2. Vandalisme kecil."
+                },
+                interventions: [
+                    { fokus: "Motivasi Akademik", data: "Data Peperiksaan", tov: "Sederhana", etr: "Tinggi", inisiatif: "1. LEAGUE OF SCHOLARS (LIGA ILMU)\nSistem leaderboard akademik gamifikasi untuk persaingan sihat.", tanggungjawab: "SU Peperiksaan", tempoh: "Suku Tahun", sumber: "RM 500", evidens: "Papan Skor", penilaian: "", kos: "" },
+                    { fokus: "Iklim Fizikal", data: "Keceriaan Kelas", tov: "3 Bintang", etr: "5 Bintang", inisiatif: "2. PROJEK 'VIBE SEKOLAHKU'\nPertandingan keceriaan kelas bertema dan mural motivasi.", tanggungjawab: "PK HEM", tempoh: "Jan-Mac", sumber: "CSR", evidens: "Foto", penilaian: "", kos: "" },
+                    { fokus: "Pengucapan Awam", data: "Keyakinan Murid", tov: "Rendah", etr: "Tinggi", inisiatif: "3. SUDUT 'SPEAKER'S CORNER'\nMewujudkan pentas mini untuk murid meluahkan pendapat/bakat semasa rehat.", tanggungjawab: "GKMP Bahasa", tempoh: "Mingguan", sumber: "RM 300", evidens: "Jadual Aktiviti", penilaian: "", kos: "" },
+                    { fokus: "Kebersihan & Kekemasan", data: "Audit 3K", tov: "80%", etr: "95%", inisiatif: "4. KELAS KONDUSIF 5S\nPenerapan amalan Sisih, Susun, Sapu, Seragam, Sentiasa Amal.", tanggungjawab: "J/K 3K", tempoh: "Harian", sumber: "Tiada", evidens: "Audit 5S", penilaian: "", kos: "" },
+                    { fokus: "Pembelajaran Kendiri", data: "Akses Bahan", tov: "Terhad", etr: "Mudah", inisiatif: "5. LALUAN ILMU DIGITAL\nPenampalan Kod QR di sekitar sekolah yang memaut kepada nota ringkas/video.", tanggungjawab: "Panitia", tempoh: "Apr 2025", sumber: "RM 200", evidens: "Kod QR", penilaian: "", kos: "" },
+                    { fokus: "Fasiliti Asas", data: "Aduan Kerosakan", tov: "Tinggi", etr: "Rendah", inisiatif: "6. TANDAS ANGKAT KORPORAT\nMencari penaja korporat untuk menaik taraf tandas murid.", tanggungjawab: "PIBG", tempoh: "Mei 2025", sumber: "Tajaan", evidens: "Tandas Baru", penilaian: "", kos: "" },
+                    { fokus: "Pembelajaran Luar Bilik", data: "Penggunaan Taman", tov: "Jarang", etr: "Kerap", inisiatif: "7. TAMAN HERBA & SAINS\nMenjadikan taman sekolah sebagai makmal hidup (Living Lab).", tanggungjawab: "Panitia Sains", tempoh: "Sepanjang Tahun", sumber: "Kelab Alam", evidens: "RPH Luar", penilaian: "", kos: "" },
+                    { fokus: "Kesihatan Mental", data: "Ujian DASS", tov: "Stress Tinggi", etr: "Stabil", inisiatif: "8. BILIK REHAT MINDA (UBK)\nRuang santai untuk murid yang mengalami tekanan emosi berehat sebentar.", tanggungjawab: "Kaunselor", tempoh: "Jun 2025", sumber: "PCG UBK", evidens: "Log Penggunaan", penilaian: "", kos: "" }
+                ]
+            },
+            "KRA4": {
+                id: "KRA4",
+                title: "KRA 4: Sokongan PIBG & Komuniti",
+                swot: {
+                    s: "S1. PIBG menyokong.\nS2. Hubungan baik PDRM.\nS3. Lokasi zon industri.",
+                    w: "W1. Kehadiran ibu bapa rendah.\nW2. Masalah pengangkutan.",
+                    o: "O1. CSR kilang.\nO2. Alumni berjaya.",
+                    c: "T1. Sosio-ekonomi B40.\nT2. Pengaruh rakan sebaya."
+                },
+                interventions: [
+                    { fokus: "Kehadiran Tegar", data: "APDM", tov: "85%", etr: "92%", inisiatif: "1. MISI SIFAR CICIR (MSC)\nZiarah cakna ke rumah murid berisiko cicir bersama komuniti.", tanggungjawab: "PK HEM", tempoh: "Bulanan", sumber: "Tabung Kebajikan", evidens: "Laporan Ziarah", penilaian: "", kos: "" },
+                    { fokus: "Kesedaran Kerjaya", data: "Minat Kerjaya", tov: "Kabur", etr: "Jelas", inisiatif: "2. KARNIVAL KERJAYA KOMUNITI\nPameran kerjaya melibatkan industri setempat (Senai/Kulai).", tanggungjawab: "UBK", tempoh: "Julai 2025", sumber: "Tajaan", evidens: "Laporan Karnival", penilaian: "", kos: "" },
+                    { fokus: "Komunikasi Ibu Bapa", data: "Aduan/Respon", tov: "Lambat", etr: "Pantas", inisiatif: "3. E-WARUNG PIBG\nSesi dialog maya santai bersama ibu bapa pada waktu malam.", tanggungjawab: "YDP PIBG", tempoh: "Suku Tahun", sumber: "Tiada", evidens: "Rakaman Meet", penilaian: "", kos: "" },
+                    { fokus: "Bantuan Akademik", data: "Pencapaian B40", tov: "Lemah", etr: "Lulus", inisiatif: "4. KELAS TUISYEN RAKYAT\nKelas tambahan percuma/murah anjuran PIBG untuk murid B40.", tanggungjawab: "Biro Akademik", tempoh: "Malam/Sabtu", sumber: "Sumbangan", evidens: "Jadual", penilaian: "", kos: "" },
+                    { fokus: "Mentoring Industri", data: "Motivasi", tov: "Rendah", etr: "Tinggi", inisiatif: "5. MENTOR MENTEE KORPORAT\nProgram anak angkat akademik oleh syarikat korporat.", tanggungjawab: "Pengetua", tempoh: "Sepanjang Tahun", sumber: "CSR", evidens: "Perjanjian", penilaian: "", kos: "" },
+                    { fokus: "Kebajikan", data: "Senarai Miskin", tov: "Ramai", etr: "Terbantu", inisiatif: "6. TABUNG PRIHATIN SEKOLAH\nDana kecemasan untuk uniform, makanan, dan yuran asas.", tanggungjawab: "Kebajikan", tempoh: "Berterusan", sumber: "Derma", evidens: "Rekod Bantuan", penilaian: "", kos: "" },
+                    { fokus: "Hubungan Silaturahim", data: "Kehadiran Program", tov: "Kurang", etr: "Ramai", inisiatif: "7. HARI KELUARGA SEKOLAH-KOMUNITI\nSukaneka dan jamuan rakyat untuk mengeratkan hubungan.", tanggungjawab: "PIBG/Kelab Guru", tempoh: "Akhir Tahun", sumber: "Tiket/Jualan", evidens: "Gambar", penilaian: "", kos: "" },
+                    { fokus: "Keselamatan & Sokongan", data: "Disiplin", tov: "Terkawal", etr: "Sifar Salah Laku", inisiatif: "8. SKUAD SUKARELAWAN IBU BAPA\nBantuan ibu bapa untuk kawalan trafik dan keselamatan acara.", tanggungjawab: "Biro Keselamatan", tempoh: "Harian/Acara", sumber: "Sukarela", evidens: "Jadual Tugas", penilaian: "", kos: "" }
+                ]
+            }
+        };
+
+        // --- State Management ---
+        let app, db, auth;
+        let currentData = null;
+        let currentTabId = "KRA1";
+
+        // --- Functions ---
+
+        async function initApp() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                await signInAnonymously(auth);
+                
+                // Try Loading Data from Firebase
+                const docRef = doc(db, PINTAS_DOC_PATH);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    currentData = docSnap.data();
+                    document.getElementById('connectionStatus').textContent = "Status: Online (Data DB)";
+                    document.getElementById('connectionStatus').className = "mt-2 text-xs font-bold text-green-600";
+                } else {
+                    currentData = DEFAULT_PINTAS_DATA;
+                    // Auto-save default data if it doesn't exist
+                    await setDoc(docRef, currentData);
+                    document.getElementById('connectionStatus').textContent = "Status: Online (Data Baru)";
+                    document.getElementById('connectionStatus').className = "mt-2 text-xs font-bold text-blue-600";
+                }
+                
+            } catch (e) {
+                console.error("Init Error", e);
+                // CRITICAL FALLBACK: Use local data if Firebase fails
+                currentData = DEFAULT_PINTAS_DATA;
+                document.getElementById('connectionStatus').textContent = "Status: Offline (Data Tempatan)";
+                document.getElementById('connectionStatus').className = "mt-2 text-xs font-bold text-red-500";
+            }
+            
+            // Build UI regardless of connection source
+            renderTabs();
+            renderContent();
+            
+            // Show App
+            document.getElementById('loadingOverlay').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('opacity-0');
+            }, 300);
+        }
+
+        window.saveData = async function() {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                // Collect current state from DOM before saving
+                saveCurrentTabStateToMemory();
+                
+                await setDoc(doc(db, PINTAS_DOC_PATH), currentData);
+                showStatus("Data berjaya disimpan!");
+                document.getElementById('connectionStatus').textContent = "Status: Disimpan & Online";
+                document.getElementById('connectionStatus').className = "mt-2 text-xs font-bold text-green-600";
+            } catch (e) {
+                console.error(e);
+                showStatus("Gagal menyimpan ke DB! (Semak Internet)", true);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function showStatus(msg, isError = false) {
+            const el = document.getElementById('statusMsg');
+            el.textContent = msg;
+            el.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-sm transition-opacity z-50 ${isError ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 3000);
+        }
+
+        // --- UI Rendering ---
+
+        function renderTabs() {
+            const tabContainer = document.getElementById('kraTabs');
+            tabContainer.innerHTML = '';
+            
+            Object.keys(currentData).forEach(key => {
+                const kra = currentData[key];
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 text-sm font-medium rounded-t-lg transition whitespace-nowrap ${key === currentTabId ? 'tab-active' : 'tab-inactive'}`;
+                btn.textContent = kra.title;
+                btn.onclick = () => switchTab(key);
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        function switchTab(newTabId) {
+            saveCurrentTabStateToMemory(); // Save inputs of current tab
+            currentTabId = newTabId;
+            renderTabs();
+            renderContent();
+        }
+
+        function saveCurrentTabStateToMemory() {
+            if (!currentTabId || !currentData) return;
+            
+            // Save SWOT
+            currentData[currentTabId].swot.s = document.getElementById('input_s').value;
+            currentData[currentTabId].swot.w = document.getElementById('input_w').value;
+            currentData[currentTabId].swot.o = document.getElementById('input_o').value;
+            currentData[currentTabId].swot.c = document.getElementById('input_c').value;
+
+            // Save Table Rows
+            const tbody = document.getElementById('interventionTableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const interventions = rows.map(row => {
+                return {
+                    fokus: row.querySelector('[data-field="fokus"]').value,
+                    data: row.querySelector('[data-field="data"]').value,
+                    tov: row.querySelector('[data-field="tov"]').value,
+                    etr: row.querySelector('[data-field="etr"]').value,
+                    inisiatif: row.querySelector('[data-field="inisiatif"]').value,
+                    tanggungjawab: row.querySelector('[data-field="tanggungjawab"]').value,
+                    tempoh: row.querySelector('[data-field="tempoh"]').value,
+                    sumber: row.querySelector('[data-field="sumber"]').value,
+                    evidens: row.querySelector('[data-field="evidens"]').value,
+                    penilaian: row.querySelector('[data-field="penilaian"]').value,
+                    kos: row.querySelector('[data-field="kos"]').value,
+                };
+            });
+            currentData[currentTabId].interventions = interventions;
+        }
+
+        function renderContent() {
+            const data = currentData[currentTabId];
+            
+            // Set Title
+            document.getElementById('currentKraTitle').textContent = `${data.title}`;
+
+            // Set SWOT
+            document.getElementById('input_s').value = data.swot.s || '';
+            document.getElementById('input_w').value = data.swot.w || '';
+            document.getElementById('input_o').value = data.swot.o || '';
+            document.getElementById('input_c').value = data.swot.c || '';
+
+            // Set Table
+            const tbody = document.getElementById('interventionTableBody');
+            tbody.innerHTML = '';
+            
+            if (data.interventions && data.interventions.length > 0) {
+                data.interventions.forEach((item, index) => {
+                    createRow(item, index + 1);
+                });
+            } else {
+                // Create empty row if none
+                createRow({}, 1);
+            }
+        }
+
+        window.addInterventionRow = function() {
+            saveCurrentTabStateToMemory();
+            currentData[currentTabId].interventions.push({});
+            renderContent(); // Re-render to show new row
+        }
+
+        window.deleteRow = function(index) {
+            saveCurrentTabStateToMemory();
+            currentData[currentTabId].interventions.splice(index, 1);
+            renderContent();
+        }
+
+        function createRow(data, index) {
+            const tbody = document.getElementById('interventionTableBody');
+            const tr = document.createElement('tr');
+            
+            const fields = [
+                'fokus', 'data', 'tov', 'etr', 'inisiatif', 
+                'tanggungjawab', 'tempoh', 'sumber', 'evidens', 
+                'penilaian', 'kos'
+            ];
+
+            let html = `<td class="text-center font-bold text-gray-500 pt-4">${index}</td>`;
+            
+            fields.forEach(field => {
+                // Special highlighting for the 'Inisiatif' column
+                const extraClass = field === 'inisiatif' ? 'bg-indigo-50 font-medium text-indigo-900 border-indigo-200 col-initiative' : 'focus:bg-gray-50';
+                html += `<td><textarea data-field="${field}" class="${extraClass}">${data[field] || ''}</textarea></td>`;
+            });
+
+            html += `
+                <td class="text-center align-middle">
+                    <button onclick="deleteRow(${index - 1})" class="text-red-300 hover:text-red-600 transition p-2" title="Padam Baris">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"></path></svg>
+                    </button>
+                </td>
+            `;
+            
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        }
+
+        // Initialize
+        initApp();
+
+    </script>
+</body>
+</html>
+
+
