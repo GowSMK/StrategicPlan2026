@@ -10,33 +10,28 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         
-        /* ORG CHART STYLES */
+        /* --- ORG CHART STYLES --- */
         .org-container {
-            overflow-x: auto;
+            overflow: auto; /* Allow scrolling */
             padding: 40px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            text-align: center;
             min-height: 600px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: flex-start; 
         }
-        .tree { display: inline-flex; flex-direction: column; align-items: center; }
-        .children-container { display: flex; gap: 20px; position: relative; padding-top: 20px; }
-        .node-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
         
-        /* Connector Lines */
-        .node-wrapper::before { content: ''; position: absolute; top: 0; height: 20px; width: 2px; background: #cbd5e1; }
-        .tree > .node-wrapper::before { display: none; } /* No line for root */
-        .children-container::before { content: ''; position: absolute; top: 0; left: 50%; height: 20px; width: 2px; background: #cbd5e1; }
-        
-        /* Horizontal Bars */
-        .node-wrapper:not(:only-child):first-child::after { content: ''; position: absolute; top: 0; right: 0; height: 2px; width: 50%; background: #cbd5e1; }
-        .node-wrapper:not(:only-child):last-child::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 50%; background: #cbd5e1; }
-        .node-wrapper:not(:only-child):not(:first-child):not(:last-child)::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 100%; background: #cbd5e1; }
+        .tree { 
+            display: inline-flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0 auto; 
+        }
 
+        .node-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; padding: 0 10px; }
+        
         /* Node Cards */
         .node-card {
             background: white;
@@ -55,155 +50,155 @@
         .node-role { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #6366f1; margin-bottom: 4px; line-height: 1.2; }
         .node-name { font-size: 11px; font-weight: 600; color: #1e293b; line-height: 1.3; }
         
-        /* Colors */
+        /* Role Colors */
         .role-pengetua { border-top: 4px solid #fcd34d; background: #fffbeb; }
         .role-pk { border-top: 4px solid #60a5fa; background: #eff6ff; }
         .role-gkmp { border-top: 4px solid #4ade80; background: #f0fdf4; }
         .role-kp { border-top: 4px solid #f472b6; background: #fdf2f8; }
         .role-default { border-top: 4px solid #94a3b8; }
 
-        /* Table Styles */
+        /* --- LAYOUT CONNECTORS --- */
+        /* Horizontal */
+        .layout-horizontal .children-container { display: flex; padding-top: 20px; position: relative; }
+        .layout-horizontal .node-wrapper::before { content: ''; position: absolute; top: 0; height: 20px; width: 2px; background: #cbd5e1; }
+        .layout-horizontal .tree > .node-wrapper::before { display: none; } 
+        .layout-horizontal .children-container::before { content: ''; position: absolute; top: 0; left: 50%; height: 20px; width: 2px; background: #cbd5e1; }
+        .layout-horizontal .node-wrapper:not(:only-child):first-child::after { content: ''; position: absolute; top: 0; right: 0; height: 2px; width: 50%; background: #cbd5e1; }
+        .layout-horizontal .node-wrapper:not(:only-child):last-child::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 50%; background: #cbd5e1; }
+        .layout-horizontal .node-wrapper:not(:only-child):not(:first-child):not(:last-child)::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 100%; background: #cbd5e1; }
+
+        /* Vertical */
+        .layout-vertical .tree { width: 100%; }
+        .layout-vertical .children-container { display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 20px; position: relative; }
+        .layout-vertical .children-container::before { content: ''; position: absolute; top: 0; left: 50%; height: 20px; width: 2px; background: #cbd5e1; }
+        .layout-vertical .node-wrapper { margin-bottom: 10px; width: 100%; }
+        .layout-vertical > .node-wrapper > .children-container { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 20px; }
+
+        /* Orphan Section */
+        .orphan-section { margin-top: 40px; padding: 20px; border: 2px dashed #f87171; background: #fef2f2; border-radius: 8px; width: 100%; text-align: center; }
+        .orphan-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+
+        /* Table & UI Styles */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .data-table th { background-color: #f1f5f9; padding: 10px; text-align: left; font-weight: 700; border: 1px solid #e2e8f0; color: #475569; }
-        .data-table td { border: 1px solid #e2e8f0; padding: 6px; background: white; }
+        .data-table th { background-color: #f1f5f9; padding: 8px; text-align: left; font-weight: 700; border: 1px solid #e2e8f0; color: #475569; position: relative; }
+        .data-table td { border: 1px solid #e2e8f0; padding: 6px; background: white; position: relative; }
         .data-table input { width: 100%; border: none; background: transparent; outline: none; font-size: 0.85rem; padding: 4px; }
         .data-table input:focus { background-color: #f0f9ff; }
         
-        /* Sidebar Item */
-        .panitia-item {
-            transition: all 0.2s;
-        }
-        .panitia-item:hover {
-            background-color: #f3f4f6;
-        }
-        .panitia-item.active {
-            background-color: #e0e7ff;
-            color: #4338ca;
-            border-right: 3px solid #4338ca;
-        }
+        #mainSidebar { transition: transform 0.3s ease-in-out; }
+        .nav-item.active { background-color: #e0e7ff; color: #4338ca; border-right: 3px solid #4338ca; }
+        
+        /* Action Buttons Visibility */
+        .row-action-btn, .col-action-btn { opacity: 0; transition: opacity 0.2s; }
+        tr:hover .row-action-btn { opacity: 1; }
+        th:hover .col-action-btn { opacity: 1; }
+        
+        /* Tabs Scrollbar */
+        #tableTabs::-webkit-scrollbar { height: 4px; }
+        #tableTabs::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
-
-    <!-- Stub to avoid "fireauth is not defined" from external environments -->
-    <script>
-        window.fireauth = window.fireauth || null;
-    </script>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm z-20">
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shadow-sm z-30 relative">
         <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-            </div>
-            <div>
-                <h1 class="text-lg font-extrabold text-gray-900 leading-none">PENGURUSAN KURIKULUM</h1>
-                <p class="text-xs text-gray-500 font-medium">SMK Seri Pulai Perdana</p>
-            </div>
-            <div id="connectionStatus" class="ml-4 text-xs font-bold px-2 py-1 rounded bg-gray-100 text-gray-500 flex items-center">
-                <span class="w-2 h-2 rounded-full bg-gray-400 mr-2"></span> Connecting...
+            <button onclick="toggleSidebar()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg hidden sm:block">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-gray-900 leading-none">PENGURUSAN KURIKULUM</h1>
+                    <p class="text-xs text-gray-500 font-medium hidden sm:block">SMK Seri Pulai Perdana</p>
+                </div>
+                <div id="connectionStatus" class="ml-2 sm:ml-4 text-xs font-bold px-2 py-1 rounded bg-gray-100 text-gray-500 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-gray-400 mr-2"></span> <span class="hidden sm:inline">Connecting...</span>
+                </div>
             </div>
         </div>
-        <div class="flex gap-3">
-            <button onclick="saveData()" id="saveBtn" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-md flex items-center gap-2">
+        <div class="flex gap-2">
+            <button onclick="resetToDefault()" class="text-red-600 hover:text-red-800 text-xs font-bold px-3 py-2">Reset</button>
+            <button onclick="saveData()" id="saveBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-md flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                Simpan
+                <span class="hidden sm:inline">Simpan</span>
             </button>
         </div>
     </header>
 
     <!-- Main Layout -->
-    <div class="flex-1 flex overflow-hidden">
-        
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-10">
-            <div class="p-4 border-b border-gray-100">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Struktur Organisasi</h3>
+    <div class="flex-1 flex overflow-hidden relative">
+        <aside id="mainSidebar" class="bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-20 w-64 absolute md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Navigasi Utama</h3>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-            
-            <!-- Navigation List -->
             <nav class="flex-1 overflow-y-auto p-2 space-y-1" id="navContainer">
-                <button onclick="switchView('carta')" id="nav-carta" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md bg-indigo-50 text-indigo-700">
+                <button onclick="switchView('carta')" id="nav-carta" class="nav-item active w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50">
                     <span class="mr-3">📊</span> Carta Organisasi
                 </button>
-                <button onclick="switchView('tables')" id="nav-tables" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50">
+                <button onclick="switchView('tables')" id="nav-tables" class="nav-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50">
                     <span class="mr-3">📋</span> Data & Jawatankuasa
                 </button>
-                
-                <div class="pt-4 pb-2">
-                    <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Senarai Panitia
-                    </h3>
-                </div>
-                <!-- Dynamic Panitia List -->
-                <div id="panitiaListContainer">
-                    <!-- Panitia items will be injected here -->
-                </div>
             </nav>
-
-            <!-- Add Panitia Button (Fixed at Bottom) -->
-            <div class="p-4 border-t border-gray-200 bg-gray-50">
-                <button onclick="addNewPanitia()" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 border-indigo-200">
-                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Tambah Panitia
-                </button>
+            <div class="p-4 bg-gray-50 border-t border-gray-200">
+                <p class="text-xs text-gray-400 text-center">Kurikulum 2025 v2.6</p>
             </div>
         </aside>
 
-        <!-- Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-8" id="mainContent">
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8 w-full" id="mainContent">
             
             <!-- VIEW 1: CARTA ORGANISASI -->
             <div id="view-carta" class="space-y-4">
-                <div class="flex justify-between items-end">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Carta Organisasi Kurikulum 2025</h2>
-                        <p class="text-sm text-gray-500">Klik pada mana-mana kotak untuk mengedit nama atau jawatan.</p>
+                        <h2 class="text-2xl font-bold text-gray-800">Carta Organisasi</h2>
+                        <p class="text-sm text-gray-500">Klik kotak untuk edit. Guna butang menu (kiri atas) untuk ruang lebih luas.</p>
                     </div>
-                    <div class="flex gap-2 text-xs">
-                        <span class="flex items-center"><span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span> Pengetua</span>
-                        <span class="flex items-center"><span class="w-2 h-2 bg-blue-400 rounded-full mr-1"></span> PK</span>
-                        <span class="flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span> GKMP</span>
-                        <span class="flex items-center"><span class="w-2 h-2 bg-pink-400 rounded-full mr-1"></span> KP</span>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center bg-white border border-gray-200 rounded-lg p-1">
+                            <button onclick="setChartOrientation('horizontal')" id="btn-horizontal" class="px-3 py-1 text-xs font-bold rounded-md bg-indigo-100 text-indigo-700">Melintang</button>
+                            <button onclick="setChartOrientation('vertical')" id="btn-vertical" class="px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:bg-gray-50">Menegak</button>
+                        </div>
                     </div>
                 </div>
-                <div class="org-container" id="chartCanvas"></div>
+                <div id="chartContainerWrapper" class="org-container layout-horizontal">
+                    <div id="chartCanvas" class="tree"></div>
+                    <!-- ORPHAN SECTION -->
+                    <div id="orphanSection" class="orphan-section hidden">
+                        <h4 class="text-red-600 font-bold text-sm">⚠️ Item Tidak Bersambung (Parent Salah)</h4>
+                        <div id="orphanCanvas" class="orphan-container"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- VIEW 2: TABLES -->
             <div id="view-tables" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800" id="tablePageTitle">Data Panitia & Analisis</h2>
+                    <button onclick="deleteActiveTable()" class="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-xs font-bold border border-red-200 transition">Hapus Senarai</button>
                 </div>
-                
-                <!-- Tabs -->
-                <div class="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200" id="tableTabs">
-                    <!-- Injected by JS -->
-                </div>
-
-                <!-- Active Table -->
-                <div id="activeTableContainer" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 min-h-[400px]">
-                    <!-- Injected by JS -->
-                </div>
+                <div class="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200 items-center" id="tableTabs"></div>
+                <div id="activeTableContainer" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 min-h-[400px]"></div>
             </div>
 
         </main>
     </div>
 
-    <!-- Modal for Org Chart -->
+    <!-- Edit Modal -->
     <div id="nodeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-96 p-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Edit Posisi</h3>
             <input type="hidden" id="nodeId">
             <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Jawatan</label>
-                    <input type="text" id="nodeRole" class="w-full border border-gray-300 rounded p-2 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Guru</label>
-                    <input type="text" id="nodeName" class="w-full border border-gray-300 rounded p-2 text-sm">
-                </div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Jawatan</label><input type="text" id="nodeRole" class="w-full border border-gray-300 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Guru</label><input type="text" id="nodeName" class="w-full border border-gray-300 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Parent ID</label><input type="text" id="nodeParent" class="w-full border border-gray-300 bg-gray-50 rounded p-2 text-sm text-gray-500"></div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Warna Tag</label>
                     <select id="nodeColor" class="w-full border border-gray-300 rounded p-2 text-sm">
@@ -228,374 +223,283 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU",
-            authDomain: "strategic2026.firebaseapp.com",
-            projectId: "strategic2026",
-            storageBucket: "strategic2026.firebasestorage.app",
-            messagingSenderId: "642605714672",
-            appId: "1:642605714672:web:5dcdfbf351c36ca6084635"
-        };
-
-        // --- CATALOGUE PATH (Dedicated to Kurikulum Only) ---
-        const appId = 'strategic2026';
+        // --- CONFIG ---
+        const hardcodedConfig = { apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU", authDomain: "strategic2026.firebaseapp.com", projectId: "strategic2026", storageBucket: "strategic2026.firebasestorage.app", messagingSenderId: "642605714672", appId: "1:642605714672:web:5dcdfbf351c36ca6084635" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'strategic2026';
         const DOC_PATH = `artifacts/${appId}/public/data/kurikulum_editor/kurikulum_live_v1`;
 
-        // --- ANONYMIZED DEFAULT DATA ---
         const DEFAULT_DATA = {
             chart: [
                 { id: 'root', parent: null, role: 'PENGETUA', name: 'NAMA PENGETUA', color: 'role-pengetua' },
-                
                 { id: 'pk1', parent: 'root', role: 'PK PENTADBIRAN', name: 'NAMA PK PENTADBIRAN', color: 'role-pk' },
                 { id: 'pkhem', parent: 'root', role: 'PK HEM', name: 'NAMA PK HEM', color: 'role-pk' },
                 { id: 'pkkoko', parent: 'root', role: 'PK KOKURIKULUM', name: 'NAMA PK KOKURIKULUM', color: 'role-pk' },
                 { id: 'pkpetang', parent: 'root', role: 'PK PETANG', name: 'NAMA PK PETANG', color: 'role-pk' },
-                
                 { id: 'su', parent: 'pk1', role: 'SU KURIKULUM', name: 'NAMA SETIAUSAHA', color: 'role-default' },
-                
-                // GKMP & KP - BAHASA
                 { id: 'gkmp_bhs', parent: 'pk1', role: 'GKMP BAHASA', name: 'NAMA GKMP BAHASA', color: 'role-gkmp' },
                 { id: 'kp_bm', parent: 'gkmp_bhs', role: 'KP B. MELAYU', name: 'KETUA PANITIA BM', color: 'role-kp' },
                 { id: 'kp_bi', parent: 'gkmp_bhs', role: 'KP B. INGGERIS', name: 'KETUA PANITIA BI', color: 'role-kp' },
-                { id: 'kp_bc', parent: 'gkmp_bhs', role: 'KP B. CINA', name: 'KETUA PANITIA BC', color: 'role-kp' },
-                { id: 'kp_bt', parent: 'gkmp_bhs', role: 'KP B. TAMIL', name: 'KETUA PANITIA BT', color: 'role-kp' },
-
-                // GKMP & KP - KEMANUSIAAN
-                { id: 'gkmp_kem', parent: 'pk1', role: 'GKMP KEMANUSIAAN', name: 'NAMA GKMP KEMANUSIAAN', color: 'role-gkmp' },
-                { id: 'kp_sej', parent: 'gkmp_kem', role: 'KP SEJARAH', name: 'KETUA PANITIA SEJARAH', color: 'role-kp' },
-                { id: 'kp_geo', parent: 'gkmp_kem', role: 'KP GEOGRAFI', name: 'KETUA PANITIA GEOGRAFI', color: 'role-kp' },
-                { id: 'kp_pi', parent: 'gkmp_kem', role: 'KP P. ISLAM', name: 'KETUA PANITIA P.ISLAM', color: 'role-kp' },
-                { id: 'kp_pm', parent: 'gkmp_kem', role: 'KP P. MORAL', name: 'KETUA PANITIA P.MORAL', color: 'role-kp' },
-                { id: 'kp_psv', parent: 'gkmp_kem', role: 'KP PSV', name: 'KETUA PANITIA PSV', color: 'role-kp' },
-                { id: 'kp_pj', parent: 'gkmp_kem', role: 'KP PJPK', name: 'KETUA PANITIA PJPK', color: 'role-kp' },
-                { id: 'kp_tas', parent: 'gkmp_kem', role: 'KP TASAWWUR', name: 'KETUA PANITIA TASAWWUR', color: 'role-kp' },
-
-                // GKMP & KP - SAINS MATH
                 { id: 'gkmp_sm', parent: 'pk1', role: 'GKMP SAINS MATH', name: 'NAMA GKMP SAINS MATH', color: 'role-gkmp' },
-                { id: 'kp_sn', parent: 'gkmp_sm', role: 'KP SAINS', name: 'KETUA PANITIA SAINS', color: 'role-kp' },
                 { id: 'kp_mat', parent: 'gkmp_sm', role: 'KP MATEMATIK', name: 'KETUA PANITIA MATH', color: 'role-kp' },
-                { id: 'kp_bio', parent: 'gkmp_sm', role: 'KP BIOLOGI', name: 'KETUA PANITIA BIOLOGI', color: 'role-kp' },
-                { id: 'kp_fiz', parent: 'gkmp_sm', role: 'KP FIZIK', name: 'KETUA PANITIA FIZIK', color: 'role-kp' },
-                { id: 'kp_kim', parent: 'gkmp_sm', role: 'KP KIMIA', name: 'KETUA PANITIA KIMIA', color: 'role-kp' },
-                { id: 'kp_mt', parent: 'gkmp_sm', role: 'KP MATH TAMBAHAN', name: 'KETUA PANITIA MATH TAM', color: 'role-kp' },
-
-                // GKMP & KP - TEKNIK VOKASIONAL
-                { id: 'gkmp_tv', parent: 'pk1', role: 'GKMP TEKNIK VOK', name: 'NAMA GKMP TVET', color: 'role-gkmp' },
-                { id: 'kp_rbt', parent: 'gkmp_tv', role: 'KP RBT', name: 'KETUA PANITIA RBT', color: 'role-kp' },
-                { id: 'kp_pn', parent: 'gkmp_tv', role: 'KP PERNIAGAAN', name: 'KETUA PANITIA PERNIAGAAN', color: 'role-kp' },
-                { id: 'kp_pa', parent: 'gkmp_tv', role: 'KP P. AKAUN', name: 'KETUA PANITIA P.AKAUN', color: 'role-kp' },
-                { id: 'kp_eko', parent: 'gkmp_tv', role: 'KP EKONOMI', name: 'KETUA PANITIA EKONOMI', color: 'role-kp' },
-                { id: 'kp_srt', parent: 'gkmp_tv', role: 'KP SRT', name: 'KETUA PANITIA SRT', color: 'role-kp' },
-                { id: 'kp_abm', parent: 'gkmp_tv', role: 'KP AMALAN BM', name: 'KETUA PANITIA ABM', color: 'role-kp' }
+                { id: 'kp_sn', parent: 'gkmp_sm', role: 'KP SAINS', name: 'KETUA PANITIA SAINS', color: 'role-kp' },
             ],
             tables: [
-                {
-                    id: 'senarai_kp',
-                    title: 'Senarai Ketua Panitia 2025',
-                    headers: ['Bil', 'Mata Pelajaran', 'Ketua Panitia'],
-                    rows: [
-                        ['1', 'Bahasa Melayu', 'NAMA GURU'],
-                        ['2', 'Bahasa Inggeris', 'NAMA GURU'],
-                        ['3', 'Sejarah', 'NAMA GURU'],
-                        ['4', 'Matematik', 'NAMA GURU'],
-                        ['5', 'Sains', 'NAMA GURU'],
-                        ['6', 'Pendidikan Islam', 'NAMA GURU'],
-                        ['7', 'PJPK', 'NAMA GURU'],
-                        ['8', 'RBT', 'NAMA GURU'],
-                        ['9', 'Geografi', 'NAMA GURU'],
-                        ['10', 'PSV', 'NAMA GURU'],
-                        ['11', 'Perniagaan', 'NAMA GURU'],
-                        ['12', 'Prinsip Akaun', 'NAMA GURU'],
-                        ['13', 'Fizik', 'NAMA GURU'],
-                        ['14', 'Kimia', 'NAMA GURU'],
-                        ['15', 'Biologi', 'NAMA GURU']
-                    ]
-                },
-                {
-                    id: 'sasaran_spm',
-                    title: 'Sasaran Prestasi SPM 2025 (ETR)',
-                    headers: ['Mata Pelajaran', '% Lulus', 'GPMP'],
-                    rows: [
-                        ['Bahasa Melayu', '93.38', '4.41'],
-                        ['Bahasa Inggeris', '88.41', '4.78'],
-                        ['Sejarah', '89.40', '4.79'],
-                        ['Matematik', '73.51', '5.91'],
-                        ['Sains', '88.17', '4.95'],
-                        ['Pendidikan Islam', '85.80', '4.56'],
-                        ['Fizik', '100.00', '3.04'],
-                        ['Kimia', '100.00', '3.43'],
-                        ['Biologi', '100.00', '2.61'],
-                        ['Perniagaan', '100.00', '3.05'],
-                        ['Prinsip Akaun', '100.00', '0.88'],
-                        ['Ekonomi', '100.00', '1.97']
-                    ]
-                }
-            ],
-            panitiaList: [
-                'Bahasa Melayu', 'Bahasa Inggeris', 'Sejarah', 'Matematik', 'Sains', 'Pendidikan Islam'
+                { id: 'senarai_kp', title: 'Senarai Ketua Panitia 2025', headers: ['Bil', 'Mata Pelajaran', 'Ketua Panitia'], rows: [['1', 'Bahasa Melayu', 'NAMA GURU'], ['2', 'Bahasa Inggeris', 'NAMA GURU']] }
             ]
         };
 
-        // --- APP LOGIC ---
-        let app, db, auth;
-        let appData = DEFAULT_DATA;
-        let activeTableIndex = 0;
-        let currentNodeId = null;
+        let app, db, auth, appData = JSON.parse(JSON.stringify(DEFAULT_DATA)), activeTableIndex = 0, currentNodeId = null, isSidebarOpen = true, chartOrientation = 'horizontal';
 
-        function isSupportedOriginForFirebase() {
-            const origin = window.location.origin || '';
-            return origin.startsWith('http://') || origin.startsWith('https://');
+        // --- CORE FUNCTIONS ---
+        function prepareForFirestore(data) {
+            const clean = JSON.parse(JSON.stringify(data));
+            if (clean.tables) clean.tables.forEach(t => { if(t.rows) t.rows = JSON.stringify(t.rows); else t.rows="[]"; });
+            return clean;
+        }
+        function parseFromFirestore(data) {
+            const parsed = JSON.parse(JSON.stringify(data));
+            if (parsed.tables) parsed.tables.forEach(t => { try { if(typeof t.rows==='string') t.rows=JSON.parse(t.rows); } catch{t.rows=[]} });
+            return parsed;
         }
 
         async function init() {
-            const statusEl = document.getElementById('connectionStatus');
-
-            // If running from Files / about:blank / file:// → offline preview mode
-            if (!isSupportedOriginForFirebase()) {
-                console.warn('Firebase disabled: unsupported origin', window.location.origin);
-                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span> Offline preview';
-                statusEl.className = "ml-4 text-xs font-bold px-2 py-1 rounded bg-yellow-50 text-yellow-700 flex items-center shadow-sm";
-                appData = DEFAULT_DATA;
-                renderAll();
-                return;
-            }
-
             try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // expose auth globally in case any environment expects "fireauth"
-                window.fireauth = auth;
-
-                await signInAnonymously(auth);
+                let config = hardcodedConfig;
+                if (typeof __firebase_config !== 'undefined') try { config = JSON.parse(__firebase_config); } catch {}
+                app = initializeApp(config); db = getFirestore(app); auth = getAuth(app);
                 
-                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Connected';
-                statusEl.className = "ml-4 text-xs font-bold px-2 py-1 rounded bg-green-50 text-green-700 flex items-center shadow-sm";
-
-                await loadData();
-            } catch (e) {
-                console.error("Firebase Error:", e);
-                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Offline';
-                statusEl.className = "ml-4 text-xs font-bold px-2 py-1 rounded bg-red-50 text-red-700 flex items-center shadow-sm";
-                appData = DEFAULT_DATA;
-                renderAll();
-            }
+                let authSuccess = false;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try { await signInWithCustomToken(auth, __initial_auth_token); authSuccess = true; } catch {}
+                }
+                if (!authSuccess) await signInAnonymously(auth);
+                
+                onAuthStateChanged(auth, async (u) => { if (u) { document.getElementById('connectionStatus').innerHTML='<span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Connected'; await loadData(); } });
+                checkSidebarState(); window.addEventListener('resize', checkSidebarState);
+            } catch (e) { console.error(e); renderAll(); }
         }
 
         async function loadData() {
-            const docRef = doc(db, DOC_PATH);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                appData = docSnap.data();
-            } else {
-                appData = DEFAULT_DATA;
-                await setDoc(docRef, appData);
-            }
-            renderAll();
+            try {
+                const snap = await getDoc(doc(db, DOC_PATH));
+                if (snap.exists()) {
+                    const d = parseFromFirestore(snap.data());
+                    appData = { ...DEFAULT_DATA, ...d }; 
+                } else {
+                    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    await setDoc(doc(db, DOC_PATH), prepareForFirestore(appData));
+                }
+                renderAll();
+            } catch(e) { console.error(e); renderAll(); }
         }
 
         window.saveData = async function() {
-            const btn = document.getElementById('saveBtn');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
-            
+            const btn = document.getElementById('saveBtn'); const old = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-pulse">Saving...</span>`;
             try {
-                if (isSupportedOriginForFirebase()) {
-                    await setDoc(doc(db, DOC_PATH), appData);
-                }
-                btn.innerHTML = `Disimpan!`;
-                setTimeout(() => btn.innerHTML = originalContent, 2000);
-            } catch (e) {
-                console.error(e);
-                alert("Gagal menyimpan. Sila semak sambungan internet.");
-                btn.innerHTML = originalContent;
-            }
+                if (auth.currentUser) await setDoc(doc(db, DOC_PATH), prepareForFirestore(appData));
+                btn.innerHTML = `Disimpan!`; setTimeout(() => btn.innerHTML = old, 2000);
+            } catch { alert("Gagal menyimpan."); btn.innerHTML = old; }
         }
 
-        window.resetToDefault = async function() {
-            if(confirm("AWAS: Ini akan memadam semua data terkini dan kembali kepada data asal. Teruskan?")) {
-                appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                if (isSupportedOriginForFirebase()) {
-                    await saveData();
-                }
-                renderAll();
-            }
-        }
+        window.resetToDefault = async function() { if(confirm("Reset data?")) { appData=JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); renderAll(); } }
 
-        // --- NEW: Add Panitia Logic ---
-        window.addNewPanitia = function() {
-            const name = prompt("Masukkan Nama Panitia Baru (Contoh: Fizik):");
-            if (name) {
-                if(!appData.panitiaList) appData.panitiaList = [];
-                appData.panitiaList.push(name);
-                if (isSupportedOriginForFirebase()) {
-                    saveData();
-                }
-                renderPanitiaList();
-            }
+        // --- SIDEBAR ---
+        function checkSidebarState() { if (window.innerWidth < 768) isSidebarOpen = false; updateSidebarUI(); }
+        window.toggleSidebar = function() { isSidebarOpen = !isSidebarOpen; updateSidebarUI(); }
+        function updateSidebarUI() {
+            const sb = document.getElementById('mainSidebar');
+            if (isSidebarOpen) { sb.classList.remove('-translate-x-full'); } else { sb.classList.add('-translate-x-full'); }
         }
-
-        window.deletePanitia = function(index) {
-            if(confirm("Padam Panitia ini?")) {
-                appData.panitiaList.splice(index, 1);
-                if (isSupportedOriginForFirebase()) {
-                    saveData();
-                }
-                renderPanitiaList();
-            }
-        }
-
-        window.switchView = function(viewName) {
+        window.switchView = function(view) {
             document.getElementById('view-carta').classList.add('hidden');
             document.getElementById('view-tables').classList.add('hidden');
+            document.getElementById('nav-carta').className = "nav-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50";
+            document.getElementById('nav-tables').className = "nav-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50";
             
-            document.getElementById('nav-carta').className = "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50";
-            document.getElementById('nav-tables').className = "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50";
-
-            document.getElementById('view-' + viewName).classList.remove('hidden');
-            document.getElementById('nav-' + viewName).className = "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md bg-indigo-50 text-indigo-700";
+            document.getElementById('view-'+view).classList.remove('hidden');
+            document.getElementById('nav-'+view).className = "nav-item active w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-indigo-700 bg-indigo-50";
+            if (window.innerWidth < 768) { isSidebarOpen = false; updateSidebarUI(); }
         }
 
-        function renderAll() {
-            renderOrgChart();
-            renderTables();
-            renderPanitiaList();
+        // --- CHART LOGIC ---
+        window.setChartOrientation = function(mode) {
+            chartOrientation = mode;
+            document.getElementById('chartContainerWrapper').className = `org-container layout-${mode}`;
+            document.getElementById('btn-horizontal').className = mode === 'horizontal' ? "px-3 py-1 text-xs font-bold rounded-md bg-indigo-100 text-indigo-700" : "px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:bg-gray-50";
+            document.getElementById('btn-vertical').className = mode === 'vertical' ? "px-3 py-1 text-xs font-bold rounded-md bg-indigo-100 text-indigo-700" : "px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:bg-gray-50";
         }
 
-        function renderPanitiaList() {
-            const container = document.getElementById('panitiaListContainer');
-            container.innerHTML = '';
-            if(!appData.panitiaList) appData.panitiaList = [];
-            
-            appData.panitiaList.forEach((panitia, index) => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md group">
-                        <span class="truncate">📁 ${panitia}</span>
-                        <button onclick="deletePanitia(${index})" class="text-xs text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">×</button>
-                    </div>
-                `;
-            });
-        }
-
-        // --- ORG CHART LOGIC ---
         function renderOrgChart() {
             const container = document.getElementById('chartCanvas');
-            container.innerHTML = '';
-            const treeData = buildTree(appData.chart);
-            if(treeData) container.appendChild(createTreeNode(treeData));
-        }
+            const orphanContainer = document.getElementById('orphanCanvas');
+            const orphanSection = document.getElementById('orphanSection');
+            
+            container.innerHTML = ''; orphanContainer.innerHTML = '';
+            if (!appData.chart || !appData.chart.length) return;
 
-        function buildTree(flatList) {
-            const map = {};
-            let root = null;
-            flatList.forEach(node => { map[node.id] = { ...node, children: [] }; });
-            flatList.forEach(node => {
-                if (node.parent === null) root = map[node.id];
-                else if(map[node.parent]) map[node.parent].children.push(map[node.id]);
+            const map = {}; let root = null;
+            appData.chart.forEach(n => map[n.id] = { ...n, children: [] });
+            
+            const visited = new Set();
+            appData.chart.forEach(n => {
+                if (n.parent === null) { root = map[n.id]; visited.add(n.id); } 
+                else if (map[n.parent]) { map[n.parent].children.push(map[n.id]); visited.add(n.id); }
             });
-            return root;
+
+            if (root) container.appendChild(createTreeNode(root));
+
+            let hasOrphans = false;
+            appData.chart.forEach(n => {
+                if (!visited.has(n.id)) {
+                    orphanContainer.appendChild(createTreeNode(map[n.id], true));
+                    hasOrphans = true;
+                }
+            });
+            orphanSection.classList.toggle('hidden', !hasOrphans);
         }
 
-        function createTreeNode(node) {
+        function createTreeNode(node, isOrphan = false) {
             const wrapper = document.createElement('div');
             wrapper.className = 'node-wrapper';
-            
             const card = document.createElement('div');
-            card.className = `node-card ${node.color || 'role-default'}`;
+            card.className = `node-card ${node.color||'role-default'}`;
+            if(isOrphan) card.classList.add('border-red-400', 'bg-red-50');
             card.innerHTML = `<div class="node-role">${node.role}</div><div class="node-name">${node.name}</div>`;
-            card.onclick = (e) => openModal(node.id, e);
+            card.onclick = (e) => { e.stopPropagation(); openModal(node.id); };
             wrapper.appendChild(card);
 
-            if (node.children && node.children.length > 0) {
-                const childrenContainer = document.createElement('div');
-                childrenContainer.className = 'children-container';
-                node.children.forEach(child => childrenContainer.appendChild(createTreeNode(child)));
-                wrapper.appendChild(childrenContainer);
+            if (!isOrphan && node.children && node.children.length > 0) {
+                const childContainer = document.createElement('div');
+                childContainer.className = 'children-container';
+                node.children.forEach(c => childContainer.appendChild(createTreeNode(c)));
+                wrapper.appendChild(childContainer);
             }
             return wrapper;
         }
 
-        // --- MODAL LOGIC ---
-        window.openModal = function(id, e) {
-            e.stopPropagation();
+        // --- EDIT MODAL ---
+        window.openModal = function(id) {
             currentNodeId = id;
             const node = appData.chart.find(n => n.id === id);
             document.getElementById('nodeRole').value = node.role;
             document.getElementById('nodeName').value = node.name;
+            document.getElementById('nodeParent').value = node.parent || '';
             document.getElementById('nodeColor').value = node.color || 'role-default';
             document.getElementById('nodeModal').classList.remove('hidden');
         }
         window.closeModal = function() { document.getElementById('nodeModal').classList.add('hidden'); }
-
         window.saveNodeEdit = function() {
             const node = appData.chart.find(n => n.id === currentNodeId);
             if(node) {
                 node.role = document.getElementById('nodeRole').value;
                 node.name = document.getElementById('nodeName').value;
+                const newParent = document.getElementById('nodeParent').value;
+                node.parent = newParent === '' ? null : newParent;
                 node.color = document.getElementById('nodeColor').value;
-                renderOrgChart();
-                closeModal();
+                renderOrgChart(); closeModal(); saveData();
             }
         }
-
         window.addChildNode = function() {
-            const newId = 'node_' + Date.now();
-            appData.chart.push({ id: newId, parent: currentNodeId, role: 'JAWATAN', name: 'NAMA', color: 'role-default' });
-            renderOrgChart();
-            closeModal();
+            appData.chart.push({ id: 'n_'+Date.now(), parent: currentNodeId, role: 'JAWATAN', name: 'NAMA', color: 'role-default' });
+            renderOrgChart(); closeModal(); saveData();
         }
-
         window.deleteNode = function() {
             if(confirm("Padam?")) {
                 appData.chart = appData.chart.filter(n => n.id !== currentNodeId && n.parent !== currentNodeId);
-                renderOrgChart();
-                closeModal();
+                renderOrgChart(); closeModal(); saveData();
             }
         }
 
-        // --- TABLE LOGIC ---
+        // --- TABLES ---
         function renderTables() {
-            const tabContainer = document.getElementById('tableTabs');
-            tabContainer.innerHTML = '';
-            appData.tables.forEach((table, index) => {
-                const btn = document.createElement('button');
-                btn.className = `whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition ${index === activeTableIndex ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`;
-                btn.textContent = table.title;
-                btn.onclick = () => { activeTableIndex = index; renderTables(); };
-                tabContainer.appendChild(btn);
-            });
+            const container = document.getElementById('activeTableContainer');
+            const tabs = document.getElementById('tableTabs');
+            container.innerHTML = ''; tabs.innerHTML = '';
+            
+            if (!appData.tables || !appData.tables.length) { container.innerHTML = '<p class="text-gray-400">Tiada data.</p>'; return; }
+            if (activeTableIndex >= appData.tables.length) activeTableIndex = 0;
 
-            const activeTable = appData.tables[activeTableIndex];
-            const tableContainer = document.getElementById('activeTableContainer');
-            
-            let html = `
-                <div class="mb-4 border-b pb-2"><input value="${activeTable.title}" onchange="updateTableTitle(this.value)" class="text-xl font-bold bg-transparent w-full outline-none text-gray-800"></div>
-                <div class="overflow-x-auto"><table class="data-table"><thead><tr>`;
-            
-            activeTable.headers.forEach((h, i) => html += `<th><input value="${h}" onchange="updateHeader(${i}, this.value)"></th>`);
-            html += `</tr></thead><tbody>`;
-            
-            activeTable.rows.forEach((row, rIdx) => {
-                html += `<tr>`;
-                row.forEach((cell, cIdx) => html += `<td><input value="${cell}" onchange="updateCell(${rIdx}, ${cIdx}, this.value)"></td>`);
-                html += `</tr>`;
+            appData.tables.forEach((t, i) => {
+                const btn = document.createElement('button');
+                btn.className = `whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition flex-shrink-0 ${i===activeTableIndex ? 'bg-indigo-600 text-white shadow' : 'bg-white border border-gray-200 text-gray-600'}`;
+                btn.textContent = t.title;
+                btn.onclick = () => { activeTableIndex = i; renderTables(); };
+                tabs.appendChild(btn);
             });
-            html += `</tbody></table></div>`;
+            const addBtn = document.createElement('button');
+            addBtn.className = "whitespace-nowrap px-3 py-2 rounded-lg text-sm font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center flex-shrink-0";
+            addBtn.innerHTML = '+ Tambah Senarai';
+            addBtn.onclick = window.addNewTable;
+            tabs.appendChild(addBtn);
+
+            const table = appData.tables[activeTableIndex];
+            if (typeof table.rows === 'string') try { table.rows = JSON.parse(table.rows); } catch { table.rows = []; }
+
+            let html = `
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <input value="${table.title}" onchange="updateTableTitle(this.value)" class="text-xl font-bold bg-transparent border-b border-dashed border-gray-300 focus:border-indigo-500 outline-none text-gray-800 w-full md:w-1/2 py-1">
+                    <button onclick="addColumn()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-sm font-bold transition flex items-center"><span class="mr-1">+</span> Lajur</button>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-gray-200 mb-4"><table class="data-table w-full"><thead><tr>`;
             
-            tableContainer.innerHTML = html;
+            // Header Row with Delete Column Buttons
+            table.headers.forEach((h, i) => {
+                html += `<th>
+                            <div class="flex items-center justify-between">
+                                <input value="${h}" onchange="updateHeader(${i}, this.value)" class="font-bold text-gray-600 w-full bg-transparent">
+                                <button onclick="deleteColumn(${i})" class="col-action-btn text-red-300 hover:text-red-500 font-bold ml-2 text-xs" title="Hapus Lajur">×</button>
+                            </div>
+                         </th>`;
+            });
+            html += `<th class="w-10"></th></tr></thead><tbody>`;
+            
+            if (table.rows) {
+                table.rows.forEach((r, ri) => {
+                    html += `<tr>`;
+                    r.forEach((c, ci) => html += `<td><input value="${c}" onchange="updateCell(${ri}, ${ci}, this.value)"></td>`);
+                    html += `<td class="text-center"><button onclick="deleteRow(${ri})" class="row-action-btn text-red-400 hover:text-red-600 font-bold px-2 py-1 rounded text-xs">×</button></td></tr>`;
+                });
+            }
+            html += `</tbody></table></div><div class="text-center"><button onclick="addRow()" class="bg-gray-100 text-gray-600 hover:bg-gray-200 px-6 py-2 rounded-lg text-sm font-bold transition border border-gray-300">+ Tambah Baris</button></div>`;
+            container.innerHTML = html;
         }
 
-        window.updateTableTitle = (val) => { appData.tables[activeTableIndex].title = val; };
-        window.updateHeader = (idx, val) => { appData.tables[activeTableIndex].headers[idx] = val; };
-        window.updateCell = (rIdx, cIdx, val) => { appData.tables[activeTableIndex].rows[rIdx][cIdx] = val; };
+        window.addNewTable = function() { const t=prompt("Nama Senarai:"); if(t){appData.tables.push({id:'t_'+Date.now(),title:t,headers:['Bil','Perkara','Catatan'],rows:[['1','Data','-']]});activeTableIndex=appData.tables.length-1;renderTables();saveData();} }
+        window.deleteActiveTable = function() { if(appData.tables.length<=1)return alert("Kekalkan 1 senarai."); if(confirm("Hapus?")){appData.tables.splice(activeTableIndex,1);activeTableIndex=0;renderTables();saveData();} }
+        window.addRow = function() { const t=appData.tables[activeTableIndex]; if(!t.rows)t.rows=[]; t.rows.push(new Array(t.headers.length).fill("-")); renderTables(); saveData(); }
+        window.addColumn = function() { const c=prompt("Nama Lajur:"); if(!c)return; const t=appData.tables[activeTableIndex]; t.headers.push(c); if(t.rows)t.rows.forEach(r=>r.push("-")); renderTables(); saveData(); }
+        window.deleteRow = function(i) { if(confirm("Padam baris?")){appData.tables[activeTableIndex].rows.splice(i,1);renderTables();saveData();} }
+        
+        // --- NEW: DELETE COLUMN FUNCTION ---
+        window.deleteColumn = function(colIndex) {
+            const table = appData.tables[activeTableIndex];
+            if (table.headers.length <= 1) {
+                alert("Anda mesti mempunyai sekurang-kurangnya satu lajur.");
+                return;
+            }
+            if (confirm(`Padam lajur "${table.headers[colIndex]}" dan semua datanya?`)) {
+                // Remove header
+                table.headers.splice(colIndex, 1);
+                // Remove data in that column for every row
+                if (table.rows) {
+                    table.rows.forEach(row => row.splice(colIndex, 1));
+                }
+                renderTables();
+                saveData();
+            }
+        }
 
-        // Start
+        window.updateTableTitle = (v) => { appData.tables[activeTableIndex].title = v; renderTables(); saveData(); };
+        window.updateHeader = (i, v) => { appData.tables[activeTableIndex].headers[i] = v; saveData(); };
+        window.updateCell = (r, c, v) => { appData.tables[activeTableIndex].rows[r][c] = v; saveData(); };
+
+        function renderAll() { renderOrgChart(); renderTables(); }
         init();
     </script>
 </body>
 </html>
+
