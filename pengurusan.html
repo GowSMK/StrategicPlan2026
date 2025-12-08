@@ -116,66 +116,6 @@
         .k-swot-s { background: #f0fdf4; border-color: #86efac; } .k-swot-w { background: #fef2f2; border-color: #fca5a5; }
         .k-swot-o { background: #eff6ff; border-color: #93c5fd; } .k-swot-c { background: #fffbeb; border-color: #fcd34d; }
 
-        /* =========================================
-           STYLES FROM MODULE B: STRATEGIC PLAN (PINTAS FILE)
-           ========================================= */
-        /* Table Layout for Strategic Plan */
-        .s-table-auto-layout {
-            width: 1200px; 
-            table-layout: fixed;
-            border-collapse: collapse;
-        }
-        .s-table-auto-layout th, .s-table-auto-layout td {
-            padding: 8px 12px;
-            text-align: left;
-            border: 1px solid #e5e7eb;
-            font-size: 0.875rem;
-            vertical-align: top;
-        }
-        #prosesPelaksanaanTable th, #pelanTaktikalTable th, #qsamMatrixTable th { 
-            text-align: center; white-space: normal; line-height: 1.2; padding-top: 10px; padding-bottom: 10px;
-        }
-        #pelanTaktikalTable textarea { min-height: 60px; }
-        
-        /* Strategy Map Styles */
-        .strategy-map-container {
-            display: flex; flex-direction: column; align-items: center; gap: 16px; 
-            padding: 20px 0; border-radius: 12px; background-color: #ffffff;
-        }
-        .strategy-perspective {
-            width: 100%; max-width: 600px; padding: 12px; border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;
-        }
-        .perspective-title { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 4px; }
-        .perspective-content { font-size: 0.95rem; font-weight: 500; min-height: 30px; }
-        .strategy-arrow {
-            width: 4px; height: 16px; background-color: #3b82f6; border-radius: 2px; position: relative; z-index: 10;
-        }
-        .strategy-arrow::after {
-            content: ''; position: absolute; top: 100%; left: -4px; width: 0; height: 0;
-            border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #3b82f6;
-        }
-        .impact { background-color: #fef2f2; border: 2px solid #ef4444; } .impact .perspective-title { color: #ef4444; }
-        .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } .outcome .perspective-title { color: #f59e0b; }
-        .process { background-color: #eff6ff; border: 2px solid #3b82f6; } .process .perspective-title { color: #3b82f6; }
-        .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } .capacity .perspective-title { color: #10b981; }
-
-        /* Dashboard Styles */
-        .dashboard-container { background-color: #f1f5f9; padding: 1.5rem; min-height: 600px; border-radius: 12px; }
-        .dashboard-card { background-color: white; border-radius: 12px; box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
-        .kpi-circle {
-            width: 70px; height: 70px; border-radius: 50%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .ei-score { background-color: #f87171; } .qra-score { background-color: #34d399; } .tbs-score { background-color: #60a5fa; }
-        
-        /* Unified Action Buttons */
-        .s-action-button {
-            flex-grow: 1; font-weight: 700; padding: 1rem 1.5rem; border-radius: 12px;
-            transition: all 0.2s ease-in-out; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
-            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; 
-        }
     </style>
 </head>
 <body>
@@ -187,10 +127,15 @@
 </div>
 
 <!-- GLOBAL HEADER -->
-<nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
+<nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200" style="padding-top: env(safe-area-inset-top);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between h-16 items-center">
             <div class="flex items-center">
+                <!-- BACK BUTTON (Links to Main Page) -->
+                <a href="index.html" class="mr-3 p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-indigo-600 transition-colors" title="Kembali ke Laman Utama">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                
                 <div class="flex-shrink-0 flex items-center gap-2">
                     <div class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">SP</div>
                     <div class="hidden md:block">
@@ -198,14 +143,7 @@
                         <p class="text-xs text-gray-500">Sistem Pengurusan Bersepadu</p>
                     </div>
                 </div>
-                <div class="hidden sm:ml-8 sm:flex sm:space-x-2 bg-gray-100 p-1 rounded-lg">
-                    <button onclick="window.switchModule('kurikulum')" id="nav-mod-kurikulum" class="nav-pill active">
-                        Pengurusan Kurikulum
-                    </button>
-                    <button onclick="window.switchModule('strategic')" id="nav-mod-strategic" class="nav-pill">
-                        Pelan Strategik
-                    </button>
-                </div>
+                <!-- Navigation pills for Strategic Plan REMOVED -->
             </div>
             <div class="flex items-center">
                 <span id="globalConnectionStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -214,12 +152,6 @@
                 </span>
             </div>
         </div>
-    </div>
-    <!-- Mobile Menu -->
-    <div class="sm:hidden border-t border-gray-200 bg-gray-50 p-2 flex justify-around">
-        <button onclick="window.switchModule('kurikulum')" id="mob-nav-kurikulum" class="text-xs font-bold text-indigo-700">Kurikulum</button>
-        <span class="text-gray-300">|</span>
-        <button onclick="window.switchModule('strategic')" id="mob-nav-strategic" class="text-xs font-bold text-gray-500">Pelan Strategik</button>
     </div>
 </nav>
 
@@ -329,74 +261,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- =======================================================
-         MODULE B: PELAN STRATEGIK (Pelan Operasi / Strategic Plan)
-         ======================================================= -->
-    <div id="module-strategic" class="module-container">
-        
-        <!-- Header Section -->
-        <header class="text-center mb-8">
-            <h2 id="s-pageMainTitle" class="text-3xl font-extrabold text-indigo-900 mb-2 tracking-tight">
-                Pelan Strategik Mata Pelajaran
-            </h2>
-            <p id="s-headerSubtitle" class="text-sm text-gray-500 mt-1">Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.</p>
-        </header>
-
-        <!-- Subject Management Section -->
-        <div id="s-subjectManagementSection" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-lg mx-auto mb-8 space-y-4">
-            <div>
-                <label for="s-subjectSelector" class="block text-sm font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran (Subjek):</label>
-                <select id="s-subjectSelector" class="w-full p-2.5 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white">
-                    <!-- Options populated by JS -->
-                </select>
-                <p id="s-subjectListMessage" class="text-xs text-gray-500 mt-1 hidden">Memuatkan senarai subjek...</p>
-            </div>
-
-            <div class="border-t pt-4">
-                <label for="s-newSubjectInput" class="block text-sm font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
-                <div class="flex space-x-2">
-                    <input type="text" id="s-newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-2.5 border border-green-300 rounded-lg focus:ring-green-500 focus:border-green-500">
-                    <button id="s-addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
-                        Tambah
-                    </button>
-                </div>
-                <div id="s-newSubjectMessageBox" class="mt-3 p-2 text-center rounded-lg hidden text-sm"></div>
-            </div>
-        </div>
-
-        <!-- Plan Editor Container -->
-        <div id="s-planEditorContainer" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hidden">
-            <div id="s-messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
-            
-            <!-- View Toggles -->
-            <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
-                <button id="s-switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition duration-150 flex items-center">
-                    &larr; Tukar Subjek
-                </button>
-                <div class="flex space-x-2">
-                    <button id="s-toggleEditView" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-sm bg-indigo-700 hover:bg-indigo-600">Edit Plan</button>
-                    <button id="s-toggleDashboardView" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-sm bg-purple-600 hover:bg-purple-700">Dashboard</button>
-                </div>
-            </div>
-
-            <!-- Dynamic Content Area -->
-            <div id="s-dynamicPlanContent">
-                <!-- Content injected here -->
-            </div>
-
-            <!-- Save and Export Area -->
-            <div class="border-t pt-6 mt-6 flex justify-between items-center" id="s-saveSection">
-                <button id="s-downloadPlanButton" class="s-action-button bg-gray-700 text-white mr-4 text-sm">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Export JSON
-                </button>
-                <button id="s-saveButton" class="s-action-button bg-green-600 text-white text-sm">
-                    Simpan Pelan Strategik
-                </button>
             </div>
         </div>
     </div>
@@ -619,291 +483,6 @@
         delPintasRow: (i) => { if(confirm("Padam inisiatif ini?")){ kurikulumApp.savePintasInputs(); kPintasData[kActiveKra].interventions.splice(i,1); kurikulumApp.renderPintas(); } }
     };
 
-    // =========================================================================
-    // MODULE B LOGIC: STRATEGIC PLAN (Namespaced under window.strategicApp)
-    // =========================================================================
-    
-    // Variables for Strategic App
-    const S_SUBJECTS_DOC_PATH = `artifacts/${APP_ID}/public/data/subject_config/subject_list`;
-    const S_PLAN_COLLECTION_BASE = `artifacts/${APP_ID}/public/data/pelan_strategik`; 
-    const S_MASTER_TEMPLATE_PATH = `${S_PLAN_COLLECTION_BASE}/master_template`; 
-    const S_DEFAULT_MASTER = {
-        misi: "Melestarikan Sistem Pendidikan Yang Berkualiti...", visi: "Pendidikan Berkualiti Insan Terdidik...",
-        bhag: "Mencapai Top 3 Daerah...", smartPrinciple: 'Quantum SMART...', entanglementMeasure: 'Peningkatan 15% Band 4...',
-        swot: { s: "Kekuatan...", w: "Kelemahan...", o: "Peluang...", c: "Cabaran..." },
-        matlamatStrategik: "Tingkatkan penguasaan...", strategiList: ["Strategi 1"], pelanTaktikal: [], qsamData: [], prosesPelaksanaan: []
-    };
-    
-    let sCurrentSubject = null;
-    let sCurrentPlanData = {};
-    let sCurrentView = 'edit';
-    let sMasterTemplateCache = {};
-
-    const strategicApp = {
-        init: async () => {
-            await strategicApp.loadSubjectList();
-            document.getElementById('s-saveButton').addEventListener('click', strategicApp.savePlan);
-            document.getElementById('s-downloadPlanButton').addEventListener('click', strategicApp.downloadPlan);
-            document.getElementById('s-subjectSelector').addEventListener('change', (e) => { if(e.target.value) strategicApp.loadPlan(e.target.value); });
-            document.getElementById('s-addNewSubjectButton').addEventListener('click', strategicApp.addNewSubject);
-            document.getElementById('s-toggleEditView').addEventListener('click', () => strategicApp.setAppView('edit'));
-            document.getElementById('s-toggleDashboardView').addEventListener('click', () => strategicApp.setAppView('dashboard'));
-            document.getElementById('s-switchSubjectButton').addEventListener('click', () => {
-                document.getElementById('s-planEditorContainer').classList.add('hidden');
-                document.getElementById('s-subjectManagementSection').classList.remove('hidden');
-                document.getElementById('s-headerSubtitle').textContent = "Sila pilih subjek.";
-                document.getElementById('s-pageMainTitle').textContent = "Pelan Strategik Mata Pelajaran";
-            });
-        },
-        loadSubjectList: async (selectSubject = null) => {
-            const sel = document.getElementById('s-subjectSelector');
-            sel.innerHTML = '<option>Loading...</option>';
-            try {
-                const docSnap = await getDoc(doc(db, S_SUBJECTS_DOC_PATH));
-                let subs = (docSnap.exists() && docSnap.data().subjects) ? docSnap.data().subjects : ["Sejarah", "Matematik"];
-                sel.innerHTML = '<option value="" disabled selected>--- Pilih Subjek ---</option>';
-                subs.forEach(s => { const op = document.createElement('option'); op.value=s; op.textContent=s; sel.appendChild(op); });
-                if(selectSubject) { sel.value = selectSubject; strategicApp.loadPlan(selectSubject); }
-            } catch(e) { console.error("Subj load err", e); }
-        },
-        addNewSubject: async () => {
-            const inp = document.getElementById('s-newSubjectInput'); const val = inp.value.trim();
-            if(!val) return;
-            try {
-                const ref = doc(db, S_SUBJECTS_DOC_PATH);
-                await updateDoc(ref, { subjects: arrayUnion(val) });
-                strategicApp.loadSubjectList(val);
-                inp.value = '';
-            } catch(e) { alert("Error adding subject"); }
-        },
-        loadPlan: async (subject) => {
-            sCurrentSubject = subject;
-            document.getElementById('s-subjectManagementSection').classList.add('hidden');
-            document.getElementById('s-planEditorContainer').classList.remove('hidden');
-            document.getElementById('s-pageMainTitle').textContent = `Pelan Strategik: ${subject}`;
-            
-            // Set view to edit by default
-            sCurrentView = 'edit';
-            strategicApp.renderEditViewHTML();
-            
-            try {
-                const snap = await getDoc(doc(db, `${S_PLAN_COLLECTION_BASE}/${strategicApp.slug(subject)}_plan`));
-                if(snap.exists()) sCurrentPlanData = snap.data();
-                else sCurrentPlanData = JSON.parse(JSON.stringify(S_DEFAULT_MASTER)); // Fallback
-                strategicApp.setFormState(sCurrentPlanData);
-            } catch(e) { console.error(e); }
-        },
-        savePlan: async () => {
-            const data = strategicApp.getFormState();
-            sCurrentPlanData = data;
-            const btn = document.getElementById('s-saveButton'); btn.textContent = "Saving...";
-            try {
-                await setDoc(doc(db, `${S_PLAN_COLLECTION_BASE}/${strategicApp.slug(sCurrentSubject)}_plan`), data);
-                btn.textContent = "Saved!"; setTimeout(()=>btn.textContent="Simpan Pelan Strategik", 2000);
-            } catch(e) { alert("Save failed"); btn.textContent="Save"; }
-        },
-        downloadPlan: () => {
-            const data = strategicApp.getFormState();
-            const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-            a.download = `${sCurrentSubject}_plan.json`; a.click();
-        },
-        setAppView: (view) => {
-            if(sCurrentView === 'edit') sCurrentPlanData = strategicApp.getFormState();
-            sCurrentView = view;
-            const content = document.getElementById('s-dynamicPlanContent');
-            const btnEdit = document.getElementById('s-toggleEditView');
-            const btnDash = document.getElementById('s-toggleDashboardView');
-            
-            if(view === 'edit') {
-                strategicApp.renderEditViewHTML();
-                strategicApp.setFormState(sCurrentPlanData);
-                document.getElementById('s-saveSection').classList.remove('hidden');
-                btnEdit.classList.replace('bg-indigo-500','bg-indigo-700'); btnDash.classList.replace('bg-purple-700','bg-purple-600');
-            } else {
-                content.innerHTML = strategicApp.getDashboardHTML();
-                strategicApp.renderDashboard(sCurrentPlanData);
-                document.getElementById('s-saveSection').classList.add('hidden');
-                btnEdit.classList.replace('bg-indigo-700','bg-indigo-500'); btnDash.classList.replace('bg-purple-600','bg-purple-700');
-            }
-        },
-        slug: (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-        
-        // --- Form Handling ---
-        getFormState: () => {
-            if(sCurrentView !== 'edit') return sCurrentPlanData;
-            // Helper to safe get value
-            const v = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
-            return {
-                misi: v('s-misiInput'), visi: v('s-visiInput'), bhag: v('s-bhagInput'),
-                matlamatStrategik: v('s-matlamatStrategik'), strategiList: v('s-strategiList').split('\n'),
-                pelanTaktikal: strategicApp.collectTaktikal(), qsamData: strategicApp.collectQsam()
-            };
-        },
-        setFormState: (data) => {
-             if(sCurrentView === 'edit') {
-                 const s = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ''; }
-                 s('s-misiInput', data.misi); s('s-visiInput', data.visi); s('s-bhagInput', data.bhag);
-                 s('s-matlamatStrategik', data.matlamatStrategik); 
-                 s('s-strategiList', Array.isArray(data.strategiList) ? data.strategiList.join('\n') : '');
-                 strategicApp.renderTaktikalTable(data.pelanTaktikal || []);
-                 strategicApp.renderQsamTable(data.pelanTaktikal || [], data.qsamData || []);
-                 strategicApp.renderMap(data);
-             }
-        },
-        
-        // --- Renderers ---
-        renderEditViewHTML: () => {
-             const html = `
-                <div class="space-y-6">
-                    <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
-                        <h3 class="font-bold text-indigo-800 mb-2">Ringkasan Eksekutif</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <textarea id="s-visiInput" placeholder="Visi" class="p-2 rounded border w-full text-sm" rows="2"></textarea>
-                            <textarea id="s-misiInput" placeholder="Misi" class="p-2 rounded border w-full text-sm" rows="2"></textarea>
-                            <input id="s-bhagInput" placeholder="Matlamat Utama (BHAG)" class="p-2 rounded border w-full md:col-span-2 text-sm font-bold text-indigo-900 bg-white">
-                        </div>
-                    </div>
-                    <div>
-                         <h3 class="font-bold text-slate-700 mb-2">Strategi & Matlamat</h3>
-                         <textarea id="s-matlamatStrategik" placeholder="Matlamat Strategik..." class="w-full p-2 border rounded mb-2 text-sm" rows="2"></textarea>
-                         <textarea id="s-strategiList" placeholder="Senarai Strategi (Satu per baris)..." class="w-full p-2 border rounded text-sm" rows="3"></textarea>
-                    </div>
-                    <!-- Live Map Preview -->
-                    <div id="s-mapPreview" class="p-4 bg-gray-50 border rounded-lg"></div>
-
-                    <!-- Tactical Table -->
-                    <div>
-                        <h3 class="font-bold text-slate-700 mb-2">Pelan Taktikal</h3>
-                        <div class="overflow-x-auto">
-                            <table class="s-table-auto-layout" id="pelanTaktikalTable">
-                                <thead><tr class="bg-gray-100 text-xs uppercase"><th class="w-10">No</th><th>Program</th><th>Tanggungjawab</th><th>Tempoh</th><th>Kos</th><th>Output</th><th></th></tr></thead>
-                                <tbody id="s-taktikalBody"></tbody>
-                            </table>
-                        </div>
-                        <button onclick="window.strategicApp.addTaktikalRow()" class="mt-2 text-xs bg-indigo-600 text-white px-3 py-1 rounded font-bold">+ Program</button>
-                    </div>
-
-                    <!-- QSAM Table -->
-                    <div>
-                        <h3 class="font-bold text-green-700 mb-2">QSAM Matrix (Monitoring)</h3>
-                        <div class="overflow-x-auto">
-                            <table class="s-table-auto-layout" id="qsamMatrixTable">
-                                <thead><tr class="bg-green-50 text-xs uppercase"><th>Program</th><th>IM (1-10)</th><th>EI (0-5)</th><th>QRA (%)</th><th>TBS (%)</th></tr></thead>
-                                <tbody id="s-qsamBody"></tbody>
-                            </table>
-                        </div>
-                        <button onclick="window.strategicApp.syncQsam()" class="mt-2 text-xs bg-green-600 text-white px-3 py-1 rounded font-bold">Sync List</button>
-                    </div>
-                </div>
-             `;
-             document.getElementById('s-dynamicPlanContent').innerHTML = html;
-             
-             // Attach listeners for live map update
-             ['s-matlamatStrategik', 's-strategiList'].forEach(id => {
-                 document.getElementById(id).addEventListener('input', () => strategicApp.renderMap(strategicApp.getFormState()));
-             });
-        },
-        renderTaktikalTable: (rows) => {
-            const tbody = document.getElementById('s-taktikalBody'); tbody.innerHTML = '';
-            rows.forEach((r, i) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="text-center">${i+1}</td>
-                    <td><textarea class="w-full border p-1 text-sm rounded" data-f="namaProgram">${r.namaProgram||''}</textarea></td>
-                    <td><input class="w-full border p-1 text-sm rounded" data-f="tanggungJawab" value="${r.tanggungJawab||''}"></td>
-                    <td><input class="w-full border p-1 text-sm rounded" data-f="tempoh" value="${r.tempoh||''}"></td>
-                    <td><input class="w-full border p-1 text-sm rounded" data-f="kosSumber" value="${r.kosSumber||''}"></td>
-                    <td><textarea class="w-full border p-1 text-sm rounded" data-f="outputOutcome">${r.outputOutcome||''}</textarea></td>
-                    <td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        },
-        addTaktikalRow: () => {
-            const tbody = document.getElementById('s-taktikalBody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="text-center">${tbody.children.length+1}</td><td><textarea class="w-full border p-1 text-sm rounded" data-f="namaProgram"></textarea></td><td><input class="w-full border p-1 text-sm rounded" data-f="tanggungJawab"></td><td><input class="w-full border p-1 text-sm rounded" data-f="tempoh"></td><td><input class="w-full border p-1 text-sm rounded" data-f="kosSumber"></td><td><textarea class="w-full border p-1 text-sm rounded" data-f="outputOutcome"></textarea></td><td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>`;
-            tbody.appendChild(tr);
-        },
-        collectTaktikal: () => {
-             return Array.from(document.querySelectorAll('#s-taktikalBody tr')).map(tr => ({
-                 namaProgram: tr.querySelector('[data-f="namaProgram"]').value,
-                 tanggungJawab: tr.querySelector('[data-f="tanggungJawab"]').value,
-                 tempoh: tr.querySelector('[data-f="tempoh"]').value,
-                 kosSumber: tr.querySelector('[data-f="kosSumber"]').value,
-                 outputOutcome: tr.querySelector('[data-f="outputOutcome"]').value
-             }));
-        },
-        renderQsamTable: (tacticalRows, qsamRows) => {
-            const tbody = document.getElementById('s-qsamBody'); tbody.innerHTML = '';
-            // Map existing QSAM data
-            const qMap = {}; qsamRows.forEach(q => qMap[q.programName] = q);
-            
-            tacticalRows.forEach(t => {
-                const q = qMap[t.namaProgram] || { im:5, ei:3, qra:0, tbs:0 };
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-bold text-sm text-gray-700" data-prog="${t.namaProgram}">${t.namaProgram}</td>
-                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="im" value="${q.im}"></td>
-                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="ei" value="${q.ei}"></td>
-                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="qra" value="${q.qra}"></td>
-                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="tbs" value="${q.tbs}"></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        },
-        syncQsam: () => {
-            const tData = strategicApp.collectTaktikal();
-            const qData = strategicApp.collectQsam();
-            strategicApp.renderQsamTable(tData, qData);
-        },
-        collectQsam: () => {
-             return Array.from(document.querySelectorAll('#s-qsamBody tr')).map(tr => ({
-                 programName: tr.getAttribute('data-prog') || tr.querySelector('[data-prog]').textContent,
-                 im: tr.querySelector('[data-f="im"]').value,
-                 ei: tr.querySelector('[data-f="ei"]').value,
-                 qra: tr.querySelector('[data-f="qra"]').value,
-                 tbs: tr.querySelector('[data-f="tbs"]').value
-             }));
-        },
-        renderMap: (data) => {
-             const div = document.getElementById('s-mapPreview');
-             if(!div) return;
-             const matlamat = data.matlamatStrategik || 'Matlamat Strategik';
-             const strat = Array.isArray(data.strategiList) ? data.strategiList.join(', ') : data.strategiList || 'Strategi';
-             div.innerHTML = `
-                <div class="strategy-map-container">
-                    <div class="strategy-perspective impact"><div class="perspective-title">IMPACT</div><div class="perspective-content">${matlamat}</div></div>
-                    <div class="strategy-arrow"></div>
-                    <div class="strategy-perspective process"><div class="perspective-title">PROCESS</div><div class="perspective-content">${strat}</div></div>
-                </div>
-             `;
-        },
-        getDashboardHTML: () => `<div id="s-dashboardView" class="dashboard-container"><h3 class="text-xl font-bold mb-4">Dashboard Prestasi</h3><div id="s-dashContent"></div></div>`,
-        renderDashboard: (data) => {
-             let qraTotal=0, tbsTotal=0, count=0;
-             if(data.qsamData) {
-                 data.qsamData.forEach(q => { qraTotal+=parseInt(q.qra||0); tbsTotal+=parseInt(q.tbs||0); count++; });
-             }
-             const avgQra = count ? (qraTotal/count).toFixed(0) : 0;
-             const avgTbs = count ? (tbsTotal/count).toFixed(0) : 0;
-             
-             document.getElementById('s-dashContent').innerHTML = `
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="dashboard-card text-center"><p class="text-green-600 font-bold">Avg Resources (QRA)</p><div class="kpi-circle qra-score mx-auto mt-2">${avgQra}%</div></div>
-                    <div class="dashboard-card text-center"><p class="text-blue-600 font-bold">Avg Progress (TBS)</p><div class="kpi-circle tbs-score mx-auto mt-2">${avgTbs}%</div></div>
-                </div>
-                <div class="dashboard-card">
-                    <h4 class="font-bold mb-2">Program Status</h4>
-                    <ul class="text-sm space-y-2">
-                        ${(data.qsamData||[]).map(q => `<li class="flex justify-between border-b pb-1"><span>${q.programName}</span><span class="font-bold ${q.tbs<q.qra ? 'text-red-500':'text-green-500'}">${q.tbs}%</span></li>`).join('')}
-                    </ul>
-                </div>
-             `;
-        }
-    };
-
     // --- MAIN INITIALIZATION ---
     window.initApp = async () => {
         try {
@@ -918,34 +497,14 @@
 
             // Expose sub-apps to window so HTML handlers work
             window.kurikulumApp = kurikulumApp;
-            window.strategicApp = strategicApp;
             
             // Init Sub-Modules
             kurikulumApp.init();
-            strategicApp.init();
 
         } catch (error) {
             console.error("App Init Error:", error);
             document.getElementById('globalConnectionStatus').innerHTML = `<span class="w-2 h-2 mr-1 bg-red-500 rounded-full"></span> Error`;
             document.getElementById('globalLoadingOverlay').innerHTML = `<p class="text-red-600 font-bold">Ralat Sambungan. Sila muat semula.</p>`;
-        }
-    };
-
-    // Global Module Switcher
-    window.switchModule = (mod) => {
-        document.querySelectorAll('.module-container').forEach(el => el.classList.remove('active-module'));
-        document.getElementById(`module-${mod}`).classList.add('active-module');
-        
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
-        if(document.getElementById(`nav-mod-${mod}`)) document.getElementById(`nav-mod-${mod}`).classList.add('active');
-        
-        // Mobile text color toggle
-        if(mod === 'kurikulum') {
-            document.getElementById('mob-nav-kurikulum').className = 'text-xs font-bold text-indigo-700';
-            document.getElementById('mob-nav-strategic').className = 'text-xs font-bold text-gray-500';
-        } else {
-            document.getElementById('mob-nav-kurikulum').className = 'text-xs font-bold text-gray-500';
-            document.getElementById('mob-nav-strategic').className = 'text-xs font-bold text-indigo-700';
         }
     };
 
@@ -955,4 +514,5 @@
 </script>
 </body>
 </html>
+
 
