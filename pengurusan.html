@@ -3,40 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Sistem Pengurusan Sekolah Bersepadu</title>
+    <title>Sistem Pengurusan Bersepadu - SMK Seri Pulai Perdana</title>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Use Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     
     <style>
-        /* GLOBAL RESETS & SHARED */
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-y: scroll; }
-        
-        /* MODULE SWITCHER NAV */
-        .app-switcher-bar {
-            background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50;
-            padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* --- GLOBAL & SHARED STYLES --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Slate-100 */
+            color: #1e293b; /* Slate-800 */
+            overflow-x: hidden; /* Prevent horizontal scroll on body */
         }
-        .module-btn {
-            padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; transition: all 0.2s;
-            color: #64748b; margin-right: 0.5rem;
+
+        /* --- MODULE TRANSITIONS --- */
+        .module-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            width: 100%;
         }
-        .module-btn:hover { background-color: #f1f5f9; color: #334155; }
-        .module-btn.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); }
+        .module-container.active-module {
+            display: block;
+            opacity: 1;
+        }
 
-        /* MODULE VISIBILITY */
-        .module-wrapper { display: none; padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
-        .module-wrapper.active-module { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- NAVIGATION STYLES --- */
+        .nav-pill {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        .nav-pill:hover {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+        .nav-pill.active {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
 
-        /* ==================================================================================
-           STYLES: KURIKULUM MODULE (Org Chart, Tables, PInTaS One Page)
-           ================================================================================== */
-        /* ORG CHART */
+        /* --- LOADING OVERLAY --- */
+        #globalLoadingOverlay {
+            position: fixed; inset: 0; z-index: 100;
+            background-color: #f8fafc;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+
+        /* =========================================
+           STYLES FROM MODULE A: KURIKULUM EDITOR
+           ========================================= */
+        /* Org Chart Styles */
         .org-container {
             overflow: auto; padding: 40px; background: white; border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); min-height: 500px;
@@ -62,127 +89,188 @@
         .layout-horizontal .node-wrapper:not(:only-child):last-child::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 50%; background: #cbd5e1; }
         .layout-horizontal .node-wrapper:not(:only-child):not(:first-child):not(:last-child)::after { content: ''; position: absolute; top: 0; left: 0; height: 2px; width: 100%; background: #cbd5e1; }
         
-        /* Colors */
+        /* Node Colors */
         .role-pengetua { border-top: 4px solid #fcd34d; background: #fffbeb; }
         .role-pk { border-top: 4px solid #60a5fa; background: #eff6ff; }
         .role-gkmp { border-top: 4px solid #4ade80; background: #f0fdf4; }
         .role-kp { border-top: 4px solid #f472b6; background: #fdf2f8; }
         .role-default { border-top: 4px solid #94a3b8; }
 
-        /* DATA TABLES (Generic) */
+        /* Data Table Styles (Kurikulam) */
         .k-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; table-layout: fixed; }
         .k-data-table th { background: #f8fafc; padding: 8px; text-align: left; border: 1px solid #e2e8f0; color: #475569; min-width: 160px; width: 160px; vertical-align: middle; }
         .k-data-table td { border: 1px solid #e2e8f0; padding: 6px; background: white; vertical-align: middle; min-width: 160px; }
         .k-data-table th:first-child, .k-data-table td:first-child { width: 50px !important; min-width: 50px !important; text-align: center; }
         .k-data-table input { width: 100%; background: transparent; outline: none; font-size: 0.85rem; padding: 4px; border-radius: 4px; border: 1px solid transparent; }
         .k-data-table input:focus { background-color: white; border-color: #cbd5e1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
-        .action-btn { color: #cbd5e1; font-weight: bold; font-size: 16px; padding: 4px 8px; cursor: pointer; transition: color 0.2s; background: transparent; border: none; }
-        .action-btn:hover { color: #ef4444; }
+        .k-action-btn { color: #cbd5e1; font-weight: bold; font-size: 16px; padding: 4px 8px; cursor: pointer; background: transparent; border: none; }
+        .k-action-btn:hover { color: #ef4444; }
 
-        /* PInTaS (One Page) Styles */
-        .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 700; background-color: #eef2ff; }
-        .tab-inactive { color: #6b7280; font-weight: 500; }
-        .pintas-table th { background-color: #1e293b; color: white; border: 1px solid #334155; }
-        .pintas-table textarea { width: 100%; min-height: 100px; resize: vertical; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 0.8rem; }
-        .col-initiative { background-color: #eff6ff; border-left: 2px solid #6366f1 !important; border-right: 2px solid #6366f1 !important; }
-        .swot-box { padding: 12px; border-radius: 8px; border: 1px solid; height: 100%; }
-        .swot-s { background: #f0fdf4; border-color: #86efac; } .swot-w { background: #fef2f2; border-color: #fca5a5; }
-        .swot-o { background: #eff6ff; border-color: #93c5fd; } .swot-c { background: #fffbeb; border-color: #fcd34d; }
+        /* PInTaS Specific (Kurikulam Module) */
+        .k-tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 700; background-color: #eef2ff; }
+        .k-tab-inactive { color: #6b7280; font-weight: 500; }
+        .k-pintas-table th { background-color: #1e293b; color: white; border: 1px solid #334155; }
+        .k-pintas-table textarea { width: 100%; min-height: 100px; resize: vertical; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 0.8rem; }
+        .k-col-initiative { background-color: #eff6ff; border-left: 2px solid #6366f1 !important; border-right: 2px solid #6366f1 !important; }
+        .k-swot-box { padding: 12px; border-radius: 8px; border: 1px solid; height: 100%; }
+        .k-swot-s { background: #f0fdf4; border-color: #86efac; } .k-swot-w { background: #fef2f2; border-color: #fca5a5; }
+        .k-swot-o { background: #eff6ff; border-color: #93c5fd; } .k-swot-c { background: #fffbeb; border-color: #fcd34d; }
 
-
-        /* ==================================================================================
-           STYLES: STRATEGIC MODULE (Pelan Operasi, QSAM, Dashboard)
-           ================================================================================== */
-        /* Table Layouts */
-        .s-table-auto-layout { width: 100%; min-width: 1200px; table-layout: fixed; border-collapse: collapse; }
-        .s-table-auto-layout th, .s-table-auto-layout td { padding: 8px 12px; text-align: left; border: 1px solid #e5e7eb; font-size: 0.875rem; vertical-align: top; }
-        .s-table-auto-layout th { text-align: center; white-space: normal; line-height: 1.2; padding-top: 10px; padding-bottom: 10px; background-color: #f8fafc; }
+        /* =========================================
+           STYLES FROM MODULE B: STRATEGIC PLAN (PINTAS FILE)
+           ========================================= */
+        /* Table Layout for Strategic Plan */
+        .s-table-auto-layout {
+            width: 1200px; 
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        .s-table-auto-layout th, .s-table-auto-layout td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            vertical-align: top;
+        }
+        #prosesPelaksanaanTable th, #pelanTaktikalTable th, #qsamMatrixTable th { 
+            text-align: center; white-space: normal; line-height: 1.2; padding-top: 10px; padding-bottom: 10px;
+        }
+        #pelanTaktikalTable textarea { min-height: 60px; }
         
-        /* Strategy Map (The Arrows and Flow) */
-        .strategy-map-container { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px 0; border-radius: 12px; background-color: #ffffff; }
-        .strategy-perspective { width: 100%; max-width: 600px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative; }
+        /* Strategy Map Styles */
+        .strategy-map-container {
+            display: flex; flex-direction: column; align-items: center; gap: 16px; 
+            padding: 20px 0; border-radius: 12px; background-color: #ffffff;
+        }
+        .strategy-perspective {
+            width: 100%; max-width: 600px; padding: 12px; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;
+        }
         .perspective-title { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 4px; }
         .perspective-content { font-size: 0.95rem; font-weight: 500; min-height: 30px; }
-        .strategy-arrow { width: 4px; height: 16px; background-color: #3b82f6; border-radius: 2px; position: relative; z-index: 10; }
-        .strategy-arrow::after { content: ''; position: absolute; top: 100%; left: -4px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #3b82f6; }
-        
-        /* Perspective Colors */
+        .strategy-arrow {
+            width: 4px; height: 16px; background-color: #3b82f6; border-radius: 2px; position: relative; z-index: 10;
+        }
+        .strategy-arrow::after {
+            content: ''; position: absolute; top: 100%; left: -4px; width: 0; height: 0;
+            border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #3b82f6;
+        }
         .impact { background-color: #fef2f2; border: 2px solid #ef4444; } .impact .perspective-title { color: #ef4444; }
         .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } .outcome .perspective-title { color: #f59e0b; }
         .process { background-color: #eff6ff; border: 2px solid #3b82f6; } .process .perspective-title { color: #3b82f6; }
         .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } .capacity .perspective-title { color: #10b981; }
-        
-        /* Dashboard Cards & KPIs */
+
+        /* Dashboard Styles */
         .dashboard-container { background-color: #f1f5f9; padding: 1.5rem; min-height: 600px; border-radius: 12px; }
         .dashboard-card { background-color: white; border-radius: 12px; box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
-        .kpi-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
-        .ei-score { background-color: #f87171; } 
-        .qra-score { background-color: #34d399; } 
-        .tbs-score { background-color: #60a5fa; } 
+        .kpi-circle {
+            width: 70px; height: 70px; border-radius: 50%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .ei-score { background-color: #f87171; } .qra-score { background-color: #34d399; } .tbs-score { background-color: #60a5fa; }
         
-        /* QSAM List Items */
-        .qsam-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
-        .qsam-badge { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; margin-left: 8px; }
-        .ei-badge { background-color: #fee2e2; color: #ef4444; }
+        /* Unified Action Buttons */
+        .s-action-button {
+            flex-grow: 1; font-weight: 700; padding: 1rem 1.5rem; border-radius: 12px;
+            transition: all 0.2s ease-in-out; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; 
+        }
     </style>
 </head>
 <body>
 
-    <!-- TOP NAVIGATION: Module Switcher -->
-    <nav class="app-switcher-bar">
-        <div class="flex items-center gap-3">
-            <div class="h-8 w-8 bg-indigo-700 rounded-lg flex items-center justify-center text-white font-bold shadow">SP</div>
-            <h1 class="text-lg font-bold text-slate-800 hidden sm:block">SMK Seri Pulai Perdana <span class="text-gray-400 font-normal">| Integrated System</span></h1>
-        </div>
-        <div class="flex bg-slate-100 p-1 rounded-lg">
-            <button onclick="switchModule('kurikulum')" id="btn-mod-kurikulum" class="module-btn active">Pengurusan Kurikulum</button>
-            <button onclick="switchModule('strategic')" id="btn-mod-strategic" class="module-btn">Pelan Strategik</button>
-        </div>
-        <div id="connectionStatus" class="text-xs font-bold px-3 py-1 rounded bg-green-100 text-green-700 flex items-center">
-            <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Online
-        </div>
-    </nav>
+<!-- GLOBAL LOADER -->
+<div id="globalLoadingOverlay">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+    <p class="text-indigo-800 font-bold animate-pulse">Memulakan Sistem Bersepadu...</p>
+</div>
 
-    <!-- =========================================================================================
-         MODULE 1: KURIKULUM (The Org Chart & General Data) 
-         Copied logic from Kurikulam_5_12_1S.txt
-    ========================================================================================== -->
-    <div id="app-kurikulum" class="module-wrapper active-module">
+<!-- GLOBAL HEADER -->
+<nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">SP</div>
+                    <div class="hidden md:block">
+                        <h1 class="text-lg font-bold text-gray-900 leading-tight">SMK Seri Pulai Perdana</h1>
+                        <p class="text-xs text-gray-500">Sistem Pengurusan Bersepadu</p>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-8 sm:flex sm:space-x-2 bg-gray-100 p-1 rounded-lg">
+                    <button onclick="window.switchModule('kurikulum')" id="nav-mod-kurikulum" class="nav-pill active">
+                        Pengurusan Kurikulum
+                    </button>
+                    <button onclick="window.switchModule('strategic')" id="nav-mod-strategic" class="nav-pill">
+                        Pelan Strategik
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <span id="globalConnectionStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span class="w-2 h-2 mr-1 bg-green-500 rounded-full"></span>
+                    Online
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div class="sm:hidden border-t border-gray-200 bg-gray-50 p-2 flex justify-around">
+        <button onclick="window.switchModule('kurikulum')" id="mob-nav-kurikulum" class="text-xs font-bold text-indigo-700">Kurikulum</button>
+        <span class="text-gray-300">|</span>
+        <button onclick="window.switchModule('strategic')" id="mob-nav-strategic" class="text-xs font-bold text-gray-500">Pelan Strategik</button>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT WRAPPER -->
+<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+    <!-- =======================================================
+         MODULE A: KURIKULUM EDITOR (Pengurusan Kurikulum)
+         ======================================================= -->
+    <div id="module-kurikulum" class="module-container active-module">
         
-        <!-- Sidebar & Content Wrapper -->
-        <div class="flex flex-col md:flex-row gap-6 relative min-h-screen">
-            
-            <!-- Sidebar -->
-            <aside class="w-full md:w-64 bg-white rounded-xl shadow-sm border border-gray-200 p-2 h-fit md:sticky md:top-20 z-10">
+        <!-- Kurikulum Header / Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h2 id="k-pageTitle" class="text-2xl font-extrabold text-slate-800">Pengurusan Kurikulum</h2>
+                <p class="text-sm text-slate-500">Carta Organisasi, Data Guru & PInTaS Intervensi</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.kurikulumApp.saveAllData()" id="k-saveBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Simpan Data Kurikulum
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 relative">
+            <!-- Kurikulum Sidebar -->
+            <aside class="w-full md:w-64 bg-white rounded-xl shadow-sm border border-gray-200 p-2 h-fit">
                 <nav class="space-y-1">
-                    <button onclick="KurikulamApp.switchView('carta')" id="k-nav-carta" class="w-full flex items-center px-3 py-3 text-sm font-bold rounded-lg text-indigo-700 bg-indigo-50">
+                    <button onclick="window.kurikulumApp.switchView('carta')" id="k-nav-carta" class="w-full flex items-center px-3 py-3 text-sm font-bold rounded-lg text-indigo-700 bg-indigo-50 transition-colors">
                         <span class="mr-3">📊</span> Carta Organisasi
                     </button>
-                    <button onclick="KurikulamApp.switchView('tables')" id="k-nav-tables" class="w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                    <button onclick="window.kurikulumApp.switchView('tables')" id="k-nav-tables" class="w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
                         <span class="mr-3">📋</span> Data & Analisis
                     </button>
                     <div class="my-2 border-t border-gray-100"></div>
-                    <button onclick="KurikulamApp.switchView('pintas')" id="k-nav-pintas" class="w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <span class="mr-3">🚀</span> PInTaS (One Page)
+                    <button onclick="window.kurikulumApp.switchView('pintas')" id="k-nav-pintas" class="w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                        <span class="mr-3">🚀</span> Plan Intervensi (PInTaS)
                     </button>
                 </nav>
-                <div class="mt-4 pt-4 border-t px-2">
-                    <button onclick="KurikulamApp.saveAllData()" id="k-saveBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition">
-                        Simpan Data
-                    </button>
-                </div>
             </aside>
 
-            <!-- Main Content Area -->
-            <main class="flex-1 w-full">
+            <!-- Kurikulum Main Area -->
+            <div class="flex-1 min-w-0">
                 
-                <!-- VIEW: CARTA -->
+                <!-- VIEW 1: CARTA ORGANISASI -->
                 <div id="k-view-carta" class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold text-slate-800">Carta Organisasi</h2>
+                    <div class="flex justify-end mb-2">
                         <div class="bg-white border rounded p-1 flex shadow-sm">
-                            <button onclick="KurikulamApp.setChartOrientation('horizontal')" class="px-3 py-1 text-xs font-bold rounded bg-indigo-100 text-indigo-700">Melintang</button>
-                            <button onclick="KurikulamApp.setChartOrientation('vertical')" class="px-3 py-1 text-xs font-bold rounded text-slate-500 hover:bg-slate-50">Menegak</button>
+                            <button onclick="window.kurikulumApp.setChartOrientation('horizontal')" class="px-3 py-1 text-xs font-bold rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200">Melintang</button>
+                            <button onclick="window.kurikulumApp.setChartOrientation('vertical')" class="px-3 py-1 text-xs font-bold rounded text-slate-500 hover:bg-slate-50">Menegak</button>
                         </div>
                     </div>
                     <div id="chartContainerWrapper" class="org-container layout-horizontal">
@@ -190,49 +278,47 @@
                     </div>
                 </div>
 
-                <!-- VIEW: TABLES -->
+                <!-- VIEW 2: DATA TABLES -->
                 <div id="k-view-tables" class="hidden space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold text-slate-800">Data & Jawatankuasa</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-700">Senarai Data</h3>
                         <div class="flex gap-2">
-                            <button onclick="KurikulamApp.addNewTable()" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded font-bold border border-indigo-200 hover:bg-indigo-100">+ Senarai Baru</button>
-                            <button onclick="KurikulamApp.deleteActiveTable()" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded font-bold border border-red-200 hover:bg-red-100">Hapus Senarai</button>
+                            <button onclick="window.kurikulumApp.addNewTable()" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-2 rounded font-bold border border-indigo-200 hover:bg-indigo-100">+ Senarai Baru</button>
+                            <button onclick="window.kurikulumApp.deleteActiveTable()" class="text-xs bg-red-50 text-red-600 px-3 py-2 rounded font-bold border border-red-200 hover:bg-red-100">Hapus Senarai</button>
                         </div>
                     </div>
                     <div class="flex gap-2 overflow-x-auto pb-2 border-b border-slate-200" id="k-tableTabs"></div>
                     <div id="k-activeTableContainer" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 min-h-[400px]"></div>
                 </div>
 
-                <!-- VIEW: PINTAS (General) -->
+                <!-- VIEW 3: PInTaS -->
                 <div id="k-view-pintas" class="hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Plan Intervensi Transformasi</h2>
-                            <p class="text-xs text-slate-500 font-semibold">One Page Project Manager (OPPM)</p>
-                        </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-slate-700">Modul Intervensi (One Page PInTaS)</h3>
                         <span class="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded border border-green-200">LIVE SYNC</span>
                     </div>
-                    <div class="flex space-x-1 border-b border-slate-200 overflow-x-auto" id="k-kraTabs"></div>
                     
-                    <!-- SWOT Section -->
+                    <div class="flex space-x-1 border-b border-slate-200 overflow-x-auto pb-2" id="k-kraTabs"></div>
+                    
+                    <!-- Fasa 1 -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Fasa 1: Analisis SWOT</h3>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Fasa 1: Analisis SWOT</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="swot-box swot-s"><div class="font-bold text-xs text-green-700 mb-2">KEKUATAN (S)</div><textarea id="k-input_s" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
-                            <div class="swot-box swot-w"><div class="font-bold text-xs text-red-700 mb-2">KELEMAHAN (W)</div><textarea id="k-input_w" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
-                            <div class="swot-box swot-o"><div class="font-bold text-xs text-blue-700 mb-2">PELUANG (O)</div><textarea id="k-input_o" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
-                            <div class="swot-box swot-c"><div class="font-bold text-xs text-yellow-700 mb-2">ANCAMAN (T)</div><textarea id="k-input_c" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
+                            <div class="k-swot-box k-swot-s"><div class="font-bold text-xs text-green-700 mb-2">KEKUATAN (S)</div><textarea id="k-input_s" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
+                            <div class="k-swot-box k-swot-w"><div class="font-bold text-xs text-red-700 mb-2">KELEMAHAN (W)</div><textarea id="k-input_w" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
+                            <div class="k-swot-box k-swot-o"><div class="font-bold text-xs text-blue-700 mb-2">PELUANG (O)</div><textarea id="k-input_o" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
+                            <div class="k-swot-box k-swot-c"><div class="font-bold text-xs text-yellow-700 mb-2">ANCAMAN (T)</div><textarea id="k-input_c" class="w-full bg-transparent border-none text-sm resize-none focus:ring-0" rows="4"></textarea></div>
                         </div>
                     </div>
-                    
-                    <!-- Initiatives Table -->
+
+                    <!-- Fasa 2 -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 overflow-hidden">
                         <div class="flex justify-between mb-4">
-                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Fasa 2: Matriks Intervensi</h3>
-                            <button onclick="KurikulamApp.addPintasRow()" class="text-xs font-bold bg-emerald-500 text-white px-3 py-1 rounded shadow hover:bg-emerald-600">+ Inisiatif</button>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fasa 2: Matriks Intervensi</h4>
+                            <button onclick="window.kurikulumApp.addPintasRow()" class="text-xs font-bold bg-emerald-500 text-white px-3 py-1 rounded shadow hover:bg-emerald-600">+ Inisiatif</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="pintas-table min-w-[1800px]">
+                            <table class="k-pintas-table min-w-[1800px]">
                                 <thead>
                                     <tr>
                                         <th class="w-10">No</th><th class="w-48">1. Bidang Fokus</th><th class="w-48">2. Data Dikumpul</th><th class="w-48">3. TOV</th><th class="w-48">4. KPI / ETR</th><th class="w-64 bg-indigo-900 border-indigo-700 text-yellow-300 shadow-inner">5. Inisiatif (Program)</th><th class="w-48">6. Tanggungjawab</th><th class="w-32">7. Tempoh</th><th class="w-32">8. Sumber</th><th class="w-32">9. Evidens</th><th class="w-32">10. Penilaian</th><th class="w-24">11. Kos</th><th class="w-10"></th>
@@ -243,624 +329,630 @@
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
 
-    <!-- =========================================================================================
-         MODULE 2: PELAN STRATEGIK (QSAM, Subject Editor, Dashboard)
-         Copied logic from Pintas_05_12_1F.txt
-    ========================================================================================== -->
-    <div id="app-strategic" class="module-wrapper">
+    <!-- =======================================================
+         MODULE B: PELAN STRATEGIK (Pelan Operasi / Strategic Plan)
+         ======================================================= -->
+    <div id="module-strategic" class="module-container">
         
-        <!-- Header -->
+        <!-- Header Section -->
         <header class="text-center mb-8">
-            <h2 id="s-pageMainTitle" class="text-2xl font-bold text-gray-800">Pelan Strategik Mata Pelajaran</h2>
-            <p id="s-headerSubtitle" class="text-sm text-gray-500 mt-1">Sila pilih subjek atau cipta subjek baharu untuk memulakan.</p>
+            <h2 id="s-pageMainTitle" class="text-3xl font-extrabold text-indigo-900 mb-2 tracking-tight">
+                Pelan Strategik Mata Pelajaran
+            </h2>
+            <p id="s-headerSubtitle" class="text-sm text-gray-500 mt-1">Sila pilih subjek atau cipta subjek baharu untuk memulakan pengeditan.</p>
         </header>
 
-        <!-- 1. Subject Selector Container -->
-        <div id="s-subjectManagementSection" class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto mb-8 space-y-4">
+        <!-- Subject Management Section -->
+        <div id="s-subjectManagementSection" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-lg mx-auto mb-8 space-y-4">
             <div>
-                <label class="block text-lg font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran:</label>
-                <select id="s-subjectSelector" class="w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 bg-white"></select>
+                <label for="s-subjectSelector" class="block text-sm font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran (Subjek):</label>
+                <select id="s-subjectSelector" class="w-full p-2.5 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                    <!-- Options populated by JS -->
+                </select>
+                <p id="s-subjectListMessage" class="text-xs text-gray-500 mt-1 hidden">Memuatkan senarai subjek...</p>
             </div>
+
             <div class="border-t pt-4">
-                <label class="block text-lg font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
+                <label for="s-newSubjectInput" class="block text-sm font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
                 <div class="flex space-x-2">
-                    <input type="text" id="s-newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-3 border border-green-300 rounded-lg">
-                    <button id="s-addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-3 rounded-lg hover:bg-green-700">Tambah</button>
+                    <input type="text" id="s-newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-2.5 border border-green-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                    <button id="s-addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                        Tambah
+                    </button>
                 </div>
+                <div id="s-newSubjectMessageBox" class="mt-3 p-2 text-center rounded-lg hidden text-sm"></div>
             </div>
         </div>
 
-        <!-- 2. Main Editor & Dashboard Container (Initially Hidden) -->
-        <div id="s-planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden border border-gray-200">
+        <!-- Plan Editor Container -->
+        <div id="s-planEditorContainer" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hidden">
+            <div id="s-messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
             
-            <!-- Navbar inside module -->
-            <div class="flex justify-between items-center mb-6 flex-wrap gap-2 border-b pb-4">
-                <button onclick="StrategicApp.resetToSubjectSelect()" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 flex items-center">
+            <!-- View Toggles -->
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
+                <button id="s-switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition duration-150 flex items-center">
                     &larr; Tukar Subjek
                 </button>
                 <div class="flex space-x-2">
-                    <button id="s-toggleEditView" onclick="StrategicApp.setAppView('edit')" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-base bg-indigo-700 hover:bg-indigo-600">
-                        Edit
-                    </button>
-                    <button id="s-toggleDashboardView" onclick="StrategicApp.setAppView('dashboard')" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-base bg-purple-600 hover:bg-purple-700">
-                        Dashboard
-                    </button>
+                    <button id="s-toggleEditView" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-sm bg-indigo-700 hover:bg-indigo-600">Edit Plan</button>
+                    <button id="s-toggleDashboardView" class="text-white font-semibold px-4 py-2 rounded-lg transition duration-150 text-sm bg-purple-600 hover:bg-purple-700">Dashboard</button>
                 </div>
             </div>
 
             <!-- Dynamic Content Area -->
-            <div id="s-dynamicPlanContent"></div>
+            <div id="s-dynamicPlanContent">
+                <!-- Content injected here -->
+            </div>
 
-            <!-- Footer Save Bar -->
-            <div id="s-saveSection" class="border-t pt-4 mt-6 flex justify-between items-center">
-                <button onclick="StrategicApp.downloadPlan()" class="font-bold px-6 py-3 rounded-lg bg-gray-700 text-white hover:bg-gray-800">Export JSON</button>
-                <button onclick="StrategicApp.savePlan()" id="s-saveButton" class="font-bold px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 flex-grow ml-4">Save Pelan Strategik</button>
+            <!-- Save and Export Area -->
+            <div class="border-t pt-6 mt-6 flex justify-between items-center" id="s-saveSection">
+                <button id="s-downloadPlanButton" class="s-action-button bg-gray-700 text-white mr-4 text-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export JSON
+                </button>
+                <button id="s-saveButton" class="s-action-button bg-green-600 text-white text-sm">
+                    Simpan Pelan Strategik
+                </button>
             </div>
         </div>
     </div>
+</main>
 
-    <!-- GLOBAL MODAL: Node Edit (Kurikulam) -->
-    <div id="k-nodeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-80 p-6">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Edit Posisi</h3>
-            <div class="space-y-3">
-                <input type="text" id="k-nodeRole" placeholder="Jawatan" class="w-full border border-gray-300 rounded p-2 text-sm font-bold">
-                <input type="text" id="k-nodeName" placeholder="Nama Guru" class="w-full border border-gray-300 rounded p-2 text-sm">
-                <select id="k-nodeColor" class="w-full border border-gray-300 rounded p-2 text-sm">
-                    <option value="role-default">Kelabu (Umum)</option><option value="role-pengetua">Kuning (Pengetua)</option><option value="role-pk">Biru (Penolong Kanan)</option><option value="role-gkmp">Hijau (GKMP)</option><option value="role-kp">Merah Jambu (KP)</option>
-                </select>
-            </div>
-            <div class="mt-4 flex gap-2">
-                <button onclick="KurikulamApp.saveNodeEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded text-sm">Simpan</button>
-                <button onclick="document.getElementById('k-nodeModal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-500 font-bold py-2 rounded text-sm">Batal</button>
-            </div>
-            <div class="mt-2 pt-2 border-t flex justify-between">
-                <button onclick="KurikulamApp.addChildNode()" class="text-xs font-bold text-green-600">+ Anak</button>
-                <button onclick="KurikulamApp.deleteNode()" class="text-xs font-bold text-red-600">Padam</button>
-            </div>
+<!-- SHARED MODALS -->
+<!-- Edit Node Modal for Kurikulam -->
+<div id="k-nodeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[200] backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-80 p-6">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Edit Posisi</h3>
+        <input type="hidden" id="k-nodeId">
+        <div class="space-y-3">
+            <input type="text" id="k-nodeRole" placeholder="Jawatan" class="w-full border border-gray-300 rounded p-2 text-sm font-bold">
+            <input type="text" id="k-nodeName" placeholder="Nama Guru" class="w-full border border-gray-300 rounded p-2 text-sm">
+            <select id="k-nodeColor" class="w-full border border-gray-300 rounded p-2 text-sm">
+                <option value="role-default">Kelabu (Umum)</option><option value="role-pengetua">Kuning (Pengetua)</option><option value="role-pk">Biru (Penolong Kanan)</option><option value="role-gkmp">Hijau (GKMP)</option><option value="role-kp">Merah Jambu (KP)</option>
+            </select>
+        </div>
+        <div class="mt-4 flex gap-2">
+            <button onclick="window.kurikulumApp.saveNodeEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded text-sm">Simpan</button>
+            <button onclick="window.kurikulumApp.closeModal()" class="flex-1 bg-gray-100 text-gray-500 font-bold py-2 rounded text-sm">Batal</button>
+        </div>
+        <div class="mt-2 pt-2 border-t flex justify-between">
+            <button onclick="window.kurikulumApp.addChildNode()" class="text-xs font-bold text-green-600">+ Anak</button>
+            <button onclick="window.kurikulumApp.deleteNode()" class="text-xs font-bold text-red-600">Padam</button>
         </div>
     </div>
+</div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE INIT ---
-        const config = { apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU", authDomain: "strategic2026.firebaseapp.com", projectId: "strategic2026", storageBucket: "strategic2026.firebasestorage.app", messagingSenderId: "642605714672", appId: "1:642605714672:web:5dcdfbf351c36ca6084635" };
-        const app = initializeApp(config);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const APP_ID = 'strategic2026';
+    // --- SHARED CONFIG ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU",
+        authDomain: "strategic2026.firebaseapp.com",
+        projectId: "strategic2026",
+        storageBucket: "strategic2026.firebasestorage.app",
+        messagingSenderId: "642605714672",
+        appId: "1:642605714672:web:5dcdfbf351c36ca6084635"
+    };
+    const APP_ID = 'strategic2026';
 
-        // =============================================================================
-        // MODULE 1 LOGIC: KURIKULUM APP (Strict Namespace)
-        // =============================================================================
-        const KurikulamApp = (() => {
-            const PATH_KURIKULUM = `artifacts/${APP_ID}/public/data/kurikulum_editor/kurikulum_live_v1`;
-            const PATH_PINTAS = `artifacts/${APP_ID}/public/data/pintas/main_plan`;
-            
-            let data = { 
-                chart: [{id:'root',parent:null,role:'PENGETUA',name:'NAMA PENGETUA',color:'role-pengetua'},{id:'pk1',parent:'root',role:'PK PENTADBIRAN',name:'NAMA PK1',color:'role-pk'}], 
-                tables: [{id:'t1',title:'Senarai KP 2025',headers:['Bil','Panitia','Nama'],rows:[['1','BM','Ali']]}] 
-            };
-            let pintasData = { "KRA1": { title:"KRA 1", swot:{s:"",w:"",o:"",c:""}, interventions:[] } };
-            let activeTableIndex = 0;
-            let activeKra = "KRA1";
-            let currentNodeId = null;
+    // --- GLOBAL STATE ---
+    let app, db, auth;
+    
+    // =========================================================================
+    // MODULE A LOGIC: KURIKULUM (Namespaced under window.kurikulumApp)
+    // =========================================================================
+    const K_PATH_KURIKULUM = `artifacts/${APP_ID}/public/data/kurikulum_editor/kurikulum_live_v1`;
+    const K_PATH_PINTAS = `artifacts/${APP_ID}/public/data/pintas/main_plan`;
+    
+    const K_DEFAULT_DATA = {
+        chart: [{id:'root',parent:null,role:'PENGETUA',name:'NAMA PENGETUA',color:'role-pengetua'},{id:'pk1',parent:'root',role:'PK PENTADBIRAN',name:'NAMA PK1',color:'role-pk'},{id:'gkmp1',parent:'pk1',role:'GKMP BAHASA',name:'NAMA GKMP',color:'role-gkmp'},{id:'kp1',parent:'gkmp1',role:'KP BM',name:'NAMA KP',color:'role-kp'}],
+        tables: [{id:'t1',title:'Senarai KP 2025',headers:['Bil','Panitia','Nama'],rows:[['1','BM','Ali']]}]
+    };
+    const K_DEFAULT_PINTAS = {
+        "KRA1": { id:"KRA1", title:"KRA 1: Pemimpin", swot: { s:"", w:"", o:"", c:"" }, interventions: [{fokus:"Kepimpinan",data:"SKPMg2",tov:"88%",etr:"95%",inisiatif:"BENGKEL COACHING",tanggungjawab:"Pengetua",tempoh:"Jan",sumber:"RM100",evidens:"Laporan",penilaian:"",kos:""}] },
+        "KRA2": { id:"KRA2", title:"KRA 2: Guru", swot:{s:"",w:"",o:"",c:""}, interventions:[] },
+        "KRA3": { id:"KRA3", title:"KRA 3: Murid", swot:{s:"",w:"",o:"",c:""}, interventions:[] },
+        "KRA4": { id:"KRA4", title:"KRA 4: PIBG", swot:{s:"",w:"",o:"",c:""}, interventions:[] }
+    };
 
-            async function init() {
-                try {
-                    const kSnap = await getDoc(doc(db, PATH_KURIKULUM));
-                    if(kSnap.exists()) {
-                        const d = kSnap.data();
-                        if(d.tables) d.tables.forEach(t => { try{ if(typeof t.rows==='string') t.rows=JSON.parse(t.rows) }catch{} });
-                        data = { ...data, ...d };
-                    }
-                    const pSnap = await getDoc(doc(db, PATH_PINTAS));
-                    if(pSnap.exists()) pintasData = { ...pintasData, ...pSnap.data() };
-                    renderAll();
-                } catch(e) { console.warn("Kurikulam load failed, using default"); renderAll(); }
-            }
+    let kData = JSON.parse(JSON.stringify(K_DEFAULT_DATA));
+    let kPintasData = JSON.parse(JSON.stringify(K_DEFAULT_PINTAS));
+    let kActiveTableIndex = 0;
+    let kActiveKra = "KRA1";
+    let kCurrentNodeId = null;
 
-            function renderAll() { renderChart(); renderTables(); renderPintas(); }
-            
-            // Org Chart Logic
-            function renderChart() {
-                const container = document.getElementById('chartCanvas'); container.innerHTML = '';
-                const map = {}; data.chart.forEach(n => map[n.id] = {...n, children:[]});
-                let root = null;
-                data.chart.forEach(n => { if(n.parent === null) root = map[n.id]; else if(map[n.parent]) map[n.parent].children.push(map[n.id]); });
-                if(root) container.appendChild(createNode(root));
-            }
-            function createNode(node) {
-                const wrap = document.createElement('div'); wrap.className = 'node-wrapper';
-                const card = document.createElement('div'); card.className = `node-card ${node.color || 'role-default'}`;
-                card.innerHTML = `<div class="node-role">${node.role}</div><div class="node-name">${node.name}</div>`;
-                card.onclick = (e) => { e.stopPropagation(); openModal(node.id); };
-                wrap.appendChild(card);
-                if(node.children.length > 0) {
-                    const kids = document.createElement('div'); kids.className = 'children-container';
-                    node.children.forEach(c => kids.appendChild(createNode(c)));
-                    wrap.appendChild(kids);
+    const kurikulumApp = {
+        init: async () => {
+            await kurikulumApp.loadData();
+            kurikulumApp.renderAll();
+        },
+        loadData: async () => {
+            try {
+                const kSnap = await getDoc(doc(db, K_PATH_KURIKULUM));
+                if (kSnap.exists()) {
+                    let d = kSnap.data();
+                    if(d.tables) d.tables.forEach(t => { try{ if(typeof t.rows==='string') t.rows=JSON.parse(t.rows) }catch{} });
+                    kData = { ...K_DEFAULT_DATA, ...d };
                 }
-                return wrap;
+                const pSnap = await getDoc(doc(db, K_PATH_PINTAS));
+                if (pSnap.exists()) kPintasData = { ...K_DEFAULT_PINTAS, ...pSnap.data() };
+            } catch (e) { console.warn("Kurikulam Load Error (using default):", e); }
+        },
+        saveAllData: async () => {
+            const btn = document.getElementById('k-saveBtn'); const oldText = btn.innerHTML; btn.textContent = 'Saving...';
+            if(!document.getElementById('k-view-pintas').classList.contains('hidden')) kurikulumApp.savePintasInputs();
+            try {
+                const kClean = JSON.parse(JSON.stringify(kData));
+                kClean.tables.forEach(t => { if(t.rows) t.rows = JSON.stringify(t.rows); });
+                await setDoc(doc(db, K_PATH_KURIKULUM), kClean);
+                await setDoc(doc(db, K_PATH_PINTAS), kPintasData);
+                btn.textContent = 'Saved!'; setTimeout(() => btn.innerHTML = oldText, 2000);
+            } catch (e) { alert("Gagal menyimpan!"); btn.innerHTML = oldText; }
+        },
+        switchView: (v) => {
+             if(!document.getElementById('k-view-pintas').classList.contains('hidden')) kurikulumApp.savePintasInputs();
+             ['carta','tables','pintas'].forEach(x => { 
+                 document.getElementById('k-view-'+x).classList.add('hidden'); 
+                 document.getElementById('k-nav-'+x).className = "w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors";
+             });
+             document.getElementById('k-view-'+v).classList.remove('hidden'); 
+             document.getElementById('k-nav-'+v).className = "w-full flex items-center px-3 py-3 text-sm font-bold rounded-lg text-indigo-700 bg-indigo-50 transition-colors";
+             if(v==='pintas') kurikulumApp.renderPintas();
+        },
+        // Chart Logic
+        setChartOrientation: (m) => { document.getElementById('chartContainerWrapper').className = `org-container layout-${m}`; },
+        renderAll: () => { kurikulumApp.renderChart(); kurikulumApp.renderTables(); kurikulumApp.renderPintas(); },
+        renderChart: () => {
+            const container = document.getElementById('chartCanvas'); container.innerHTML = '';
+            const map = {}; kData.chart.forEach(n => map[n.id] = {...n, children:[]});
+            let root = null;
+            kData.chart.forEach(n => { if(n.parent === null) root = map[n.id]; else if(map[n.parent]) map[n.parent].children.push(map[n.id]); });
+            if(root) container.appendChild(kurikulumApp.createNode(root));
+        },
+        createNode: (node) => {
+            const wrap = document.createElement('div'); wrap.className = 'node-wrapper';
+            const card = document.createElement('div'); card.className = `node-card ${node.color || 'role-default'}`;
+            card.innerHTML = `<div class="node-role">${node.role}</div><div class="node-name">${node.name}</div>`;
+            card.onclick = (e) => { e.stopPropagation(); kurikulumApp.openModal(node.id); };
+            wrap.appendChild(card);
+            if(node.children.length > 0) {
+                const kids = document.createElement('div'); kids.className = 'children-container';
+                node.children.forEach(c => kids.appendChild(kurikulumApp.createNode(c)));
+                wrap.appendChild(kids);
             }
-            function openModal(id) {
-                currentNodeId = id; const n = data.chart.find(x=>x.id===id);
-                if(n) {
-                    document.getElementById('k-nodeRole').value=n.role; document.getElementById('k-nodeName').value=n.name;
-                    document.getElementById('k-nodeColor').value=n.color; document.getElementById('k-nodeModal').classList.remove('hidden');
-                }
+            return wrap;
+        },
+        openModal: (id) => { 
+            kCurrentNodeId=id; const n=kData.chart.find(x=>x.id===id); 
+            if(n){
+                document.getElementById('k-nodeRole').value=n.role;
+                document.getElementById('k-nodeName').value=n.name;
+                document.getElementById('k-nodeColor').value=n.color;
+                document.getElementById('k-nodeModal').classList.remove('hidden');
             }
+        },
+        closeModal: () => document.getElementById('k-nodeModal').classList.add('hidden'),
+        saveNodeEdit: () => { 
+            const n=kData.chart.find(x=>x.id===kCurrentNodeId); 
+            if(n){
+                n.role=document.getElementById('k-nodeRole').value;
+                n.name=document.getElementById('k-nodeName').value;
+                n.color=document.getElementById('k-nodeColor').value;
+                kurikulumApp.renderChart(); kurikulumApp.closeModal(); kurikulumApp.saveAllData();
+            }
+        },
+        addChildNode: () => { kData.chart.push({id:'n'+Date.now(),parent:kCurrentNodeId,role:'Jawatan',name:'Nama',color:'role-default'}); kurikulumApp.renderChart(); kurikulumApp.closeModal(); kurikulumApp.saveAllData(); },
+        deleteNode: () => { if(confirm("Padam nod ini?")){ kData.chart=kData.chart.filter(n=>n.id!==kCurrentNodeId && n.parent!==kCurrentNodeId); kurikulumApp.renderChart(); kurikulumApp.closeModal(); kurikulumApp.saveAllData(); } },
+        
+        // Table Logic
+        renderTables: () => {
+            const tabs = document.getElementById('k-tableTabs'); const container = document.getElementById('k-activeTableContainer');
+            tabs.innerHTML = ''; container.innerHTML = '';
+            if(!kData.tables.length) { container.innerHTML = 'Tiada data'; return; }
+            if(kActiveTableIndex >= kData.tables.length) kActiveTableIndex = 0;
 
-            // Table Logic
-            function renderTables() {
-                const tabs = document.getElementById('k-tableTabs'); const container = document.getElementById('k-activeTableContainer');
-                tabs.innerHTML = ''; container.innerHTML = '';
-                if(activeTableIndex >= data.tables.length) activeTableIndex = 0;
-                
-                data.tables.forEach((t, i) => {
-                    const b = document.createElement('button');
-                    b.className = `px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${i===activeTableIndex ? 'bg-indigo-600 text-white shadow' : 'bg-white border text-slate-600'}`;
-                    b.textContent = t.title; b.onclick = () => { activeTableIndex = i; renderTables(); };
-                    tabs.appendChild(b);
-                });
+            kData.tables.forEach((t, i) => {
+                const b = document.createElement('button');
+                b.className = `px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${i===kActiveTableIndex ? 'bg-indigo-600 text-white shadow' : 'bg-white border text-slate-600'}`;
+                b.textContent = t.title;
+                b.onclick = () => { kActiveTableIndex = i; kurikulumApp.renderTables(); };
+                tabs.appendChild(b);
+            });
+            const t = kData.tables[kActiveTableIndex];
+            let h = `<div class="mb-6 flex gap-4"><input class="text-xl font-bold bg-transparent border-b border-dashed w-1/2 py-1" value="${t.title}" onchange="window.kurikulumApp.updateTableTitle(this.value)"><button onclick="window.kurikulumApp.addColumn()" class="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded border border-blue-200">+ Lajur</button></div>`;
+            h += `<div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm mb-4"><table class="k-data-table"><thead><tr>`;
+            t.headers.forEach((hdr, i) => { h += `<th><div class="flex gap-1"><input value="${hdr}" onchange="window.kurikulumApp.updateHeader(${i},this.value)" class="font-bold"><button onclick="window.kurikulumApp.deleteColumn(${i})" class="k-action-btn">×</button></div></th>`; });
+            h += `<th class="w-10"></th></tr></thead><tbody>`;
+            if(t.rows) t.rows.forEach((row, ri) => {
+                h += `<tr>`; row.forEach((cell, ci) => h += `<td><input value="${cell}" onchange="window.kurikulumApp.updateCell(${ri},${ci},this.value)"></td>`);
+                h += `<td class="text-center bg-gray-50"><button class="k-action-btn" onclick="window.kurikulumApp.delRow(${ri})">×</button></td></tr>`;
+            });
+            h += `</tbody></table></div><div class="text-center"><button class="bg-slate-100 text-slate-600 px-6 py-2 rounded-lg text-sm font-bold border" onclick="window.kurikulumApp.addRow()">+ Tambah Baris</button></div>`;
+            container.innerHTML = h;
+        },
+        addNewTable: () => { const n=prompt("Nama Senarai:"); if(n){kData.tables.push({id:Date.now(),title:n,headers:['Bil','Lajur 2'],rows:[['1','-']]}); kActiveTableIndex=kData.tables.length-1; kurikulumApp.renderTables(); kurikulumApp.saveAllData();} },
+        deleteActiveTable: () => { if(kData.tables.length<=1)return alert("Minimum 1 senarai."); if(confirm("Hapus?")){kData.tables.splice(kActiveTableIndex,1);kActiveTableIndex=0;kurikulumApp.renderTables();kurikulumApp.saveAllData();} },
+        updateTableTitle: (v) => { kData.tables[kActiveTableIndex].title = v; kurikulumApp.saveAllData(); },
+        updateHeader: (i,v) => { kData.tables[kActiveTableIndex].headers[i]=v; kurikulumApp.saveAllData(); },
+        updateCell: (r,c,v) => { kData.tables[kActiveTableIndex].rows[r][c]=v; kurikulumApp.saveAllData(); },
+        addRow: () => { const t = kData.tables[kActiveTableIndex]; if(!t.rows) t.rows=[]; const r=new Array(t.headers.length).fill('-'); r[0]=t.rows.length+1; t.rows.push(r); kurikulumApp.renderTables(); kurikulumApp.saveAllData(); },
+        delRow: (i) => { const t = kData.tables[kActiveTableIndex]; t.rows.splice(i,1); kurikulumApp.renderTables(); kurikulumApp.saveAllData(); },
+        addColumn: () => { const t = kData.tables[kActiveTableIndex]; t.headers.push("Lajur "+(t.headers.length+1)); if(t.rows)t.rows.forEach(r=>r.push("-")); kurikulumApp.renderTables(); kurikulumApp.saveAllData(); },
+        deleteColumn: (i) => { const t = kData.tables[kActiveTableIndex]; if(confirm("Hapus lajur?")){t.headers.splice(i,1); if(t.rows)t.rows.forEach(r=>r.splice(i,1)); kurikulumApp.renderTables(); kurikulumApp.saveAllData();} },
 
-                const t = data.tables[activeTableIndex];
-                if(!t) return;
-                
-                let h = `<div class="mb-4 flex gap-4"><input class="text-xl font-bold border-b border-dashed w-1/2 py-1" value="${t.title}" onchange="KurikulamApp.updateTableTitle(this.value)"><button onclick="KurikulamApp.addColumn()" class="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded border border-blue-200">+ Lajur</button></div>`;
-                h += `<div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm mb-4"><table class="k-data-table"><thead><tr>`;
-                t.headers.forEach((hdr, i) => { h += `<th><div class="flex gap-1"><input value="${hdr}" onchange="KurikulamApp.updateHeader(${i},this.value)" class="font-bold"><button onclick="KurikulamApp.deleteColumn(${i})" class="action-btn">×</button></div></th>`; });
-                h += `<th class="w-10"></th></tr></thead><tbody>`;
-                if(t.rows) t.rows.forEach((row, ri) => {
-                    h += `<tr>`; row.forEach((cell, ci) => h += `<td><input value="${cell}" onchange="KurikulamApp.updateCell(${ri},${ci},this.value)"></td>`);
-                    h += `<td class="text-center bg-gray-50"><button class="action-btn" onclick="KurikulamApp.delRow(${ri})">×</button></td></tr>`;
-                });
-                h += `</tbody></table></div><div class="text-center"><button class="bg-slate-100 text-slate-600 px-6 py-2 rounded-lg text-sm font-bold border" onclick="KurikulamApp.addRow()">+ Tambah Baris</button></div>`;
-                container.innerHTML = h;
-            }
+        // Pintas Logic
+        renderPintas: () => {
+            const tabs = document.getElementById('k-kraTabs'); tabs.innerHTML = '';
+            Object.keys(kPintasData).forEach(key => {
+                const b = document.createElement('button'); b.className = `px-6 py-3 text-sm font-medium whitespace-nowrap ${key===kActiveKra ? 'k-tab-active' : 'k-tab-inactive'}`;
+                b.textContent = kPintasData[key].title; b.onclick = () => { kurikulumApp.savePintasInputs(); kActiveKra = key; kurikulumApp.renderPintas(); };
+                tabs.appendChild(b);
+            });
+            const d = kPintasData[kActiveKra];
+            document.getElementById('k-input_s').value = d.swot.s; document.getElementById('k-input_w').value = d.swot.w;
+            document.getElementById('k-input_o').value = d.swot.o; document.getElementById('k-input_c').value = d.swot.c;
+            const tbody = document.getElementById('k-interventionTableBody'); tbody.innerHTML = '';
+            if(d.interventions) d.interventions.forEach((row, i) => {
+                const tr = document.createElement('tr'); const fields = ['fokus','data','tov','etr','inisiatif','tanggungjawab','tempoh','sumber','evidens','penilaian','kos'];
+                let h = `<td class="text-center text-xs font-bold text-slate-400 pt-2">${i+1}</td>`;
+                fields.forEach(f => { const cls = f==='inisiatif' ? 'k-col-initiative' : ''; h += `<td><textarea data-f="${f}" class="${cls}" onchange="window.kurikulumApp.savePintasInputs()">${row[f]||''}</textarea></td>`; });
+                h += `<td class="text-center"><button class="k-action-btn" onclick="window.kurikulumApp.delPintasRow(${i})">×</button></td>`;
+                tr.innerHTML = h; tbody.appendChild(tr);
+            });
+        },
+        savePintasInputs: () => {
+            if(!kActiveKra || !kPintasData[kActiveKra]) return;
+            const d = kPintasData[kActiveKra];
+            d.swot.s = document.getElementById('k-input_s').value; d.swot.w = document.getElementById('k-input_w').value;
+            d.swot.o = document.getElementById('k-input_o').value; d.swot.c = document.getElementById('k-input_c').value;
+            const rows = Array.from(document.querySelectorAll('#k-interventionTableBody tr'));
+            d.interventions = rows.map(tr => { const obj = {}; tr.querySelectorAll('textarea').forEach(ta => obj[ta.getAttribute('data-f')] = ta.value); return obj; });
+        },
+        addPintasRow: () => { kurikulumApp.savePintasInputs(); kPintasData[kActiveKra].interventions.push({}); kurikulumApp.renderPintas(); },
+        delPintasRow: (i) => { if(confirm("Padam inisiatif ini?")){ kurikulumApp.savePintasInputs(); kPintasData[kActiveKra].interventions.splice(i,1); kurikulumApp.renderPintas(); } }
+    };
 
-            // Pintas Logic (One Page)
-            function renderPintas() {
-                const tabs = document.getElementById('k-kraTabs'); tabs.innerHTML = '';
-                Object.keys(pintasData).forEach(key => {
-                    const b = document.createElement('button'); b.className = `px-6 py-3 text-sm font-medium whitespace-nowrap ${key===activeKra ? 'tab-active' : 'tab-inactive'}`;
-                    b.textContent = pintasData[key].title || key; b.onclick = () => { savePintasInputs(); activeKra = key; renderPintas(); };
-                    tabs.appendChild(b);
-                });
-                const d = pintasData[activeKra];
-                if(!d) return;
-                document.getElementById('k-input_s').value = d.swot.s; document.getElementById('k-input_w').value = d.swot.w;
-                document.getElementById('k-input_o').value = d.swot.o; document.getElementById('k-input_c').value = d.swot.c;
-                const tbody = document.getElementById('k-interventionTableBody'); tbody.innerHTML = '';
-                if(d.interventions) d.interventions.forEach((row, i) => {
-                    const tr = document.createElement('tr'); const fields = ['fokus','data','tov','etr','inisiatif','tanggungjawab','tempoh','sumber','evidens','penilaian','kos'];
-                    let h = `<td class="text-center text-xs font-bold text-slate-400 pt-2">${i+1}</td>`;
-                    fields.forEach(f => { const cls = f==='inisiatif' ? 'col-initiative' : ''; h += `<td><textarea data-f="${f}" class="${cls}" onchange="KurikulamApp.savePintasInputs()">${row[f]||''}</textarea></td>`; });
-                    h += `<td class="text-center"><button class="action-btn" onclick="KurikulamApp.delPintasRow(${i})">×</button></td>`;
-                    tr.innerHTML = h; tbody.appendChild(tr);
-                });
-            }
-            function savePintasInputs() {
-                if(!activeKra || !pintasData[activeKra]) return;
-                const d = pintasData[activeKra];
-                d.swot.s = document.getElementById('k-input_s').value; d.swot.w = document.getElementById('k-input_w').value;
-                d.swot.o = document.getElementById('k-input_o').value; d.swot.c = document.getElementById('k-input_c').value;
-                const rows = Array.from(document.querySelectorAll('#k-interventionTableBody tr'));
-                d.interventions = rows.map(tr => { const obj = {}; tr.querySelectorAll('textarea').forEach(ta => obj[ta.getAttribute('data-f')] = ta.value); return obj; });
-            }
+    // =========================================================================
+    // MODULE B LOGIC: STRATEGIC PLAN (Namespaced under window.strategicApp)
+    // =========================================================================
+    
+    // Variables for Strategic App
+    const S_SUBJECTS_DOC_PATH = `artifacts/${APP_ID}/public/data/subject_config/subject_list`;
+    const S_PLAN_COLLECTION_BASE = `artifacts/${APP_ID}/public/data/pelan_strategik`; 
+    const S_MASTER_TEMPLATE_PATH = `${S_PLAN_COLLECTION_BASE}/master_template`; 
+    const S_DEFAULT_MASTER = {
+        misi: "Melestarikan Sistem Pendidikan Yang Berkualiti...", visi: "Pendidikan Berkualiti Insan Terdidik...",
+        bhag: "Mencapai Top 3 Daerah...", smartPrinciple: 'Quantum SMART...', entanglementMeasure: 'Peningkatan 15% Band 4...',
+        swot: { s: "Kekuatan...", w: "Kelemahan...", o: "Peluang...", c: "Cabaran..." },
+        matlamatStrategik: "Tingkatkan penguasaan...", strategiList: ["Strategi 1"], pelanTaktikal: [], qsamData: [], prosesPelaksanaan: []
+    };
+    
+    let sCurrentSubject = null;
+    let sCurrentPlanData = {};
+    let sCurrentView = 'edit';
+    let sMasterTemplateCache = {};
 
-            // Expose public methods
+    const strategicApp = {
+        init: async () => {
+            await strategicApp.loadSubjectList();
+            document.getElementById('s-saveButton').addEventListener('click', strategicApp.savePlan);
+            document.getElementById('s-downloadPlanButton').addEventListener('click', strategicApp.downloadPlan);
+            document.getElementById('s-subjectSelector').addEventListener('change', (e) => { if(e.target.value) strategicApp.loadPlan(e.target.value); });
+            document.getElementById('s-addNewSubjectButton').addEventListener('click', strategicApp.addNewSubject);
+            document.getElementById('s-toggleEditView').addEventListener('click', () => strategicApp.setAppView('edit'));
+            document.getElementById('s-toggleDashboardView').addEventListener('click', () => strategicApp.setAppView('dashboard'));
+            document.getElementById('s-switchSubjectButton').addEventListener('click', () => {
+                document.getElementById('s-planEditorContainer').classList.add('hidden');
+                document.getElementById('s-subjectManagementSection').classList.remove('hidden');
+                document.getElementById('s-headerSubtitle').textContent = "Sila pilih subjek.";
+                document.getElementById('s-pageMainTitle').textContent = "Pelan Strategik Mata Pelajaran";
+            });
+        },
+        loadSubjectList: async (selectSubject = null) => {
+            const sel = document.getElementById('s-subjectSelector');
+            sel.innerHTML = '<option>Loading...</option>';
+            try {
+                const docSnap = await getDoc(doc(db, S_SUBJECTS_DOC_PATH));
+                let subs = (docSnap.exists() && docSnap.data().subjects) ? docSnap.data().subjects : ["Sejarah", "Matematik"];
+                sel.innerHTML = '<option value="" disabled selected>--- Pilih Subjek ---</option>';
+                subs.forEach(s => { const op = document.createElement('option'); op.value=s; op.textContent=s; sel.appendChild(op); });
+                if(selectSubject) { sel.value = selectSubject; strategicApp.loadPlan(selectSubject); }
+            } catch(e) { console.error("Subj load err", e); }
+        },
+        addNewSubject: async () => {
+            const inp = document.getElementById('s-newSubjectInput'); const val = inp.value.trim();
+            if(!val) return;
+            try {
+                const ref = doc(db, S_SUBJECTS_DOC_PATH);
+                await updateDoc(ref, { subjects: arrayUnion(val) });
+                strategicApp.loadSubjectList(val);
+                inp.value = '';
+            } catch(e) { alert("Error adding subject"); }
+        },
+        loadPlan: async (subject) => {
+            sCurrentSubject = subject;
+            document.getElementById('s-subjectManagementSection').classList.add('hidden');
+            document.getElementById('s-planEditorContainer').classList.remove('hidden');
+            document.getElementById('s-pageMainTitle').textContent = `Pelan Strategik: ${subject}`;
+            
+            // Set view to edit by default
+            sCurrentView = 'edit';
+            strategicApp.renderEditViewHTML();
+            
+            try {
+                const snap = await getDoc(doc(db, `${S_PLAN_COLLECTION_BASE}/${strategicApp.slug(subject)}_plan`));
+                if(snap.exists()) sCurrentPlanData = snap.data();
+                else sCurrentPlanData = JSON.parse(JSON.stringify(S_DEFAULT_MASTER)); // Fallback
+                strategicApp.setFormState(sCurrentPlanData);
+            } catch(e) { console.error(e); }
+        },
+        savePlan: async () => {
+            const data = strategicApp.getFormState();
+            sCurrentPlanData = data;
+            const btn = document.getElementById('s-saveButton'); btn.textContent = "Saving...";
+            try {
+                await setDoc(doc(db, `${S_PLAN_COLLECTION_BASE}/${strategicApp.slug(sCurrentSubject)}_plan`), data);
+                btn.textContent = "Saved!"; setTimeout(()=>btn.textContent="Simpan Pelan Strategik", 2000);
+            } catch(e) { alert("Save failed"); btn.textContent="Save"; }
+        },
+        downloadPlan: () => {
+            const data = strategicApp.getFormState();
+            const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `${sCurrentSubject}_plan.json`; a.click();
+        },
+        setAppView: (view) => {
+            if(sCurrentView === 'edit') sCurrentPlanData = strategicApp.getFormState();
+            sCurrentView = view;
+            const content = document.getElementById('s-dynamicPlanContent');
+            const btnEdit = document.getElementById('s-toggleEditView');
+            const btnDash = document.getElementById('s-toggleDashboardView');
+            
+            if(view === 'edit') {
+                strategicApp.renderEditViewHTML();
+                strategicApp.setFormState(sCurrentPlanData);
+                document.getElementById('s-saveSection').classList.remove('hidden');
+                btnEdit.classList.replace('bg-indigo-500','bg-indigo-700'); btnDash.classList.replace('bg-purple-700','bg-purple-600');
+            } else {
+                content.innerHTML = strategicApp.getDashboardHTML();
+                strategicApp.renderDashboard(sCurrentPlanData);
+                document.getElementById('s-saveSection').classList.add('hidden');
+                btnEdit.classList.replace('bg-indigo-700','bg-indigo-500'); btnDash.classList.replace('bg-purple-600','bg-purple-700');
+            }
+        },
+        slug: (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+        
+        // --- Form Handling ---
+        getFormState: () => {
+            if(sCurrentView !== 'edit') return sCurrentPlanData;
+            // Helper to safe get value
+            const v = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
             return {
-                init,
-                switchView: (v) => {
-                    savePintasInputs();
-                    ['carta','tables','pintas'].forEach(x => { document.getElementById('k-view-'+x).classList.add('hidden'); document.getElementById('k-nav-'+x).classList.remove('bg-indigo-50','text-indigo-700','font-bold'); document.getElementById('k-nav-'+x).classList.add('text-slate-600'); });
-                    document.getElementById('k-view-'+v).classList.remove('hidden'); 
-                    document.getElementById('k-nav-'+v).classList.add('bg-indigo-50','text-indigo-700','font-bold');
-                    if(v==='pintas') renderPintas();
-                },
-                setChartOrientation: (m) => { document.getElementById('chartContainerWrapper').className = `org-container layout-${m}`; },
-                saveAllData: async () => {
-                    savePintasInputs();
-                    const btn = document.getElementById('k-saveBtn'); btn.textContent = 'Saving...';
-                    try {
-                        const kClean = JSON.parse(JSON.stringify(data));
-                        kClean.tables.forEach(t => { if(t.rows) t.rows = JSON.stringify(t.rows); });
-                        await setDoc(doc(db, PATH_KURIKULUM), kClean);
-                        await setDoc(doc(db, PATH_PINTAS), pintasData);
-                        btn.textContent = 'Saved!'; setTimeout(()=>btn.textContent='Simpan Data', 2000);
-                    } catch(e) { alert("Save Error"); btn.textContent='Save'; }
-                },
-                saveNodeEdit: () => { 
-                    const n = data.chart.find(x=>x.id===currentNodeId);
-                    if(n) { n.role=document.getElementById('k-nodeRole').value; n.name=document.getElementById('k-nodeName').value; n.color=document.getElementById('k-nodeColor').value; renderChart(); document.getElementById('k-nodeModal').classList.add('hidden'); KurikulamApp.saveAllData(); }
-                },
-                deleteNode: () => { if(confirm("Padam?")){ data.chart=data.chart.filter(n=>n.id!==currentNodeId && n.parent!==currentNodeId); renderChart(); document.getElementById('k-nodeModal').classList.add('hidden'); KurikulamApp.saveAllData(); } },
-                addChildNode: () => { data.chart.push({id:'n'+Date.now(),parent:currentNodeId,role:'Jawatan',name:'Nama',color:'role-default'}); renderChart(); document.getElementById('k-nodeModal').classList.add('hidden'); KurikulamApp.saveAllData(); },
-                
-                // Table helpers
-                updateTableTitle: (v) => { data.tables[activeTableIndex].title = v; },
-                updateHeader: (i,v) => { data.tables[activeTableIndex].headers[i]=v; },
-                updateCell: (r,c,v) => { data.tables[activeTableIndex].rows[r][c]=v; },
-                addRow: () => { const t = data.tables[activeTableIndex]; if(!t.rows) t.rows=[]; const r=new Array(t.headers.length).fill('-'); r[0]=t.rows.length+1; t.rows.push(r); renderTables(); },
-                delRow: (i) => { data.tables[activeTableIndex].rows.splice(i,1); renderTables(); },
-                addColumn: () => { const t = data.tables[activeTableIndex]; t.headers.push("Lajur "+(t.headers.length+1)); t.rows.forEach(r=>r.push("-")); renderTables(); },
-                deleteColumn: (i) => { const t = data.tables[activeTableIndex]; if(confirm("Hapus?")){ t.headers.splice(i,1); t.rows.forEach(r=>r.splice(i,1)); renderTables(); } },
-                addNewTable: () => { const n=prompt("Nama?"); if(n){ data.tables.push({id:Date.now(),title:n,headers:['Bil','Col'],rows:[['1','-']]}); activeTableIndex=data.tables.length-1; renderTables(); } },
-                deleteActiveTable: () => { if(data.tables.length>1 && confirm("Hapus?")){ data.tables.splice(activeTableIndex,1); activeTableIndex=0; renderTables(); } },
-
-                // Pintas helpers
-                addPintasRow: () => { savePintasInputs(); pintasData[activeKra].interventions.push({}); renderPintas(); },
-                delPintasRow: (i) => { savePintasInputs(); pintasData[activeKra].interventions.splice(i,1); renderPintas(); },
-                savePintasInputs // exposed for inline calls
+                misi: v('s-misiInput'), visi: v('s-visiInput'), bhag: v('s-bhagInput'),
+                matlamatStrategik: v('s-matlamatStrategik'), strategiList: v('s-strategiList').split('\n'),
+                pelanTaktikal: strategicApp.collectTaktikal(), qsamData: strategicApp.collectQsam()
             };
-        })();
+        },
+        setFormState: (data) => {
+             if(sCurrentView === 'edit') {
+                 const s = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ''; }
+                 s('s-misiInput', data.misi); s('s-visiInput', data.visi); s('s-bhagInput', data.bhag);
+                 s('s-matlamatStrategik', data.matlamatStrategik); 
+                 s('s-strategiList', Array.isArray(data.strategiList) ? data.strategiList.join('\n') : '');
+                 strategicApp.renderTaktikalTable(data.pelanTaktikal || []);
+                 strategicApp.renderQsamTable(data.pelanTaktikal || [], data.qsamData || []);
+                 strategicApp.renderMap(data);
+             }
+        },
+        
+        // --- Renderers ---
+        renderEditViewHTML: () => {
+             const html = `
+                <div class="space-y-6">
+                    <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                        <h3 class="font-bold text-indigo-800 mb-2">Ringkasan Eksekutif</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <textarea id="s-visiInput" placeholder="Visi" class="p-2 rounded border w-full text-sm" rows="2"></textarea>
+                            <textarea id="s-misiInput" placeholder="Misi" class="p-2 rounded border w-full text-sm" rows="2"></textarea>
+                            <input id="s-bhagInput" placeholder="Matlamat Utama (BHAG)" class="p-2 rounded border w-full md:col-span-2 text-sm font-bold text-indigo-900 bg-white">
+                        </div>
+                    </div>
+                    <div>
+                         <h3 class="font-bold text-slate-700 mb-2">Strategi & Matlamat</h3>
+                         <textarea id="s-matlamatStrategik" placeholder="Matlamat Strategik..." class="w-full p-2 border rounded mb-2 text-sm" rows="2"></textarea>
+                         <textarea id="s-strategiList" placeholder="Senarai Strategi (Satu per baris)..." class="w-full p-2 border rounded text-sm" rows="3"></textarea>
+                    </div>
+                    <!-- Live Map Preview -->
+                    <div id="s-mapPreview" class="p-4 bg-gray-50 border rounded-lg"></div>
 
-        // =============================================================================
-        // MODULE 2 LOGIC: STRATEGIC APP (Strict Namespace)
-        // =============================================================================
-        const StrategicApp = (() => {
-            const SUBJECTS_DOC_PATH = `artifacts/${APP_ID}/public/data/subject_config/subject_list`;
-            const PLAN_COLLECTION_BASE = `artifacts/${APP_ID}/public/data/pelan_strategik`; 
+                    <!-- Tactical Table -->
+                    <div>
+                        <h3 class="font-bold text-slate-700 mb-2">Pelan Taktikal</h3>
+                        <div class="overflow-x-auto">
+                            <table class="s-table-auto-layout" id="pelanTaktikalTable">
+                                <thead><tr class="bg-gray-100 text-xs uppercase"><th class="w-10">No</th><th>Program</th><th>Tanggungjawab</th><th>Tempoh</th><th>Kos</th><th>Output</th><th></th></tr></thead>
+                                <tbody id="s-taktikalBody"></tbody>
+                            </table>
+                        </div>
+                        <button onclick="window.strategicApp.addTaktikalRow()" class="mt-2 text-xs bg-indigo-600 text-white px-3 py-1 rounded font-bold">+ Program</button>
+                    </div>
+
+                    <!-- QSAM Table -->
+                    <div>
+                        <h3 class="font-bold text-green-700 mb-2">QSAM Matrix (Monitoring)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="s-table-auto-layout" id="qsamMatrixTable">
+                                <thead><tr class="bg-green-50 text-xs uppercase"><th>Program</th><th>IM (1-10)</th><th>EI (0-5)</th><th>QRA (%)</th><th>TBS (%)</th></tr></thead>
+                                <tbody id="s-qsamBody"></tbody>
+                            </table>
+                        </div>
+                        <button onclick="window.strategicApp.syncQsam()" class="mt-2 text-xs bg-green-600 text-white px-3 py-1 rounded font-bold">Sync List</button>
+                    </div>
+                </div>
+             `;
+             document.getElementById('s-dynamicPlanContent').innerHTML = html;
+             
+             // Attach listeners for live map update
+             ['s-matlamatStrategik', 's-strategiList'].forEach(id => {
+                 document.getElementById(id).addEventListener('input', () => strategicApp.renderMap(strategicApp.getFormState()));
+             });
+        },
+        renderTaktikalTable: (rows) => {
+            const tbody = document.getElementById('s-taktikalBody'); tbody.innerHTML = '';
+            rows.forEach((r, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">${i+1}</td>
+                    <td><textarea class="w-full border p-1 text-sm rounded" data-f="namaProgram">${r.namaProgram||''}</textarea></td>
+                    <td><input class="w-full border p-1 text-sm rounded" data-f="tanggungJawab" value="${r.tanggungJawab||''}"></td>
+                    <td><input class="w-full border p-1 text-sm rounded" data-f="tempoh" value="${r.tempoh||''}"></td>
+                    <td><input class="w-full border p-1 text-sm rounded" data-f="kosSumber" value="${r.kosSumber||''}"></td>
+                    <td><textarea class="w-full border p-1 text-sm rounded" data-f="outputOutcome">${r.outputOutcome||''}</textarea></td>
+                    <td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        },
+        addTaktikalRow: () => {
+            const tbody = document.getElementById('s-taktikalBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="text-center">${tbody.children.length+1}</td><td><textarea class="w-full border p-1 text-sm rounded" data-f="namaProgram"></textarea></td><td><input class="w-full border p-1 text-sm rounded" data-f="tanggungJawab"></td><td><input class="w-full border p-1 text-sm rounded" data-f="tempoh"></td><td><input class="w-full border p-1 text-sm rounded" data-f="kosSumber"></td><td><textarea class="w-full border p-1 text-sm rounded" data-f="outputOutcome"></textarea></td><td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>`;
+            tbody.appendChild(tr);
+        },
+        collectTaktikal: () => {
+             return Array.from(document.querySelectorAll('#s-taktikalBody tr')).map(tr => ({
+                 namaProgram: tr.querySelector('[data-f="namaProgram"]').value,
+                 tanggungJawab: tr.querySelector('[data-f="tanggungJawab"]').value,
+                 tempoh: tr.querySelector('[data-f="tempoh"]').value,
+                 kosSumber: tr.querySelector('[data-f="kosSumber"]').value,
+                 outputOutcome: tr.querySelector('[data-f="outputOutcome"]').value
+             }));
+        },
+        renderQsamTable: (tacticalRows, qsamRows) => {
+            const tbody = document.getElementById('s-qsamBody'); tbody.innerHTML = '';
+            // Map existing QSAM data
+            const qMap = {}; qsamRows.forEach(q => qMap[q.programName] = q);
             
-            let currentSubject = null;
-            let currentPlanData = {}; // The SINGLE SOURCE OF TRUTH for this module
-            let currentView = 'edit';
-
-            // Initializer
-            async function init() {
-                loadSubjectList();
-            }
-
-            // Subject Management
-            async function loadSubjectList(selectSubject = null) {
-                const sel = document.getElementById('s-subjectSelector');
-                sel.innerHTML = '<option>Loading...</option>';
-                try {
-                    const snap = await getDoc(doc(db, SUBJECTS_DOC_PATH));
-                    let subs = (snap.exists() && snap.data().subjects) ? snap.data().subjects : ["Sejarah", "Matematik"];
-                    sel.innerHTML = '<option value="" disabled selected>--- Pilih Subjek ---</option>';
-                    subs.forEach(s => { const opt = document.createElement('option'); opt.value=s; opt.textContent=s; sel.appendChild(opt); });
-                    sel.onchange = (e) => loadPlan(e.target.value);
-                    if(selectSubject) { sel.value = selectSubject; loadPlan(selectSubject); }
-                } catch(e) { console.error(e); }
-            }
-
-            async function loadPlan(subject) {
-                currentSubject = subject;
-                document.getElementById('s-subjectManagementSection').classList.add('hidden');
-                document.getElementById('s-planEditorContainer').classList.remove('hidden');
-                document.getElementById('s-pageMainTitle').textContent = `Pelan Strategik: ${subject}`;
-                
-                // Fetch Data
-                const path = `${PLAN_COLLECTION_BASE}/${subject.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_plan`;
-                const snap = await getDoc(doc(db, path));
-                
-                if(snap.exists()) currentPlanData = snap.data();
-                else currentPlanData = {
-                    misi: "", visi: "", bhag: "",
-                    matlamatStrategik: "", strategiList: [], pelanTaktikal: [], qsamData: []
-                };
-
-                setAppView('edit'); // Default to edit
-            }
-
-            // View Switching & HTML Generation
-            function setAppView(view) {
-                // 1. Capture data from current view before switching
-                if (currentView === 'edit') captureFormData();
-                
-                currentView = view;
-                const container = document.getElementById('s-dynamicPlanContent');
-                const btnEdit = document.getElementById('s-toggleEditView');
-                const btnDash = document.getElementById('s-toggleDashboardView');
-
-                if (view === 'edit') {
-                    container.innerHTML = getEditHTML();
-                    renderEditData(); // Populate inputs
-                    document.getElementById('s-saveSection').classList.remove('hidden');
-                    btnEdit.className = "bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg";
-                    btnDash.className = "bg-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-purple-700";
-                } else {
-                    container.innerHTML = getDashboardHTML();
-                    renderDashboardData(); // Populate dashboard
-                    document.getElementById('s-saveSection').classList.add('hidden');
-                    btnEdit.className = "bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600";
-                    btnDash.className = "bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg";
-                }
-            }
-
-            // HTML Templates
-            function getEditHTML() {
-                return `
-                    <div class="space-y-6 animate-fade-in">
-                        <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                            <h3 class="font-bold text-indigo-800 mb-2 border-b border-indigo-200 pb-1">Ringkasan Eksekutif</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <textarea id="s-visi" placeholder="Visi" rows="2" class="w-full p-2 border rounded"></textarea>
-                                <textarea id="s-misi" placeholder="Misi" rows="2" class="w-full p-2 border rounded"></textarea>
-                                <input id="s-bhag" placeholder="Matlamat Utama (BHAG)" class="w-full p-2 border rounded md:col-span-2 font-bold text-indigo-900">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h3 class="font-bold text-slate-700 mb-2">Matlamat & Strategi</h3>
-                            <textarea id="s-matlamat" placeholder="Matlamat Strategik..." rows="2" class="w-full p-2 border rounded mb-2"></textarea>
-                            <textarea id="s-strategi" placeholder="Strategi (Satu per baris)..." rows="3" class="w-full p-2 border rounded"></textarea>
-                        </div>
-
-                        <!-- LIVE PREVIEW MAP IN EDITOR -->
-                        <div id="s-editMapPreview" class="bg-gray-50 p-4 border rounded-lg"></div>
-
-                        <div>
-                            <h3 class="font-bold text-slate-700 mb-2">Pelan Taktikal (Program)</h3>
-                            <div class="overflow-x-auto">
-                                <table class="s-table-auto-layout" id="s-taktikalTable">
-                                    <thead><tr class="bg-gray-100"><th class="w-10">No</th><th>Nama Program</th><th>Tanggungjawab</th><th>Tempoh</th><th>Kos</th><th>Output</th><th></th></tr></thead>
-                                    <tbody id="s-taktikalBody"></tbody>
-                                </table>
-                            </div>
-                            <button onclick="StrategicApp.addTaktikalRow()" class="mt-2 text-xs bg-indigo-600 text-white px-3 py-1 rounded font-bold">+ Program</button>
-                        </div>
-
-                        <div>
-                            <h3 class="font-bold text-green-700 mb-2">QSAM Matrix (Monitoring)</h3>
-                            <div class="overflow-x-auto">
-                                <table class="s-table-auto-layout">
-                                    <thead><tr class="bg-green-50"><th>Program</th><th>IM (1-10)</th><th>EI (0-5)</th><th>QRA (%)</th><th>TBS (%)</th></tr></thead>
-                                    <tbody id="s-qsamBody"></tbody>
-                                </table>
-                            </div>
-                            <button onclick="StrategicApp.syncQsam()" class="mt-2 text-xs bg-green-600 text-white px-3 py-1 rounded font-bold">Sync List</button>
-                        </div>
-                    </div>
+            tacticalRows.forEach(t => {
+                const q = qMap[t.namaProgram] || { im:5, ei:3, qra:0, tbs:0 };
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-bold text-sm text-gray-700" data-prog="${t.namaProgram}">${t.namaProgram}</td>
+                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="im" value="${q.im}"></td>
+                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="ei" value="${q.ei}"></td>
+                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="qra" value="${q.qra}"></td>
+                    <td><input type="number" class="w-full text-center border rounded p-1" data-f="tbs" value="${q.tbs}"></td>
                 `;
-            }
+                tbody.appendChild(tr);
+            });
+        },
+        syncQsam: () => {
+            const tData = strategicApp.collectTaktikal();
+            const qData = strategicApp.collectQsam();
+            strategicApp.renderQsamTable(tData, qData);
+        },
+        collectQsam: () => {
+             return Array.from(document.querySelectorAll('#s-qsamBody tr')).map(tr => ({
+                 programName: tr.getAttribute('data-prog') || tr.querySelector('[data-prog]').textContent,
+                 im: tr.querySelector('[data-f="im"]').value,
+                 ei: tr.querySelector('[data-f="ei"]').value,
+                 qra: tr.querySelector('[data-f="qra"]').value,
+                 tbs: tr.querySelector('[data-f="tbs"]').value
+             }));
+        },
+        renderMap: (data) => {
+             const div = document.getElementById('s-mapPreview');
+             if(!div) return;
+             const matlamat = data.matlamatStrategik || 'Matlamat Strategik';
+             const strat = Array.isArray(data.strategiList) ? data.strategiList.join(', ') : data.strategiList || 'Strategi';
+             div.innerHTML = `
+                <div class="strategy-map-container">
+                    <div class="strategy-perspective impact"><div class="perspective-title">IMPACT</div><div class="perspective-content">${matlamat}</div></div>
+                    <div class="strategy-arrow"></div>
+                    <div class="strategy-perspective process"><div class="perspective-title">PROCESS</div><div class="perspective-content">${strat}</div></div>
+                </div>
+             `;
+        },
+        getDashboardHTML: () => `<div id="s-dashboardView" class="dashboard-container"><h3 class="text-xl font-bold mb-4">Dashboard Prestasi</h3><div id="s-dashContent"></div></div>`,
+        renderDashboard: (data) => {
+             let qraTotal=0, tbsTotal=0, count=0;
+             if(data.qsamData) {
+                 data.qsamData.forEach(q => { qraTotal+=parseInt(q.qra||0); tbsTotal+=parseInt(q.tbs||0); count++; });
+             }
+             const avgQra = count ? (qraTotal/count).toFixed(0) : 0;
+             const avgTbs = count ? (tbsTotal/count).toFixed(0) : 0;
+             
+             document.getElementById('s-dashContent').innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="dashboard-card text-center"><p class="text-green-600 font-bold">Avg Resources (QRA)</p><div class="kpi-circle qra-score mx-auto mt-2">${avgQra}%</div></div>
+                    <div class="dashboard-card text-center"><p class="text-blue-600 font-bold">Avg Progress (TBS)</p><div class="kpi-circle tbs-score mx-auto mt-2">${avgTbs}%</div></div>
+                </div>
+                <div class="dashboard-card">
+                    <h4 class="font-bold mb-2">Program Status</h4>
+                    <ul class="text-sm space-y-2">
+                        ${(data.qsamData||[]).map(q => `<li class="flex justify-between border-b pb-1"><span>${q.programName}</span><span class="font-bold ${q.tbs<q.qra ? 'text-red-500':'text-green-500'}">${q.tbs}%</span></li>`).join('')}
+                    </ul>
+                </div>
+             `;
+        }
+    };
 
-            function getDashboardHTML() {
-                // Exactly matching the original Dashboard layout
-                return `
-                    <div class="dashboard-container">
-                        <h3 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Dashboard Prestasi Quantum Strategik</h3>
-                        
-                        <!-- Executive Summary Card -->
-                        <div class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-6 rounded-xl shadow-lg mb-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <h4 class="font-bold text-indigo-100 uppercase text-xs mb-1">Visi</h4>
-                                    <p class="font-semibold text-lg leading-tight" id="dashVisi">Loading...</p>
-                                    <h4 class="font-bold text-indigo-100 uppercase text-xs mt-4 mb-1">Misi</h4>
-                                    <p class="font-semibold text-lg leading-tight" id="dashMisi">Loading...</p>
-                                </div>
-                                <div class="border-l border-indigo-400 pl-6 flex flex-col justify-center">
-                                    <h4 class="font-bold text-yellow-300 uppercase text-xs mb-2">Matlamat Utama (BHAG)</h4>
-                                    <p class="font-extrabold text-2xl italic leading-tight" id="dashBhag">Loading...</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- KPI Row -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                            <div class="dashboard-card text-center">
-                                <p class="text-sm font-semibold text-red-500 mb-2">Entanglement Index (EI)</p>
-                                <div id="dashboardEiAvg" class="kpi-circle ei-score mx-auto">0.0</div>
-                                <p class="text-xs text-gray-500 mt-2">Penjajaran Strategik</p>
-                            </div>
-                            <div class="dashboard-card text-center">
-                                <p class="text-sm font-semibold text-green-500 mb-2">QRA (Sumber) Purata</p>
-                                <div id="dashboardQraAvg" class="kpi-circle qra-score mx-auto">0%</div>
-                                <p class="text-xs text-gray-500 mt-2">Kecekapan Kos</p>
-                            </div>
-                            <div class="dashboard-card text-center">
-                                <p class="text-sm font-semibold text-blue-500 mb-2">TBS (Progress) Purata</p>
-                                <div id="dashboardTbsAvg" class="kpi-circle tbs-score mx-auto">0%</div>
-                                <p class="text-xs text-gray-500 mt-2">Prestasi Fizikal</p>
-                            </div>
-                        </div>
-
-                        <!-- Strategy Map -->
-                        <h4 class="text-xl font-bold text-blue-700 mb-4">Peta Strategi & KPI Utama</h4>
-                        <div id="strategyMapDisplay" class="dashboard-map mb-8"></div>
-
-                        <!-- QSAM List with Visual Bars -->
-                        <h4 class="text-xl font-bold text-green-700 mb-4">Status & Penjajaran Program Taktikal</h4>
-                        <div class="dashboard-card">
-                            <div id="qsamDashboardList" class="divide-y divide-gray-100"></div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Data Handling & Rendering
-            function captureFormData() {
-                // Saves data from Inputs -> RAM
-                const v = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
-                currentPlanData.misi = v('s-misi');
-                currentPlanData.visi = v('s-visi');
-                currentPlanData.bhag = v('s-bhag');
-                currentPlanData.matlamatStrategik = v('s-matlamat');
-                currentPlanData.strategiList = v('s-strategi').split('\n');
-                
-                // Capture Tables
-                currentPlanData.pelanTaktikal = Array.from(document.querySelectorAll('#s-taktikalBody tr')).map(tr => ({
-                    namaProgram: tr.querySelector('[data-f="namaProgram"]').value,
-                    tanggungJawab: tr.querySelector('[data-f="tanggungJawab"]').value,
-                    tempoh: tr.querySelector('[data-f="tempoh"]').value,
-                    kosSumber: tr.querySelector('[data-f="kosSumber"]').value,
-                    outputOutcome: tr.querySelector('[data-f="outputOutcome"]').value
-                }));
-
-                currentPlanData.qsamData = Array.from(document.querySelectorAll('#s-qsamBody tr')).map(tr => ({
-                    programName: tr.querySelector('td:first-child').textContent,
-                    im: tr.querySelector('[data-f="im"]').value,
-                    ei: tr.querySelector('[data-f="ei"]').value,
-                    qra: tr.querySelector('[data-f="qra"]').value,
-                    tbs: tr.querySelector('[data-f="tbs"]').value
-                }));
-            }
-
-            function renderEditData() {
-                const d = currentPlanData;
-                const v = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ''; };
-                v('s-visi', d.visi); v('s-misi', d.misi); v('s-bhag', d.bhag);
-                v('s-matlamat', d.matlamatStrategik);
-                v('s-strategi', Array.isArray(d.strategiList) ? d.strategiList.join('\n') : '');
-                
-                // Render Tables
-                const tb = document.getElementById('s-taktikalBody'); tb.innerHTML = '';
-                (d.pelanTaktikal || []).forEach((r,i) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="text-center">${i+1}</td>
-                        <td><textarea class="w-full border p-1 rounded text-sm" data-f="namaProgram">${r.namaProgram||''}</textarea></td>
-                        <td><input class="w-full border p-1 rounded text-sm" data-f="tanggungJawab" value="${r.tanggungJawab||''}"></td>
-                        <td><input class="w-full border p-1 rounded text-sm" data-f="tempoh" value="${r.tempoh||''}"></td>
-                        <td><input class="w-full border p-1 rounded text-sm" data-f="kosSumber" value="${r.kosSumber||''}"></td>
-                        <td><textarea class="w-full border p-1 rounded text-sm" data-f="outputOutcome">${r.outputOutcome||''}</textarea></td>
-                        <td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>
-                    `;
-                    tb.appendChild(tr);
-                });
-
-                renderQsamTable(d.pelanTaktikal||[], d.qsamData||[], 's-qsamBody');
-                renderMap(d, 's-editMapPreview');
-
-                // Live Preview Listeners
-                document.getElementById('s-matlamat').addEventListener('input', () => { captureFormData(); renderMap(currentPlanData, 's-editMapPreview'); });
-            }
-
-            function renderDashboardData() {
-                const d = currentPlanData;
-                document.getElementById('dashVisi').textContent = d.visi || '-';
-                document.getElementById('dashMisi').textContent = d.misi || '-';
-                document.getElementById('dashBhag').textContent = d.bhag || '-';
-                
-                renderMap(d, 'strategyMapDisplay');
-
-                // Calc Averages
-                let ei=0, qra=0, tbs=0, count=0;
-                (d.qsamData||[]).forEach(i => { ei+=parseFloat(i.ei||0); qra+=parseFloat(i.qra||0); tbs+=parseFloat(i.tbs||0); count++; });
-                
-                document.getElementById('dashboardEiAvg').textContent = count ? (ei/count).toFixed(1) : "0.0";
-                document.getElementById('dashboardQraAvg').textContent = count ? (qra/count).toFixed(0)+"%" : "0%";
-                document.getElementById('dashboardTbsAvg').textContent = count ? (tbs/count).toFixed(0)+"%" : "0%";
-
-                // Render Visual Bars List
-                const list = document.getElementById('qsamDashboardList');
-                list.innerHTML = `<div class="qsam-item font-bold text-xs text-gray-600"><span class="w-2/5">Nama Program</span><span class="w-1/6 text-center">EI</span><span class="w-1/5 text-center">QRA</span><span class="w-1/5 text-center">TBS</span></div>`;
-                
-                (d.qsamData||[]).forEach(item => {
-                    const isLagging = (item.tbs || 0) < (item.qra || 0);
-                    const html = `
-                        <div class="qsam-item">
-                            <span class="w-2/5 text-sm pr-2 font-semibold ${isLagging ? 'text-red-600' : 'text-gray-700'}">${item.programName} ${isLagging ? '(LAGGING)':''}</span>
-                            <span class="w-1/6 text-center"><span class="qsam-badge bg-red-100 text-red-600">${item.ei}</span></span>
-                            <div class="w-1/5 px-2"><div class="w-full bg-gray-200 h-2 rounded"><div class="bg-teal-500 h-2 rounded" style="width:${item.qra}%"></div></div><div class="text-xs text-right text-gray-500">${item.qra}%</div></div>
-                            <div class="w-1/5 px-2"><div class="w-full bg-gray-200 h-2 rounded"><div class="${isLagging?'bg-red-500':'bg-blue-500'} h-2 rounded" style="width:${item.tbs}%"></div></div><div class="text-xs text-right text-gray-500">${item.tbs}%</div></div>
-                        </div>
-                    `;
-                    list.insertAdjacentHTML('beforeend', html);
-                });
-            }
-
-            function renderQsamTable(tactical, qsam, targetId) {
-                const tb = document.getElementById(targetId); tb.innerHTML = '';
-                const qMap = {}; qsam.forEach(q => qMap[q.programName] = q);
-                tactical.forEach(t => {
-                    const q = qMap[t.namaProgram] || { im:5, ei:3, qra:0, tbs:0 };
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="font-bold text-sm text-gray-700">${t.namaProgram}</td>
-                        <td><input type="number" class="w-full text-center border rounded p-1 bg-yellow-50" data-f="im" value="${q.im}"></td>
-                        <td><input type="number" class="w-full text-center border rounded p-1 bg-red-50" data-f="ei" value="${q.ei}"></td>
-                        <td><input type="number" class="w-full text-center border rounded p-1 bg-green-50" data-f="qra" value="${q.qra}"></td>
-                        <td><input type="number" class="w-full text-center border rounded p-1 bg-blue-50" data-f="tbs" value="${q.tbs}"></td>
-                    `;
-                    tb.appendChild(tr);
-                });
-            }
-
-            function renderMap(d, targetId) {
-                const container = document.getElementById(targetId);
-                if(!container) return;
-                const mat = d.matlamatStrategik || "Matlamat Strategik...";
-                const strat = Array.isArray(d.strategiList) ? d.strategiList.join(', ') : "Strategi...";
-                const progs = (d.pelanTaktikal||[]).map(p=>p.namaProgram).join(', ') || "Program Taktikal...";
-                
-                container.innerHTML = `
-                    <div class="strategy-map-container">
-                        <div class="strategy-perspective impact"><div class="perspective-title">I. IMPACT (Matlamat)</div><div class="perspective-content">${mat}</div></div>
-                        <div class="strategy-arrow"></div>
-                        <div class="strategy-perspective process"><div class="perspective-title">II. PROCESS (Strategi)</div><div class="perspective-content">${strat}</div></div>
-                        <div class="strategy-arrow"></div>
-                        <div class="strategy-perspective capacity"><div class="perspective-title">III. CAPACITY (Program)</div><div class="perspective-content">${progs}</div></div>
-                    </div>
-                `;
-            }
-
-            // Expose Public Methods
-            return {
-                init,
-                resetToSubjectSelect: () => { document.getElementById('s-planEditorContainer').classList.add('hidden'); document.getElementById('s-subjectManagementSection').classList.remove('hidden'); },
-                setAppView,
-                addTaktikalRow: () => { const tb=document.getElementById('s-taktikalBody'); const tr=document.createElement('tr'); tr.innerHTML=`<td class="text-center">${tb.children.length+1}</td><td><textarea class="w-full border p-1 rounded text-sm" data-f="namaProgram"></textarea></td><td><input class="w-full border p-1 rounded text-sm" data-f="tanggungJawab"></td><td><input class="w-full border p-1 rounded text-sm" data-f="tempoh"></td><td><input class="w-full border p-1 rounded text-sm" data-f="kosSumber"></td><td><textarea class="w-full border p-1 rounded text-sm" data-f="outputOutcome"></textarea></td><td class="text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold">×</button></td>`; tb.appendChild(tr); },
-                syncQsam: () => { captureFormData(); renderQsamTable(currentPlanData.pelanTaktikal, currentPlanData.qsamData, 's-qsamBody'); },
-                savePlan: async () => {
-                    if(currentView==='edit') captureFormData();
-                    const btn=document.getElementById('s-saveButton'); btn.textContent="Saving...";
-                    try {
-                        const path = `${PLAN_COLLECTION_BASE}/${currentSubject.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_plan`;
-                        await setDoc(doc(db, path), currentPlanData);
-                        btn.textContent="Saved!"; setTimeout(()=>btn.textContent="Save Pelan Strategik", 2000);
-                    } catch(e){ alert("Error saving"); btn.textContent="Save Failed"; }
-                },
-                downloadPlan: () => {
-                    if(currentView==='edit') captureFormData();
-                    const blob = new Blob([JSON.stringify(currentPlanData,null,2)], {type:'application/json'});
-                    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${currentSubject}_plan.json`; a.click();
-                },
-                addNewSubject: async () => {
-                    const inp = document.getElementById('s-newSubjectInput'); const val = inp.value.trim();
-                    if(!val) return;
-                    await updateDoc(doc(db, SUBJECTS_DOC_PATH), { subjects: arrayUnion(val) });
-                    loadSubjectList(val); inp.value='';
-                }
-            };
-        })();
-
-        // =============================================================================
-        // GLOBAL INIT
-        // =============================================================================
-        window.switchModule = (mod) => {
-            document.querySelectorAll('.module-wrapper').forEach(e => e.classList.remove('active-module'));
-            document.getElementById(`app-${mod}`).classList.add('active-module');
-            document.querySelectorAll('.module-btn').forEach(e => e.classList.remove('active'));
-            document.getElementById(`btn-mod-${mod}`).classList.add('active');
-        };
-
-        window.initApp = async () => {
+    // --- MAIN INITIALIZATION ---
+    window.initApp = async () => {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
             await signInAnonymously(auth);
             
-            // Expose Namespaces
-            window.KurikulamApp = KurikulamApp;
-            window.StrategicApp = StrategicApp;
+            // Remove Loader
+            document.getElementById('globalLoadingOverlay').style.display = 'none';
+            document.getElementById('globalConnectionStatus').innerHTML = `<span class="w-2 h-2 mr-1 bg-green-500 rounded-full"></span> Online`;
 
-            // Start Apps
-            KurikulamApp.init();
-            StrategicApp.init();
-        };
+            // Expose sub-apps to window so HTML handlers work
+            window.kurikulumApp = kurikulumApp;
+            window.strategicApp = strategicApp;
+            
+            // Init Sub-Modules
+            kurikulumApp.init();
+            strategicApp.init();
 
-        window.initApp();
+        } catch (error) {
+            console.error("App Init Error:", error);
+            document.getElementById('globalConnectionStatus').innerHTML = `<span class="w-2 h-2 mr-1 bg-red-500 rounded-full"></span> Error`;
+            document.getElementById('globalLoadingOverlay').innerHTML = `<p class="text-red-600 font-bold">Ralat Sambungan. Sila muat semula.</p>`;
+        }
+    };
 
-    </script>
+    // Global Module Switcher
+    window.switchModule = (mod) => {
+        document.querySelectorAll('.module-container').forEach(el => el.classList.remove('active-module'));
+        document.getElementById(`module-${mod}`).classList.add('active-module');
+        
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        if(document.getElementById(`nav-mod-${mod}`)) document.getElementById(`nav-mod-${mod}`).classList.add('active');
+        
+        // Mobile text color toggle
+        if(mod === 'kurikulum') {
+            document.getElementById('mob-nav-kurikulum').className = 'text-xs font-bold text-indigo-700';
+            document.getElementById('mob-nav-strategic').className = 'text-xs font-bold text-gray-500';
+        } else {
+            document.getElementById('mob-nav-kurikulum').className = 'text-xs font-bold text-gray-500';
+            document.getElementById('mob-nav-strategic').className = 'text-xs font-bold text-indigo-700';
+        }
+    };
+
+    // Start
+    window.initApp();
+
+</script>
 </body>
 </html>
 
