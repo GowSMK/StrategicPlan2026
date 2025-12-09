@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perancangan Strategik Teras - SMK Seri Pulai Perdana</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            min-height: 100vh;
+            padding-bottom: 20px; 
+        }
+        /* Ensures table is wide enough for content, enabling horizontal scroll on mobile */
+        .table-auto-layout {
+            width: 100%; 
+            min-width: 600px;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        .table-auto-layout th, .table-auto-layout td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            vertical-align: top;
+        }
+        
+        /* --- Strategy Map Specific Styles --- */
+        .strategy-map-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px; 
+            padding: 20px 0;
+            border-radius: 12px;
+            background-color: #ffffff;
+        }
+        .strategy-perspective {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .perspective-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        .perspective-content {
+            font-size: 0.95rem;
+            font-weight: 500;
+            min-height: 30px;
+        }
+        /* Arrow Styling (for visual flow) */
+        .strategy-arrow {
+            width: 4px;
+            height: 16px;
+            background-color: #3b82f6; /* Blue-500 */
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .strategy-arrow::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #3b82f6;
+        }
+        /* Specific Colors */
+        .impact { background-color: #fef2f2; border: 2px solid #ef4444; } /* Red-100 */
+        .impact .perspective-title { color: #ef4444; }
+        .outcome { background-color: #fffbeb; border: 2px solid #f59e0b; } /* Amber-100 */
+        .outcome .perspective-title { color: #f59e0b; }
+        .process { background-color: #eff6ff; border: 2px solid #3b82f6; } /* Blue-100 */
+        .process .perspective-title { color: #3b82f6; }
+        .capacity { background-color: #ecfdf5; border: 2px solid #10b981; } /* Green-100 */
+        .capacity .perspective-title { color: #10b981; }
+        
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
+    <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
+        <p class="mt-4 text-indigo-700 font-semibold">Memuatkan Perancangan Strategik...</p>
+    </div>
+</div>
+
+<div id="app" class="min-h-screen p-4 sm:p-8 max-w-5xl mx-auto pt-8">
+
+    <!-- Header Section -->
+    <header class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold text-indigo-900 mb-2 tracking-tight">
+            SMK Seri Pulai Perdana
+        </h1>
+        <h2 id="pageMainTitle" class="text-xl font-bold text-gray-800">
+            Perancangan Strategik Teras (Core Strategy)
+        </h2>
+        <p class="text-sm text-gray-500 mt-2">Modul Ringkasan Eksekutif & Analisis Strategik</p>
+    </header>
+
+    <!-- Main Content Container -->
+    <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl">
+        <div id="messageBox" class="p-3 text-center rounded-lg hidden mb-4" role="alert"></div>
+        
+        <!-- Dynamic Content Area -->
+        <div id="dynamicPlanContent">
+            <!-- Content Injected Here -->
+        </div>
+
+        <!-- Save Button Section (Modified: Smaller button, No JSON) -->
+        <div class="border-t pt-4 mt-6 flex justify-end items-center" id="saveSection">
+            <button id="saveButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-sm shadow-md transition duration-200">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+    // --- TEMPLATE DATA ---
+    const DEFAULT_MASTER_DATA = {
+        misi: "Melestarikan Sistem Pendidikan Yang Berkualiti Untuk Membangunkan Potensi Individu Bagi Memenuhi Aspirasi Negara.",
+        visi: "Pendidikan Berkualiti Insan Terdidik Negara Sejahtera.",
+        bhag: "Mencapai kedudukan Top 3 Daerah dalam SPM 2026 dengan Gred Purata Sekolah (GPS) di bawah 4.0.",
+        
+        smartPrinciple: 'Quantum SMART Principle Example: Semua KPI (Measurable) mestilah boleh dicapai (Achievable) dalam tempoh (Time-bound) yang ditetapkan.',
+        entanglementMeasure: `Peningkatan 15% murid Band 4 ke atas dalam PBD subjek, selaras dengan peningkatan penggunaan sumber digital oleh guru.`,
+        
+        // FULL SWOT DATA
+        swot: {
+            s: "- Barisan pentadbir yang komited dan berwawasan.\n- Lebih 85% guru adalah terlatih dan berpengalaman (>5 tahun).\n- Kemudahan infrastruktur dan ICT yang kondusif untuk PdP.\n- Disiplin murid yang terkawal dan budaya sekolah yang positif.\n- Pencapaian kokurikulum yang cemerlang di peringkat daerah/negeri.",
+            w: "- Capaian internet yang lemah di beberapa blok akademik.\n- Masalah kehadiran murid tegar yang menjejaskan prestasi kelas.\n- Beban tugas perkeranian guru yang tinggi mengurangkan masa rancang PdP.\n- Penguasaan murid dalam kemahiran asas (3M) bagi tingkatan peralihan.\n- Kekurangan dana untuk program pembangunan sahsiah secara berskala besar.",
+            o: "- Hubungan erat dan sokongan kewangan yang padu daripada PIBG.\n- Jalinan kerjasama strategik dengan IPTA/IPTS tempatan.\n- Sumbangan dana dan kepakaran daripada Alumni sekolah.\n- Peluang geran dan sumbangan CSR daripada syarikat korporat berhampiran.\n- Sokongan padu komuniti setempat dalam program sarana sekolah.",
+            c: "- Pengaruh gajet dan media sosial yang melalaikan murid di rumah.\n- Gejala sosial persekitaran (cybercafe/lepak) yang mempengaruhi murid.\n- Kurangnya pemantauan ibu bapa terhadap pembelajaran anak di rumah.\n- Ekspektasi ibu bapa yang terlalu tinggi tanpa sokongan realistik.\n- Kos sara hidup keluarga B40 yang menjejaskan fokus murid (bekerja sambilan)."
+        },
+        
+        matlamatStrategik: `Tingkatkan penguasaan kefahaman konsep dan lonjakkan pencapaian akademik (A > 30%).`,
+        strategiList: [
+            "Melaksanakan PAK21 konsisten", 
+            "Memperkasa kemahiran KBAT guru", 
+            "Memanfaatkan teknologi DELIMA"
+        ],
+        // Required for Strategy Map visualization
+        pelanTaktikal: [
+            {namaProgram: 'LITERASI DIGITAL & e-PORTFOLIO'},
+            {namaProgram: 'PLC BERFOKUS (Inkuiri)'},
+            {namaProgram: 'BENGKEL TEKNIK MENJAWAB KBAT'}
+        ]
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- Core Configuration and Paths ---
+    const appId = 'strategic2026'; 
+    const firebaseConfig = {
+        apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU", 
+        authDomain: "strategic2026.firebaseapp.com",
+        projectId: "strategic2026",
+        storageBucket: "strategic2026.firebasestorage.app",
+        messagingSenderId: "642605714672",
+        appId: "1:642605714672:web:5dcdfbf351c36ca6084635"
+    };
+    
+    const PLAN_DOC_PATH = `artifacts/${appId}/public/data/pelan_strategik/core_strategy_master`; 
+
+    // --- GLOBAL STATE ---
+    let app, db, auth;
+    let isAuthReady = false;
+    let currentPlanData = {}; 
+
+    // --- UTILITIES ---
+    function showMessage(message, type = 'success', target = document.getElementById('messageBox')) {
+        target.textContent = message;
+        target.className = `p-3 text-center rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} mb-4`;
+        target.classList.remove('hidden');
+        setTimeout(() => { target.classList.add('hidden'); }, 5000);
+    }
+    
+    const textToArray = (text) => text.split('\n').map(item => item.trim()).filter(item => item.length > 0);
+    const arrayToText = (array) => Array.isArray(array) ? array.join('\n') : '';
+    
+    function ensureUIVisible() {
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+    }
+    
+    function getFormState() {
+        return {
+            misi: document.getElementById('misiInput')?.value.trim() || currentPlanData.misi || '',
+            visi: document.getElementById('visiInput')?.value.trim() || currentPlanData.visi || '',
+            bhag: document.getElementById('bhagInput')?.value.trim() || currentPlanData.bhag || '',
+
+            smartPrinciple: document.getElementById('smartPrinciple')?.value.trim() || currentPlanData.smartPrinciple || '',
+            entanglementMeasure: document.getElementById('entanglementMeasure')?.value.trim() || currentPlanData.entanglementMeasure || '',
+            
+            swot: {
+                s: document.getElementById('swot_s')?.value.trim() || currentPlanData.swot?.s || '',
+                w: document.getElementById('swot_w')?.value.trim() || currentPlanData.swot?.w || '',
+                o: document.getElementById('swot_o')?.value.trim() || currentPlanData.swot?.o || '',
+                c: document.getElementById('swot_c')?.value.trim() || currentPlanData.swot?.c || '',
+            },
+
+            matlamatStrategik: document.getElementById('matlamatStrategik')?.value.trim() || currentPlanData.matlamatStrategik || '',
+            strategiList: textToArray(document.getElementById('strategiList')?.value) || currentPlanData.strategiList || [],
+            
+            // Keep existing data
+            pelanTaktikal: currentPlanData.pelanTaktikal || DEFAULT_MASTER_DATA.pelanTaktikal,
+            
+            updatedAt: serverTimestamp(),
+        };
+    }
+    
+    function setFormState(data) {
+        currentPlanData = data; 
+        
+        if (document.getElementById('misiInput')) document.getElementById('misiInput').value = data.misi || DEFAULT_MASTER_DATA.misi;
+        if (document.getElementById('visiInput')) document.getElementById('visiInput').value = data.visi || DEFAULT_MASTER_DATA.visi;
+        if (document.getElementById('bhagInput')) document.getElementById('bhagInput').value = data.bhag || DEFAULT_MASTER_DATA.bhag;
+
+        if (document.getElementById('smartPrinciple')) document.getElementById('smartPrinciple').value = data.smartPrinciple || '';
+        if (document.getElementById('entanglementMeasure')) document.getElementById('entanglementMeasure').value = data.entanglementMeasure || '';
+
+        if (document.getElementById('swot_s')) document.getElementById('swot_s').value = data.swot?.s || DEFAULT_MASTER_DATA.swot.s;
+        if (document.getElementById('swot_w')) document.getElementById('swot_w').value = data.swot?.w || DEFAULT_MASTER_DATA.swot.w;
+        if (document.getElementById('swot_o')) document.getElementById('swot_o').value = data.swot?.o || DEFAULT_MASTER_DATA.swot.o;
+        if (document.getElementById('swot_c')) document.getElementById('swot_c').value = data.swot?.c || DEFAULT_MASTER_DATA.swot.c;
+
+        if (document.getElementById('matlamatStrategik')) document.getElementById('matlamatStrategik').value = data.matlamatStrategik || '';
+        if (document.getElementById('strategiList')) document.getElementById('strategiList').value = arrayToText(data.strategiList) || '';
+        
+        if (document.getElementById('strategyMapDisplay')) renderStrategyMap(data);
+    }
+
+    // --- VIEW GENERATION ---
+    function getCoreViewHTML() {
+        return `
+            <!-- 1. Executive Summary -->
+            <div class="mb-8 p-6 bg-white border border-indigo-200 rounded-xl shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4 border-b pb-2">1. Ringkasan Eksekutif (Executive Summary)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Visi</label>
+                        <textarea id="visiInput" rows="2" class="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Contoh: Pendidikan Berkualiti Insan Terdidik..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Misi</label>
+                        <textarea id="misiInput" rows="2" class="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Contoh: Melestarikan Sistem Pendidikan Yang Berkualiti..."></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-yellow-600 mb-1">Matlamat Utama (BHAG)</label>
+                        <input type="text" id="bhagInput" class="w-full p-3 border border-yellow-400 bg-yellow-50 rounded focus:ring-yellow-500 focus:border-yellow-500 font-bold text-gray-800" placeholder="Contoh: Mencapai kedudukan Top 3 Daerah...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Analisis Quantum SMART -->
+            <h3 class="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">2. Analisis Quantum SMART (Prinsip Teras)</h3>
+            <div class="mb-6 flex justify-center">
+                <img src="https://raw.githubusercontent.com/GowSMK/StrategicPlan2026/refs/heads/main/smart.jpg" alt="Quantum SMART Framework" class="rounded-lg shadow-lg max-w-full h-auto border border-gray-200" style="max-height: 200px;">
+            </div>
+            <div class="overflow-x-auto mb-8 p-4 border border-teal-200 rounded-lg bg-teal-50">
+                <table class="table-auto-layout border-collapse border border-gray-200">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/4 bg-teal-100 font-medium">Quantum SMART Principle</th>
+                            <td colspan="3"><textarea id="smartPrinciple" rows="3" class="w-full focus:outline-none resize-none bg-transparent" placeholder="Terangkan bagaimana setiap program taktik memenuhi prinsip SMART."></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/4 bg-teal-100 font-medium">Entanglement Measurement</th>
+                            <td colspan="3"><textarea id="entanglementMeasure" rows="3" class="w-full focus:outline-none resize-none bg-transparent" placeholder="Terangkan metrik utama yang mengukur kejayaan holistik program ini."></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-6 flex justify-center">
+                <img src="https://raw.githubusercontent.com/GowSMK/StrategicPlan2026/refs/heads/main/flow.JPG" alt="Strategic Process Flow" class="rounded-lg shadow-lg max-w-full h-auto border border-gray-200" style="max-height: 200px;">
+            </div>
+
+            <!-- 3. SWOT Analysis -->
+            <h3 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">3. Analisis Persekitaran (SWOT/SWOC Analysis)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Strengths -->
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold mr-2">S</div>
+                        <h4 class="font-bold text-green-800">Strengths (Kekuatan)</h4>
+                    </div>
+                    <textarea id="swot_s" rows="6" class="w-full p-2 border border-green-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"></textarea>
+                </div>
+                <!-- Weaknesses -->
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold mr-2">W</div>
+                        <h4 class="font-bold text-red-800">Weaknesses (Kelemahan)</h4>
+                    </div>
+                    <textarea id="swot_w" rows="6" class="w-full p-2 border border-red-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"></textarea>
+                </div>
+                <!-- Opportunities -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mr-2">O</div>
+                        <h4 class="font-bold text-blue-800">Opportunities (Peluang)</h4>
+                    </div>
+                    <textarea id="swot_o" rows="6" class="w-full p-2 border border-blue-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                </div>
+                <!-- Challenges -->
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold mr-2">C</div>
+                        <h4 class="font-bold text-yellow-800">Challenges/Threats (Cabaran)</h4>
+                    </div>
+                    <textarea id="swot_c" rows="6" class="w-full p-2 border border-yellow-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"></textarea>
+                </div>
+            </div>
+
+            <!-- 4. Matlamat & Strategi -->
+            <h3 class="text-xl font-semibold text-red-600 mb-4 border-b pb-2">4. Matlamat & Strategi</h3>
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto-layout border-collapse border border-gray-200">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/4 bg-red-100 font-medium">MATLAMAT STRATEGIK</th>
+                            <td colspan="3"><textarea id="matlamatStrategik" rows="2" class="w-full focus:outline-none resize-none" placeholder="Sasaran Akademik Utama..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <th class="w-1/4 bg-red-100 font-medium">STRATEGI</th>
+                            <td colspan="3"><textarea id="strategiList" rows="3" class="w-full focus:outline-none resize-none" placeholder="Senaraikan strategi utama, satu per baris."></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 5. Strategy Map -->
+            <h3 class="text-xl font-semibold text-blue-600 mb-4 border-b pb-2">5. Peta Strategi Visual (Live Preview)</h3>
+            <div id="strategyMapDisplay" class="mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
+                <!-- Map Content -->
+            </div>
+        `;
+    }
+
+    // --- VISUALIZATION LOGIC ---
+    function renderStrategyMap(data) {
+        const display = document.getElementById('strategyMapDisplay');
+        if (!display) return;
+        
+        const matlamat = data.matlamatStrategik || `Tingkatkan penguasaan kefahaman konsep dan lonjakkan pencapaian akademik.`;
+        const entanglement = data.entanglementMeasure || `Peningkatan prestasi murid selaras dengan penggunaan sumber digital.`;
+        const strategi = arrayToText(data.strategiList).replace(/\n/g, '<br>') || 'Strategi: Melaksanakan PAK21, KBAT, dan teknologi.';
+        
+        const initiativesList = data.pelanTaktikal || [];
+        const initiatives = initiativesList.length > 0 
+            ? initiativesList.map(p => p.namaProgram).join(', ') 
+            : 'Program: LITERASI DIGITAL & e-PORTFOLIO, PLC BERFOKUS (Inkuiri).';
+        
+        display.innerHTML = `
+            <div class="strategy-map-container">
+                <div class="strategy-perspective impact">
+                    <div class="perspective-title">I. ULTIMATE IMPACT (Vision)</div>
+                    <div class="perspective-content">${matlamat}</div>
+                </div>
+                <div class="strategy-arrow"></div>
+                <div class="strategy-perspective outcome">
+                    <div class="perspective-title">II. STUDENT OUTCOME (Measurement)</div>
+                    <div class="perspective-content">${entanglement}</div>
+                </div>
+                <div class="strategy-arrow"></div>
+                <div class="strategy-perspective process">
+                    <div class="perspective-title">III. INTERNAL PROCESS (Strategy)</div>
+                    <div class="perspective-content">${strategi}</div>
+                </div>
+                <div class="strategy-arrow"></div>
+                <div class="strategy-perspective capacity">
+                    <div class="perspective-title">IV. FOUNDATIONAL CAPACITY (Programs)</div>
+                    <div class="perspective-content">${initiatives}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- FIREBASE LOGIC ---
+    async function loadPlan() {
+        if (!isAuthReady || !db) return;
+        
+        try {
+            document.getElementById('dynamicPlanContent').innerHTML = getCoreViewHTML();
+            attachLiveListeners();
+
+            const docSnap = await getDoc(doc(db, PLAN_DOC_PATH));
+            let data = {};
+
+            if (docSnap.exists()) {
+                data = docSnap.data();
+                showMessage(`Data Perancangan Strategik Teras dimuatkan.`, 'success');
+            } else {
+                data = JSON.parse(JSON.stringify(DEFAULT_MASTER_DATA));
+                showMessage(`Memuatkan templat asas.`, 'info');
+            }
+            setFormState(data);
+        } catch (error) {
+            console.error(error);
+            showMessage(`Ralat memuatkan data.`, 'error');
+        } finally { document.getElementById('loadingOverlay').classList.add('hidden'); }
+    }
+
+    async function savePlan() {
+        const dataToSave = getFormState();
+        const btn = document.getElementById('saveButton');
+        btn.textContent = 'Saving...';
+        btn.disabled = true;
+        
+        try {
+            await setDoc(doc(db, PLAN_DOC_PATH), dataToSave);
+            currentPlanData = dataToSave;
+            showMessage(`Strategi Teras disimpan!`, 'success');
+        } catch (error) {
+            showMessage(`Gagal menyimpan: ${error.message}`, 'error');
+        } finally {
+            btn.textContent = 'Save';
+            btn.disabled = false;
+        }
+    }
+
+    function attachLiveListeners() {
+        ['matlamatStrategik', 'entanglementMeasure', 'strategiList'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', () => renderStrategyMap(getFormState()));
+        });
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('saveButton').addEventListener('click', savePlan);
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            signInAnonymously(auth).then(() => {
+                isAuthReady = true;
+                loadPlan();
+            });
+        } catch (error) {
+            console.error("Firebase Error:", error);
+            ensureUIVisible();
+            showMessage("Ralat konfigurasi Firebase.", 'error');
+        }
+    });
+</script>
+</body>
+</html>
+
