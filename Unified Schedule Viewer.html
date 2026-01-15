@@ -92,7 +92,11 @@
         .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #4f46e5; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @media print {
+        
+        /* FIX: Ensure settings gear is always tappable on iOS */
+        #settings-btn { position: relative; z-index: 80; pointer-events: auto; touch-action: manipulation; }
+        #settings-btn svg { pointer-events: none; }
+@media print {
             body { background: white; color: black; font-size: 12px; }
             header, .no-print, #settings-btn, .view-toggle-button, #view-relief-btn, #view-slot-btn, #view-teacher-btn, #view-class-btn, #view-edit-btn, #loading-indicator, #relief-view > div:first-child, #roster-generation-section, #absent-details-container { display: none !important; }
             #relief-rosters-display { display: block !important; }
@@ -234,6 +238,16 @@
                                 <span>+ Add Slot</span>
                             </button>
                         </div>
+
+                        <!-- N/A Finder Controls -->
+                        <div class="p-2 bg-yellow-50 border-b flex items-center gap-2 text-xs">
+                            <button id="find-na-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded font-bold">Find N/A</button>
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="filter-na-only">
+                                <span>Show N/A only</span>
+                            </label>
+                            <span id="na-count" class="ml-auto text-yellow-800 font-mono"></span>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-gray-50 text-gray-600 font-bold border-b">
@@ -301,7 +315,35 @@
                 </div>
             </div>
 
-            <div class="border-t pt-4">
+            
+            <!-- NEW: MASTER DATA (Teachers / Subjects / Locations) -->
+            <div class="mt-4 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                <h3 class="font-bold text-emerald-800 mb-2 text-sm">Add New Data (Teacher / Subject / Location)</h3>
+                <p class="text-xs text-emerald-700 mb-3">
+                    Use this if you have a new teacher, missing subject, or new location. This updates the master list used by dropdowns and summary.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Type</label>
+                        <select id="master-type-select" class="w-full border rounded p-2 text-xs font-bold bg-white">
+                            <option value="teacher">Teacher</option>
+                            <option value="subject">Subject</option>
+                            <option value="location">Location</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Value</label>
+                        <input id="master-new-value" type="text" placeholder="Example: PN. FARAH / BM / MAKMAL SAINS" class="w-full border rounded p-2 text-xs bg-white uppercase">
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button id="master-add-btn" class="flex-1 bg-emerald-600 text-white text-xs py-2 px-3 rounded hover:bg-emerald-700 font-bold">Add</button>
+                    <button id="master-remove-btn" class="flex-1 bg-gray-200 text-gray-800 text-xs py-2 px-3 rounded hover:bg-gray-300 font-bold">Remove</button>
+                </div>
+                <p id="master-status" class="text-xs mt-2 font-mono text-center text-emerald-700 h-4"></p>
+            </div>
+
+<div class="border-t pt-4">
                 <h3 class="font-bold text-gray-800 mb-3 text-sm text-center">Database Summary (Listing)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 h-80">
                     <div class="flex flex-col h-full">
@@ -366,7 +408,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, writeBatch, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgvyb95-jujtCC2HPiHXLdYMJgQquIEx4",
@@ -392,7 +434,70 @@
         "1 ALKHA", "1 ALKHAWARIZMI", "1 ALKIND", "1 ALKINDI", "2 ALKHA", "2 ALKHAWARIZMI", "2 ALKIND", "2 ALKINDI", "3 AL-BUK", "3 AL-BUKHARI", "3 ALKHA", "3 ALKHAWARIZMI", "3 ALKIN", "3 ALKINDI", "4AP1", "4AP2", "4PTS", "4PTW", "4S1", "4S2", "4S3", "4SN1", "4SN2", "4TS1", "4TS2", "5AAP", "5AP", "5PTS", "5PTW", "5S1", "5S2", "5S3", "5SN1", "5SN2", "5TS1", "5TS2", "B. NILAM LAU", "B.LUKISAN IQBAL", "B.LUKISAN NIK", "BGKEL R NIVETHA", "BGKPL .E ROSLINA", "LEGOLAND FAUZI", "LEGOLAND HAJAR", "LEGOLAND HASLINA", "LEGOLAND NADIA", "M. KOM 2 NADIA", "M. KOMP 2N. MASRUL", "MAK. BIO HAJAR", "MAK. BIO NOROSNIZA", "MAK. FIZ ARFAH", "MAK. FIZ MALINA", "MAK. KIM SYAMIMI"
     ];
 
-    // Utility Functions
+    
+
+    // --- MASTER LISTS (Teachers / Subjects / Locations) ---
+    // Stored separately so you can add new values even if they are not present in current schedules.
+    const MASTER_LISTS_DOC = doc(db, 'artifacts', appId, 'public', 'data', 'meta', 'masterLists');
+    let MASTER_LISTS = { teachers: [], subjects: [], locations: [] };
+
+    async function loadMasterLists() {
+        try {
+            const snap = await getDoc(MASTER_LISTS_DOC);
+            const data = snap.exists() ? snap.data() : {};
+            MASTER_LISTS = {
+                teachers: Array.isArray(data.teachers) ? data.teachers : [],
+                subjects: Array.isArray(data.subjects) ? data.subjects : [],
+                locations: Array.isArray(data.locations) ? data.locations : []
+            };
+        } catch (e) {
+            console.warn("Failed to load MASTER_LISTS:", e);
+            MASTER_LISTS = { teachers: [], subjects: [], locations: [] };
+        }
+        return MASTER_LISTS;
+    }
+
+    async function saveMasterLists() {
+        // Merge write to avoid wiping other fields.
+        await setDoc(MASTER_LISTS_DOC, MASTER_LISTS, { merge: true });
+    }
+
+    function normalizeMasterValue(type, value) {
+        const v = (value || '').trim();
+        if (!v) return '';
+        if (type === 'teacher') return normalizeTeacherName(v).toUpperCase();
+        return v.toUpperCase();
+    }
+
+    function addToMaster(type, value) {
+        const key = type === 'teacher' ? 'teachers' : (type === 'subject' ? 'subjects' : 'locations');
+        const v = normalizeMasterValue(type, value);
+        if (!v) return { ok: false, msg: "Value is empty." };
+        const arr = MASTER_LISTS[key] || [];
+        if (arr.includes(v)) return { ok: false, msg: "Already exists." };
+        arr.push(v);
+        arr.sort((a,b)=>a.localeCompare(b));
+        MASTER_LISTS[key] = arr;
+        return { ok: true, msg: "Added." };
+    }
+
+    function removeFromMaster(type, value) {
+        const key = type === 'teacher' ? 'teachers' : (type === 'subject' ? 'subjects' : 'locations');
+        const v = normalizeMasterValue(type, value);
+        const arr = MASTER_LISTS[key] || [];
+        const idx = arr.indexOf(v);
+        if (idx === -1) return { ok: false, msg: "Not found." };
+        arr.splice(idx, 1);
+        MASTER_LISTS[key] = arr;
+        return { ok: true, msg: "Removed." };
+    }
+
+    function mergeMasterIntoSets(teachersSet, subjectsSet, locationsSet) {
+        (MASTER_LISTS.teachers || []).forEach(t => teachersSet.add(t));
+        (MASTER_LISTS.subjects || []).forEach(s => subjectsSet.add(s));
+        (MASTER_LISTS.locations || []).forEach(l => locationsSet.add(l));
+    }
+// Utility Functions
     function cleanTimeSlot(rawSlot) {
         if (!rawSlot || typeof rawSlot !== 'string') return "";
         const match = rawSlot.match(/\d{1,2}:\d{2}-\d{1,2}:\d{2}/);
@@ -855,12 +960,18 @@
                 });
             });
         });
-        
+
+        // Include master lists (manual additions)
+        mergeMasterIntoSets(allTeachers, allSubjects, allLocations);
+
         // Populate Main Selects
         classSelect.innerHTML = '<option value="">-- Select Class --</option>';
         allSchedules.sort((a,b) => a.className.localeCompare(b.className)).forEach(s => classSelect.innerHTML += `<option value="${s.className}">${s.className}</option>`);
         daySelect.innerHTML = '<option value="">-- Select Day --</option>';
+        daySelect.innerHTML += `<option value="ALL_WEEK">ALL WEEK</option>`;
         days.forEach(d => daySelect.innerHTML += `<option value="${d}">${d}</option>`);
+        // Default to ALL WEEK view
+        daySelect.value = 'ALL_WEEK';
         
         // Populate Modal Dropdowns
         const populateSelect = (id, items) => {
@@ -879,24 +990,125 @@
         let currentDayData = [];
         let editingIndex = -1;
 
+        let currentWeekData = {}; // {DAY: [slots...]}
+        let editingDay = null;
+        // --- N/A Finder (Schedule Editor) ---
+        const isNA = (value) => {
+            if (value === undefined || value === null) return true;
+            const v = String(value).trim().toUpperCase();
+            return v === '' || v === 'N/A' || v === 'NA' || v === '-' || v === 'UNKNOWN';
+        };
+        const rowHasNA = (slot) => {
+            if (!slot) return true;
+            return isNA(slot.subject) || isNA(slot.teacher) || isNA(slot.location);
+        };
+
+
+        
         const renderTable = () => {
             if(!currentEditingClass || !currentEditingDay) { editArea.classList.add('hidden'); return; }
             editArea.classList.remove('hidden');
             tableBody.innerHTML = '';
-            
-            currentDayData.sort((a,b) => timeToMinutes(cleanTimeSlot(a.period).split('-')[0]) - timeToMinutes(cleanTimeSlot(b.period).split('-')[0]));
 
-            if(currentDayData.length === 0) tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No slots defined for this day.</td></tr>';
+            // N/A Finder state
+            const naOnlyEl = document.getElementById('filter-na-only');
+            const showNAOnly = naOnlyEl ? naOnlyEl.checked : false;
 
-            currentDayData.forEach((slot, index) => {
+            let naCounter = 0;
+            let renderedAny = false;
+
+            const renderOneRow = (slot, index, dayLabel) => {
+                const hasNA = rowHasNA(slot);
+                if (hasNA) naCounter++;
+                if (showNAOnly && !hasNA) return false;
+
+                const periodLabel = (currentEditingDay === 'ALL_WEEK')
+                    ? `${dayLabel} — ${slot.period || ''}`
+                    : (slot.period || '');
+
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 border-b last:border-0";
-                tr.innerHTML = `<td class="p-3 font-mono text-xs">${slot.period}</td><td class="p-3 font-bold text-gray-700">${slot.subject}</td><td class="p-3">${slot.teacher}</td><td class="p-3 text-gray-500 text-xs">${slot.location || '-'}</td><td class="p-3 text-right"><button class="edit-btn text-indigo-600 hover:text-indigo-800 font-bold text-xs mr-2" data-idx="${index}">Edit</button><button class="del-btn text-red-500 hover:text-red-700 font-bold text-xs" data-idx="${index}">Delete</button></td>`;
+                tr.className = `hover:bg-gray-50 border-b last:border-0 ${hasNA ? 'bg-yellow-100 border-l-4 border-yellow-500' : ''}`;
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-xs">${periodLabel}</td>
+                    <td class="p-3 font-bold text-gray-700">${slot.subject || ''}</td>
+                    <td class="p-3">${slot.teacher || ''}</td>
+                    <td class="p-3 text-gray-500 text-xs">${slot.location || '-'}</td>
+                    <td class="p-3 text-right">
+                        <button class="edit-btn text-indigo-600 hover:text-indigo-800 font-bold text-xs mr-2" data-day="${dayLabel}" data-idx="${index}">Edit</button>
+                        <button class="del-btn text-red-500 hover:text-red-700 font-bold text-xs" data-day="${dayLabel}" data-idx="${index}">Delete</button>
+                    </td>
+                `;
                 tableBody.appendChild(tr);
-            });
+                return true;
+            };
 
-            document.querySelectorAll('.edit-btn').forEach(b => b.onclick = (e) => openModal(parseInt(e.target.dataset.idx)));
-            document.querySelectorAll('.del-btn').forEach(b => b.onclick = (e) => deleteSlot(parseInt(e.target.dataset.idx)));
+            if (currentEditingDay === 'ALL_WEEK') {
+                // Build week data fresh each render (safe, reflects latest in-memory edits)
+                currentWeekData = {};
+                days.forEach(d => {
+                    currentWeekData[d] = [...(currentEditingClass.scheduleData[d] || [])];
+                });
+
+                days.forEach(dayName => {
+                    const dayData = currentWeekData[dayName] || [];
+                    dayData.sort((a,b) => timeToMinutes(cleanTimeSlot(a.period).split('-')[0]) - timeToMinutes(cleanTimeSlot(b.period).split('-')[0]));
+
+                    // Decide if we should show this day section when filtering
+                    let willRenderThisDay = !showNAOnly;
+
+                    if (showNAOnly) {
+                        willRenderThisDay = dayData.some(rowHasNA);
+                    }
+
+                    if (!willRenderThisDay) return;
+
+                    // Day separator row
+                    const sep = document.createElement('tr');
+                    sep.innerHTML = `<td colspan="5" class="p-2 bg-gray-50 text-gray-700 font-bold">${dayName}</td>`;
+                    tableBody.appendChild(sep);
+
+                    if (dayData.length === 0) {
+                        if (!showNAOnly) {
+                            const empty = document.createElement('tr');
+                            empty.innerHTML = `<td colspan="5" class="p-3 text-center text-gray-400 text-xs">No slots defined for ${dayName}.</td>`;
+                            tableBody.appendChild(empty);
+                        }
+                        return;
+                    }
+
+                    dayData.forEach((slot, idx) => {
+                        const didRender = renderOneRow(slot, idx, dayName);
+                        if (didRender) renderedAny = true;
+                    });
+                });
+            } else {
+                // Single-day view (existing behavior)
+                currentDayData.sort((a,b) => timeToMinutes(cleanTimeSlot(a.period).split('-')[0]) - timeToMinutes(cleanTimeSlot(b.period).split('-')[0]));
+
+                if(currentDayData.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No slots defined for this day.</td></tr>';
+                } else {
+                    currentDayData.forEach((slot, index) => {
+                        const didRender = renderOneRow(slot, index, currentEditingDay);
+                        if (didRender) renderedAny = true;
+                    });
+                }
+            }
+
+            // Update counter / status
+            const naCountEl = document.getElementById('na-count');
+            if (naCountEl) {
+                naCountEl.textContent = naCounter > 0 ? `N/A found: ${naCounter}` : 'No N/A detected';
+            }
+
+            // If filtering yields nothing, show a friendly message
+            if (showNAOnly && !renderedAny) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No N/A entries found for the selected scope.</td></tr>';
+            }
+
+            // Wire actions
+            document.querySelectorAll('.edit-btn').forEach(b => b.onclick = (e) => openModal(e.target.dataset.day, parseInt(e.target.dataset.idx)));
+            document.querySelectorAll('.del-btn').forEach(b => b.onclick = (e) => deleteSlot(e.target.dataset.day, parseInt(e.target.dataset.idx)));
         };
 
         const loadData = () => {
@@ -905,13 +1117,37 @@
             if(cName && dName) {
                 currentEditingClass = allSchedules.find(s => s.className === cName);
                 currentEditingDay = dName;
-                currentDayData = [...(currentEditingClass.scheduleData[dName] || [])];
+
+                if (dName === 'ALL_WEEK') {
+                    currentWeekData = {};
+                    days.forEach(d => { currentWeekData[d] = [...(currentEditingClass.scheduleData[d] || [])]; });
+                    currentDayData = [];
+                } else {
+                    currentDayData = [...(currentEditingClass.scheduleData[dName] || [])];
+                }
+
                 renderTable();
-            } else { editArea.classList.add('hidden'); }
+            } else {
+                editArea.classList.add('hidden');
+            }
         };
 
         classSelect.onchange = loadData;
         daySelect.onchange = loadData;
+
+        // N/A Finder controls
+        const findNaBtn = document.getElementById('find-na-btn');
+        const filterNaOnly = document.getElementById('filter-na-only');
+        if (findNaBtn) {
+            findNaBtn.onclick = () => {
+                if (filterNaOnly) filterNaOnly.checked = false;
+                renderTable();
+            };
+        }
+        if (filterNaOnly) {
+            filterNaOnly.onchange = () => renderTable();
+        }
+
 
         // Helper to safely select option or add if missing
         const safeSet = (id, value) => {
@@ -923,10 +1159,17 @@
             select.value = value;
         };
 
-        const openModal = (index) => {
+        
+        const openModal = (dayName, index) => {
+            editingDay = dayName || currentEditingDay;
             editingIndex = index;
+
+            const sourceArray = (currentEditingDay === 'ALL_WEEK')
+                ? (currentWeekData[editingDay] || [])
+                : currentDayData;
+
             if(index >= 0) {
-                const d = currentDayData[index];
+                const d = sourceArray[index];
                 safeSet('edit-modal-period', d.period);
                 safeSet('edit-modal-subject', d.subject);
                 safeSet('edit-modal-teacher', d.teacher);
@@ -943,9 +1186,15 @@
             modal.classList.add('open');
         };
 
-        addBtn.onclick = () => openModal(-1);
+        addBtn.onclick = () => {
+            // When in ALL WEEK mode, add uses the currently selected day (if not ALL_WEEK), otherwise default to ISNIN.
+            const targetDay = (currentEditingDay === 'ALL_WEEK') ? 'ISNIN' : currentEditingDay;
+            openModal(targetDay, -1);
+        };
+ () => openModal(-1);
         cancelEditBtn.onclick = () => modal.classList.remove('open');
 
+        
         saveEditBtn.onclick = async () => {
             const p = document.getElementById('edit-modal-period').value;
             const s = document.getElementById('edit-modal-subject').value;
@@ -955,35 +1204,78 @@
             if(!p || !s) return alert("Period and Subject required!");
 
             const newSlot = { period: cleanTimeSlot(p), subject: s, teacher: t, location: l };
-            if(editingIndex >= 0) currentDayData[editingIndex] = newSlot; else currentDayData.push(newSlot);
+
+            const dayToSave = (currentEditingDay === 'ALL_WEEK') ? (editingDay || 'ISNIN') : currentEditingDay;
+
+            // Determine which array to modify
+            let targetArray;
+            if (currentEditingDay === 'ALL_WEEK') {
+                if (!currentWeekData[dayToSave]) currentWeekData[dayToSave] = [];
+                targetArray = currentWeekData[dayToSave];
+            } else {
+                targetArray = currentDayData;
+            }
+
+            if(editingIndex >= 0) targetArray[editingIndex] = newSlot;
+            else targetArray.push(newSlot);
 
             editStatus.textContent = "Saving...";
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME, currentEditingClass.className);
                 const updatePayload = {};
-                updatePayload[`scheduleData.${currentEditingDay}`] = currentDayData;
+                updatePayload[`scheduleData.${dayToSave}`] = targetArray;
                 await updateDoc(docRef, updatePayload);
-                currentEditingClass.scheduleData[currentEditingDay] = currentDayData;
+
+                // Update in-memory source of truth
+                currentEditingClass.scheduleData[dayToSave] = targetArray;
+
                 modal.classList.remove('open');
+
+                // Re-render view (week/day)
+                if (currentEditingDay !== 'ALL_WEEK') {
+                    currentDayData = [...targetArray];
+                }
                 renderTable();
-            } catch(e) { editStatus.innerHTML = `<span class="text-red-500">Error: ${e.message}</span>`; }
+            } catch(e) {
+                editStatus.innerHTML = `<span class="text-red-500">Error: ${e.message}</span>`;
+            }
         };
 
-        deleteBtn.onclick = () => deleteSlot(editingIndex);
+        deleteBtn.onclick = () => deleteSlot((currentEditingDay === 'ALL_WEEK') ? (editingDay || 'ISNIN') : currentEditingDay, editingIndex);
+ () => deleteSlot(editingIndex);
 
-        const deleteSlot = async (index) => {
+        
+        const deleteSlot = async (dayName, index) => {
+            const dayToDelete = (currentEditingDay === 'ALL_WEEK') ? (dayName || 'ISNIN') : currentEditingDay;
             if(index < 0 || !confirm("Delete?")) return;
-            currentDayData.splice(index, 1);
+
+            let targetArray;
+            if (currentEditingDay === 'ALL_WEEK') {
+                targetArray = [...(currentEditingClass.scheduleData[dayToDelete] || [])];
+            } else {
+                targetArray = [...currentDayData];
+            }
+
+            targetArray.splice(index, 1);
+
             editStatus.textContent = "Deleting...";
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME, currentEditingClass.className);
                 const updatePayload = {};
-                updatePayload[`scheduleData.${currentEditingDay}`] = currentDayData;
+                updatePayload[`scheduleData.${dayToDelete}`] = targetArray;
                 await updateDoc(docRef, updatePayload);
-                currentEditingClass.scheduleData[currentEditingDay] = currentDayData;
+
+                currentEditingClass.scheduleData[dayToDelete] = targetArray;
+
                 modal.classList.remove('open');
+
+                if (currentEditingDay !== 'ALL_WEEK') {
+                    currentDayData = [...targetArray];
+                }
                 renderTable();
-            } catch(e) { alert(e.message); }
+            } catch(e) {
+                alert(e.message);
+            }
         };
     }
 
@@ -1060,7 +1352,10 @@
         });
 
         // Sort Data
-        const sortedTeachers = Array.from(teachers).sort();
+                // Include master lists (manual additions)
+        mergeMasterIntoSets(teachers, subjects, locations);
+
+const sortedTeachers = Array.from(teachers).sort();
         const sortedSubjects = Array.from(subjects).sort();
         const sortedLocations = Array.from(locations).sort();
 
@@ -1074,6 +1369,8 @@
         document.getElementById('count-locations').textContent = sortedLocations.length;
         document.getElementById('list-locations').value = sortedLocations.join('\n');
 
+
+
         // NEW: BULK EDIT LOGIC (MULTI-SELECT)
         const bulkType = document.getElementById('bulk-type-select');
         const bulkContainer = document.getElementById('bulk-checkbox-container');
@@ -1083,12 +1380,44 @@
         const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
         const bulkStatus = document.getElementById('bulk-status');
 
+        // NEW: MASTER DATA add/remove
+        const masterType = document.getElementById('master-type-select');
+        const masterVal = document.getElementById('master-new-value');
+        const masterAddBtn = document.getElementById('master-add-btn');
+        const masterRemoveBtn = document.getElementById('master-remove-btn');
+        const masterStatus = document.getElementById('master-status');
+
+        const refreshSummaryAndBulkUI = () => {
+            const sortedTeachers = Array.from(teachers).sort();
+            const sortedSubjects = Array.from(subjects).sort();
+            const sortedLocations = Array.from(locations).sort();
+
+            document.getElementById('count-teachers').textContent = sortedTeachers.length;
+            document.getElementById('list-teachers').value = sortedTeachers.join('\n');
+
+            document.getElementById('count-subjects').textContent = sortedSubjects.length;
+            document.getElementById('list-subjects').value = sortedSubjects.join('\n');
+
+            document.getElementById('count-locations').textContent = sortedLocations.length;
+            document.getElementById('list-locations').value = sortedLocations.join('\n');
+
+
+
+            // keep bulk lists in sync
+            window.__bulkSortedTeachers = sortedTeachers;
+            window.__bulkSortedSubjects = sortedSubjects;
+            window.__bulkSortedLocations = sortedLocations;
+        };
+
+        // Initialize master-derived lists into UI
+        refreshSummaryAndBulkUI();
+
         const populateBulkList = () => {
              const type = bulkType.value;
              let items = [];
-             if(type === 'teacher') items = sortedTeachers;
-             else if(type === 'subject') items = sortedSubjects;
-             else if(type === 'location') items = sortedLocations;
+             if(type === 'teacher') items = (window.__bulkSortedTeachers || sortedTeachers);
+             else if(type === 'subject') items = (window.__bulkSortedSubjects || sortedSubjects);
+             else if(type === 'location') items = (window.__bulkSortedLocations || sortedLocations);
 
              bulkContainer.innerHTML = '';
              items.forEach(i => {
@@ -1101,6 +1430,54 @@
         
         bulkType.onchange = populateBulkList;
         populateBulkList(); // Init
+
+        // Init caches for refresh
+        window.__bulkSortedTeachers = sortedTeachers;
+        window.__bulkSortedSubjects = sortedSubjects;
+        window.__bulkSortedLocations = sortedLocations;
+
+        // Master add/remove handlers
+        const setMasterMsg = (msg, ok=true) => {
+            masterStatus.textContent = msg;
+            masterStatus.className = ok ? "text-xs mt-2 font-mono text-center text-emerald-700 h-4" : "text-xs mt-2 font-mono text-center text-red-700 h-4";
+            setTimeout(()=>{ masterStatus.textContent = ""; }, 2500);
+        };
+
+        masterAddBtn.onclick = async () => {
+            const type = masterType.value;
+            const val = masterVal.value;
+            const res = addToMaster(type, val);
+            if(!res.ok) return setMasterMsg(res.msg, false);
+            await saveMasterLists();
+
+            // Also add into the in-memory sets for immediate UI update
+            const normalized = normalizeMasterValue(type, val);
+            if(type === 'teacher') teachers.add(normalized);
+            else if(type === 'subject') subjects.add(normalized);
+            else locations.add(normalized);
+
+            refreshSummaryAndBulkUI();
+            populateBulkList();
+            setMasterMsg("Added to master list.");
+        };
+
+        masterRemoveBtn.onclick = async () => {
+            const type = masterType.value;
+            const val = masterVal.value;
+            const res = removeFromMaster(type, val);
+            if(!res.ok) return setMasterMsg(res.msg, false);
+            await saveMasterLists();
+
+            const normalized = normalizeMasterValue(type, val);
+            if(type === 'teacher') teachers.delete(normalized);
+            else if(type === 'subject') subjects.delete(normalized);
+            else locations.delete(normalized);
+
+            refreshSummaryAndBulkUI();
+            populateBulkList();
+            setMasterMsg("Removed from master list.");
+        };
+
         
         // Filter Logic
         bulkSearch.oninput = (e) => {
@@ -1192,8 +1569,18 @@
         bulkBtn.onclick = () => performBulkUpdate(false);
         bulkDeleteBtn.onclick = () => performBulkUpdate(true);
 
-        btn.onclick = () => modal.classList.add('open');
-        close.onclick = () => modal.classList.remove('open');
+        const openSettings = (e) => {
+            // iOS viewers sometimes need explicit touch handling
+            try { e && e.preventDefault && e.preventDefault(); } catch(_) {}
+            modal.classList.add('open');
+        };
+        btn.addEventListener('click', openSettings);
+        btn.addEventListener('touchend', openSettings, { passive: false });
+        btn.addEventListener('pointerup', openSettings);
+        const closeSettings = (e) => { try { e && e.preventDefault && e.preventDefault(); } catch(_) {} modal.classList.remove('open'); };
+        close.addEventListener('click', closeSettings);
+        close.addEventListener('touchend', closeSettings, { passive: false });
+        close.addEventListener('pointerup', closeSettings);
         modal.onclick = (e) => { if(e.target === modal) modal.classList.remove('open'); }
         
         document.getElementById('upload-direct-btn').onclick = async () => {
@@ -1240,6 +1627,7 @@
         if(user) {
             const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME));
             const data = []; snap.forEach(d => data.push(d.data()));
+            await loadMasterLists();
             initializeUI(data);
         }
     });
