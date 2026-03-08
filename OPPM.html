@@ -1,406 +1,345 @@
 <!DOCTYPE html>
-
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One Page Project Manager (OPPM)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OPPM Matched</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:18px;
+    background:#d8d8d8;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#111;
+  }
+  .controls{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+  .btn{border:2px solid #111;background:#fff;padding:8px 14px;font-weight:700;cursor:pointer}
+  .btn.active{background:#111;color:#fff}
+  .page{display:none}
+  .page.active{display:block}
+  .sheet{
+    width:1000px;
+    margin:0 auto 18px auto;
+    background:#efefef;
+    border:3px solid #111;
+  }
+  .title{
+    text-align:center;
+    padding:10px 10px 2px;
+    font-weight:700;
+    font-size:16px;
+    line-height:1.25;
+  }
+  .subtitle{font-size:14px;margin-top:2px}
+  table{border-collapse:collapse;width:100%}
+  .hdr td,.main th,.main td,.lower td,.cost td,.cost th,.summary td{border:2px solid #111}
+  .hdr td{padding:0;vertical-align:middle;background:#efefef}
+  .logo-cell{width:175px;text-align:center;background:#f3f3f3}
+  .logo-wrap{height:110px;display:flex;align-items:center;justify-content:center}
+  .logo-wrap img{max-width:90px;max-height:90px;object-fit:contain}
+  .pair{display:grid;grid-template-columns:138px 1fr;min-height:54px}
+  .pair .label,.pair .value{padding:8px 8px;border-left:2px solid #111}
+  .pair .label{font-weight:700;text-transform:uppercase;background:#f4f4f4}
+  .pair .value{background:#efefef}
+  .pair .value input,.pair .value textarea{width:100%;border:none;background:transparent;font:inherit;color:#111;outline:none}
+  .pair .value textarea{resize:none;min-height:36px}
+  .pair .small{font-size:12px}
 
-body {
-font-family: ‘Source Sans 3’, Arial, sans-serif;
-background: #c8cdd8;
-padding: 20px;
-color: #1a2744;
-}
+  .main th{background:#efefef;font-weight:700;padding:2px 4px;text-align:center}
+  .main td{height:26px;background:#efefef;padding:0;text-align:center;font-size:12px}
+  .main .sub{width:34px}
+  .main .num{width:28px}
+  .main .task{text-align:left;padding:0 6px;width:340px}
+  .main .month{width:25px}
+  .main .resp{width:45px}
+  .main input{width:100%;height:100%;border:none;background:transparent;text-align:center;font:inherit;outline:none}
+  .main .task input{text-align:left;padding:0 4px}
+  .rotate{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:6px 0;font-size:11px}
 
-.page-controls {
-display: flex; gap: 8px; margin-bottom: 16px; justify-content: center;
-}
-.tab-btn {
-padding: 10px 28px;
-border: 2px solid #1a2744;
-background: white; color: #1a2744;
-font-family: inherit; font-size: 13px; font-weight: 700;
-letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
-}
-.tab-btn.active { background: #1a2744; color: white; }
+  .lower td{background:#efefef;vertical-align:top;padding:0}
+  .subobj-col{width:174px}
+  .subobj-table td{border:1.6px solid #111;height:41px;text-align:center;padding:0;background:#efefef}
+  .subobj-table .vtxt{writing-mode:vertical-rl;transform:rotate(180deg);padding:8px 0;font-size:12px;line-height:1.2}
+  .diag-cell{position:relative;height:280px;width:374px;background:#efefef}
+  .diag-cell svg{position:absolute;inset:0;width:100%;height:100%}
+  .diag-label{position:absolute;font-size:14px}
+  .diag-top{top:72px;left:150px}
+  .diag-left{top:124px;left:74px}
+  .diag-right{top:104px;right:42px;text-align:center;line-height:1.2}
+  .diag-bottom{bottom:54px;left:118px}
+  .diag-cost{bottom:92px;right:50px}
 
-.oppm-page { display: none; }
-.oppm-page.visible { display: block; }
+  .sched-wrap{width:308px}
+  .sched-grid td{border:1.6px solid #111;background:#efefef;height:73px;width:25px;text-align:center;padding:0}
+  .sched-grid .v{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;padding:5px 0;white-space:nowrap}
+  .sched-grid .blank{width:30px}
+  .cost-wrap{width:143px}
+  .cost th,.cost td{border:1.6px solid #111;background:#efefef;padding:2px 4px;font-size:12px}
+  .cost th{text-align:center;font-weight:700}
+  .cost td input{width:100%;border:none;background:transparent;font:inherit;outline:none}
+  .cost .n{width:34px;text-align:center}
+  .cost .k{width:65px;text-align:center}
 
-.oppm-wrapper {
-max-width: 1150px; margin: 0 auto;
-border: 3px solid #1a2744;
-background: white;
-box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-}
+  .summary td{background:#efefef;height:26px;padding:3px 6px;font-size:12px}
+  .summary .sn{width:34px;text-align:center}
+  .summary input{width:100%;border:none;background:transparent;font:inherit;outline:none}
 
-/* Title bar */
-.oppm-title {
-background: #1a2744; color: white;
-text-align: center; padding: 10px 0 8px;
-}
-.oppm-title h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.1em; }
-.oppm-title h2 { font-size: 12px; font-weight: 700; letter-spacing: 0.3em; color: #c8a84b; margin-top: 2px; }
-
-/* Header section using a simple table for reliable borders */
-table.hdr-table {
-width: 100%;
-border-collapse: collapse;
-border-bottom: 3px solid #1a2744;
-}
-table.hdr-table td {
-border: 2px solid #1a2744;
-padding: 7px 10px;
-vertical-align: top;
-background: #edf0f7;
-}
-table.hdr-table td.logo-td {
-width: 80px; text-align: center;
-vertical-align: middle;
-background: #dde2ee;
-border: 2px solid #1a2744;
-}
-.logo-circle {
-width: 56px; height: 56px; border-radius: 50%;
-border: 2px solid #c8a84b;
-background: #f5edd6;
-display: inline-flex; align-items: center; justify-content: center;
-font-size: 9px; font-weight: 700; color: #1a2744; text-align: center;
-line-height: 1.2;
-}
-.hdr-label {
-font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-text-transform: uppercase; color: #3a5a9e; margin-bottom: 4px;
-}
-.hdr-inp {
-display: block; width: 100%;
-border: none; border-bottom: 1.5px solid #c8a84b;
-background: transparent;
-font-family: inherit; font-size: 13px; font-weight: 600;
-color: #1a2744; outline: none; padding: 2px 0;
-}
-.hdr-inp::placeholder { color: #aab; font-weight: 400; }
-.hdr-inp.small { font-size: 11px; margin-top: 4px; }
-.hdr-ta {
-display: block; width: 100%; border: none;
-border-bottom: 1.5px solid #c8a84b;
-background: transparent; font-family: inherit;
-font-size: 12px; color: #1a2744; outline: none;
-resize: none; line-height: 1.5;
-}
-.hdr-ta::placeholder { color: #aab; }
-
-/* Main OPPM table */
-table.main-tbl {
-width: 100%;
-border-collapse: collapse;
-font-size: 11px;
-}
-table.main-tbl th {
-background: #1a2744;
-color: white;
-border: 2px solid #1a2744;
-padding: 5px 3px;
-font-size: 10px;
-font-weight: 700;
-letter-spacing: 0.04em;
-white-space: nowrap;
-}
-table.main-tbl td {
-border: 1.5px solid #1a2744;
-padding: 4px 4px;
-vertical-align: middle;
-text-align: center;
-}
-.th-vert { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; white-space: nowrap; }
-
-td.sobj { background: #f5edd6; width: 22px; }
-td.sobj input { width: 100%; border: none; background: transparent; font-size: 10px; text-align: center; outline: none; font-family: inherit; color: #1a2744; }
-
-td.task-td { text-align: left; background: #fff; min-width: 160px; }
-.task-inp { border: none; background: transparent; font-family: inherit; font-size: 11px; color: #1a2744; width: calc(100% - 4px); outline: none; }
-.task-inp::placeholder { color: #bbb; }
-
-td.mc { background: #f8f9fb; width: 22px; }
-td.mc input { width: 100%; border: none; background: transparent; font-size: 10px; text-align: center; outline: none; font-family: inherit; color: #1a2744; }
-
-td.rc { background: #e8ecf7; width: 22px; font-weight: 700; font-size: 10px; color: #3a5a9e; }
-
-tr.sec-row td {
-background: #3a5a9e !important;
-color: white !important;
-font-weight: 700; font-size: 10px; letter-spacing: 0.08em;
-text-align: left; padding-left: 10px;
-border: 2px solid #1a2744;
-}
-tr.sec-row td input {
-width: 100%; border: none; background: transparent;
-color: white; font-weight: 700; font-size: 10px;
-letter-spacing: 0.08em; outline: none; font-family: inherit;
-}
-
-tr.even-row td.task-td { background: #f2f5fb; }
-
-/* Bottom section */
-table.bottom-tbl {
-width: 100%;
-border-collapse: collapse;
-border-top: 3px solid #1a2744;
-}
-table.bottom-tbl td {
-border: 2px solid #1a2744;
-vertical-align: top;
-padding: 10px;
-}
-td.legend-td { width: 200px; background: #edf0f7; position: relative; overflow: hidden; }
-td.timeline-td { background: #fff; }
-td.cost-td { width: 270px; background: #f8f9fb; }
-
-.sec-label {
-font-size: 9px; font-weight: 700; text-transform: uppercase;
-letter-spacing: 0.1em; color: #3a5a9e; margin-bottom: 8px;
-}
-
-.leg-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
-.leg-key {
-width: 20px; height: 20px; flex-shrink: 0;
-border: 2px solid #1a2744; background: white;
-display: flex; align-items: center; justify-content: center;
-font-size: 9px; font-weight: 700; color: #1a2744;
-}
-.leg-val { flex: 1; border-bottom: 1.5px solid #c8a84b; }
-.leg-val input { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 10px; color: #1a2744; outline: none; }
-.leg-val input::placeholder { color: #bbb; }
-.leg-plain { font-size: 10px; color: #1a2744; padding: 2px 0; }
-
-.diag-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.08; }
-
-.tl-wrap { display: grid; grid-template-columns: repeat(12,1fr); gap: 2px; margin-bottom: 10px; }
-.tl-mth { font-size: 8px; font-weight: 700; text-align: center; padding: 3px 1px; background: #dde2ee; border: 1.5px solid #1a2744; color: #1a2744; }
-.tl-bar { height: 18px; background: #f0e6c8; border: 1.5px solid #1a2744; cursor: pointer; transition: background 0.15s; }
-.tl-bar:hover { background: #c8a84b; }
-.tl-bar.on { background: #1a2744; }
-
-.sum-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-.sum-num { width: 18px; height: 18px; background: #1a2744; color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.sum-inp { flex: 1; border: none; border-bottom: 1.5px solid #c8a84b; background: transparent; font-family: inherit; font-size: 10px; color: #1a2744; outline: none; padding: 2px 0; }
-.sum-inp::placeholder { color: #bbb; }
-
-table.cost-tbl { width: 100%; border-collapse: collapse; font-size: 10px; }
-table.cost-tbl th { background: #1a2744; color: white; padding: 4px 5px; font-size: 9px; font-weight: 700; border: 1.5px solid #1a2744; }
-table.cost-tbl td { border: 1.5px solid #1a2744; padding: 3px 5px; }
-table.cost-tbl tr:nth-child(even) td { background: #f0f3fa; }
-.ci { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 10px; color: #1a2744; outline: none; }
-.ci::placeholder { color: #bbb; }
-.cost-total td { background: #f5edd6 !important; font-weight: 700; border: 1.5px solid #1a2744; }
-
-@media print {
-body { background: white; padding: 0; }
-.page-controls { display: none; }
-.oppm-page { display: block !important; page-break-after: always; }
-.oppm-wrapper { box-shadow: none; max-width: 100%; }
-}
+  @media (max-width: 1050px){
+    body{padding:8px}
+    .sheet{width:100%;overflow:auto}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .controls{display:none}
+    .page{display:block !important;page-break-after:always}
+    .sheet{width:100%;border-width:2px;margin:0 0 10px 0}
+  }
 </style>
-
 </head>
 <body>
-
-<div class="page-controls">
-  <button class="tab-btn active" onclick="showPage('tak',this)">OPPM TAKTIKAL</button>
-  <button class="tab-btn" onclick="showPage('ops',this)">OPPM OPERASI</button>
-  <button class="tab-btn" onclick="window.print()" style="border-color:#c8a84b;">🖨 Cetak</button>
+<div class="controls">
+  <button class="btn active" onclick="showPage('tak',this)">TAKTIKAL</button>
+  <button class="btn" onclick="showPage('ops',this)">OPERASI</button>
+  <button class="btn" onclick="window.print()">CETAK</button>
 </div>
 
-<!-- ════ TAKTIKAL ════ -->
-
-<div id="page-tak" class="oppm-page visible">
-<div class="oppm-wrapper">
-  <div class="oppm-title">
-    <h1>One Page Project Manager (OPPM)</h1>
-    <h2>TAKTIKAL</h2>
-  </div>
-  <table class="hdr-table">
-    <tr>
-      <td class="logo-td" rowspan="2"><div class="logo-circle">LOGO<br>SEKOLAH</div></td>
-      <td style="width:28%"><div class="hdr-label">Pengurus</div><input class="hdr-inp" type="text" placeholder="Nama Pengurus..."><input class="hdr-inp small" type="text" placeholder="Jawatan..."></td>
-      <td style="width:28%"><div class="hdr-label">Objektif</div><input class="hdr-inp" type="text" placeholder="Nyatakan objektif utama..."></td>
-      <td><div class="hdr-label">Tarikh</div><input class="hdr-inp" type="text" placeholder="Cth: Feb – Disember 2026"></td>
-    </tr>
-    <tr>
-      <td><div class="hdr-label">Bidang Fokus</div><input class="hdr-inp" type="text" placeholder="Bidang fokus kecemerlangan..."></td>
-      <td colspan="2"><div class="hdr-label">Penyataan Objektif</div><textarea class="hdr-ta" rows="2" placeholder="Huraikan objektif program secara terperinci..."></textarea></td>
-    </tr>
-  </table>
-  <table class="main-tbl">
-    <thead>
+<div id="page-tak" class="page active">
+  <div class="sheet">
+    <div class="title">One Page Project Manager ( OPPM )<div class="subtitle">TAKTIKAL</div></div>
+    <table class="hdr">
       <tr>
-        <th style="width:22px">S1</th><th style="width:22px">S2</th>
-        <th style="width:26px">#</th>
-        <th style="text-align:left;min-width:170px;">Tugas Utama</th>
-        <th style="width:22px">Jan</th><th style="width:22px">Feb</th><th style="width:22px">Mac</th>
-        <th style="width:22px">Apr</th><th style="width:22px">Mei</th><th style="width:22px">Jun</th>
-        <th style="width:22px">Jul</th><th style="width:22px">Ogos</th><th style="width:22px">Sep</th>
-        <th style="width:22px">Okt</th><th style="width:22px">Nov</th><th style="width:22px">Dis</th>
-        <th style="width:22px"><span class="th-vert">PK HEM</span></th>
-        <th style="width:22px"><span class="th-vert">Ketua Guru Pengawas</span></th>
-        <th style="width:22px"><span class="th-vert">Guru Pengawas</span></th>
+        <td rowspan="2" class="logo-cell"><div class="logo-wrap"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'><circle cx='55' cy='55' r='48' fill='%23f3f3f3' stroke='%23111' stroke-width='2'/><text x='55' y='50' text-anchor='middle' font-size='10' font-family='Arial' fill='%23111'>LOGO</text><text x='55' y='64' text-anchor='middle' font-size='10' font-family='Arial' fill='%23111'>SEKOLAH</text></svg>" alt="Logo"></div></td>
+        <td><div class="pair"><div class="label">Pengurus</div><div class="value"><input value="ROSIEATI BINTI ROSLAN"><div class="small">(KETUA GURU PENGAWAS)</div></div></div></td>
+        <td><div class="pair"><div class="label">Objektif:</div><div class="value"></div></div></td>
+        <td><div class="pair"><div class="label">Tarikh:</div><div class="value"><input value="FEB – DISEMBER 2026"></div></div></td>
       </tr>
-    </thead>
-    <tbody>
-      <tr class="sec-row"><td colspan="19"><input type="text" placeholder="Nama Program / Bahagian..."></td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">1</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">2</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">3</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">4</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">5</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">6</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td></tr>
-    </tbody>
-  </table>
-  <table class="bottom-tbl">
-    <tr>
-      <td class="legend-td">
-        <svg class="diag-svg" viewBox="0 0 200 200" preserveAspectRatio="none"><line x1="0" y1="0" x2="200" y2="200" stroke="#1a2744" stroke-width="2"/><line x1="200" y1="0" x2="0" y2="200" stroke="#1a2744" stroke-width="2"/></svg>
-        <div class="sec-label">Sub Objektif</div>
-        <div class="leg-row"><div class="leg-key">1</div><div class="leg-val"><input type="text" placeholder="Sub objektif 1..."></div></div>
-        <div class="leg-row"><div class="leg-key">2</div><div class="leg-val"><input type="text" placeholder="Sub objektif 2..."></div></div>
-        <div class="leg-row"><div class="leg-key">3</div><div class="leg-val"><input type="text" placeholder="Sub objektif 3..."></div></div>
-        <div style="margin-top:12px;" class="sec-label">Tanggungjawab</div>
-        <div class="leg-row"><div class="leg-key">A</div><div class="leg-plain">PK HEM</div></div>
-        <div class="leg-row"><div class="leg-key">B</div><div class="leg-plain">Ketua Guru Pengawas</div></div>
-        <div class="leg-row"><div class="leg-key">C</div><div class="leg-plain">Guru Pengawas</div></div>
-      </td>
-      <td class="timeline-td">
-        <div class="sec-label">Jadual Pelaksanaan — klik untuk tandakan</div>
-        <div class="tl-wrap">
-          <div class="tl-mth">Jan</div><div class="tl-mth">Feb</div><div class="tl-mth">Mac</div><div class="tl-mth">Apr</div><div class="tl-mth">Mei</div><div class="tl-mth">Jun</div><div class="tl-mth">Jul</div><div class="tl-mth">Ogos</div><div class="tl-mth">Sep</div><div class="tl-mth">Okt</div><div class="tl-mth">Nov</div><div class="tl-mth">Dis</div>
-          <div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div>
-        </div>
-        <div class="sec-label">Ringkasan &amp; Ramalan</div>
-        <div class="sum-row"><div class="sum-num">1</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 1..."></div>
-        <div class="sum-row"><div class="sum-num">2</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 2..."></div>
-        <div class="sum-row"><div class="sum-num">3</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 3..."></div>
-        <div class="sum-row"><div class="sum-num">4</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 4..."></div>
-      </td>
-      <td class="cost-td">
-        <div class="sec-label">Anggaran Kos</div>
-        <table class="cost-tbl">
-          <thead><tr><th>Bil</th><th>Program / Aktiviti</th><th>Kos (RM)</th><th>Catatan</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>2</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>3</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>4</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr class="cost-total"><td colspan="2" style="text-align:right;">JUMLAH</td><td>RM 0.00</td><td></td></tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </table>
-</div>
-</div>
-
-<!-- ════ OPERASI ════ -->
-
-<div id="page-ops" class="oppm-page">
-<div class="oppm-wrapper">
-  <div class="oppm-title">
-    <h1>One Page Project Manager (OPPM)</h1>
-    <h2>OPERASI</h2>
-  </div>
-  <table class="hdr-table">
-    <tr>
-      <td class="logo-td" rowspan="2"><div class="logo-circle">LOGO<br>SEKOLAH</div></td>
-      <td style="width:28%"><div class="hdr-label">Pengurus</div><input class="hdr-inp" type="text" placeholder="Nama Pengurus..."><input class="hdr-inp small" type="text" placeholder="Jawatan..."></td>
-      <td style="width:28%"><div class="hdr-label">Objektif</div><input class="hdr-inp" type="text" placeholder="Nyatakan objektif utama..."></td>
-      <td><div class="hdr-label">Tarikh</div><input class="hdr-inp" type="text" placeholder="Cth: Feb – Disember 2026"></td>
-    </tr>
-    <tr>
-      <td><div class="hdr-label">Bidang Fokus</div><input class="hdr-inp" type="text" placeholder="Nama program operasi..."><input class="hdr-inp small" type="text" placeholder="Sub fokus..."></td>
-      <td colspan="2"><div class="hdr-label">Penyataan Objektif</div><textarea class="hdr-ta" rows="2" placeholder="Huraikan objektif program secara terperinci..."></textarea></td>
-    </tr>
-  </table>
-  <table class="main-tbl">
-    <thead>
       <tr>
-        <th style="width:22px">S1</th><th style="width:22px">S2</th><th style="width:22px">S3</th>
-        <th style="width:26px">#</th>
-        <th style="text-align:left;min-width:160px;">Tugas Utama</th>
-        <th style="width:22px">Jan</th><th style="width:22px">Feb</th><th style="width:22px">Mac</th><th style="width:22px">Apr</th><th style="width:22px">Mei</th><th style="width:22px">Jun</th><th style="width:22px">Jul</th><th style="width:22px">Ogos</th><th style="width:22px">Sep</th><th style="width:22px">Okt</th><th style="width:22px">Nov</th><th style="width:22px">Dis</th>
-        <th style="width:22px"><span class="th-vert">PK HEM</span></th>
-        <th style="width:22px"><span class="th-vert">Ketua Guru Pengawas</span></th>
-        <th style="width:22px"><span class="th-vert">Guru Pengawas</span></th>
-        <th style="width:22px"><span class="th-vert">Lain-lain (D)</span></th>
+        <td><div class="pair"><div class="label">Bidang Fokus</div><div class="value"><input value="KECEMERLANGAN DAN SAHSIAH"></div></div></td>
+        <td colspan="2"><div class="pair" style="grid-template-columns:220px 1fr"><div class="label">&nbsp;</div><div class="value"><textarea>- Meningkatkan peratus pengawas yang mengamalkan kelakuan baik daripada 80% kepada 90%</textarea></div></div></td>
       </tr>
-    </thead>
-    <tbody>
-      <tr class="sec-row"><td colspan="21"><input type="text" placeholder="Nama Program / Bahagian..."></td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">1</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">2</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">3</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">4</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-      <tr><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">5</td><td class="task-td"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-      <tr class="even-row"><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td class="sobj"><input type="text"></td><td style="font-weight:700;color:#3a5a9e;background:#f2f5fb;">6</td><td class="task-td" style="background:#f2f5fb;"><input class="task-inp" type="text" placeholder="Huraikan tugas utama..."></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="mc"><input type="text"></td><td class="rc">A</td><td class="rc">B</td><td class="rc">C</td><td class="rc">D</td></tr>
-    </tbody>
-  </table>
-  <table class="bottom-tbl">
-    <tr>
-      <td class="legend-td">
-        <svg class="diag-svg" viewBox="0 0 200 200" preserveAspectRatio="none"><line x1="0" y1="0" x2="200" y2="200" stroke="#1a2744" stroke-width="2"/><line x1="200" y1="0" x2="0" y2="200" stroke="#1a2744" stroke-width="2"/></svg>
-        <div class="sec-label">Sub Objektif</div>
-        <div class="leg-row"><div class="leg-key">1</div><div class="leg-val"><input type="text" placeholder="Sub objektif 1..."></div></div>
-        <div class="leg-row"><div class="leg-key">2</div><div class="leg-val"><input type="text" placeholder="Sub objektif 2..."></div></div>
-        <div class="leg-row"><div class="leg-key">3</div><div class="leg-val"><input type="text" placeholder="Sub objektif 3..."></div></div>
-        <div style="margin-top:12px;" class="sec-label">Tanggungjawab</div>
-        <div class="leg-row"><div class="leg-key">A</div><div class="leg-plain">PK HEM</div></div>
-        <div class="leg-row"><div class="leg-key">B</div><div class="leg-plain">Ketua Guru Pengawas</div></div>
-        <div class="leg-row"><div class="leg-key">C</div><div class="leg-plain">Guru Pengawas</div></div>
-        <div class="leg-row"><div class="leg-key">D</div><div class="leg-val"><input type="text" placeholder="Lain-lain..."></div></div>
-      </td>
-      <td class="timeline-td">
-        <div class="sec-label">Jadual Pelaksanaan — klik untuk tandakan</div>
-        <div class="tl-wrap">
-          <div class="tl-mth">Jan</div><div class="tl-mth">Feb</div><div class="tl-mth">Mac</div><div class="tl-mth">Apr</div><div class="tl-mth">Mei</div><div class="tl-mth">Jun</div><div class="tl-mth">Jul</div><div class="tl-mth">Ogos</div><div class="tl-mth">Sep</div><div class="tl-mth">Okt</div><div class="tl-mth">Nov</div><div class="tl-mth">Dis</div>
-          <div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div><div class="tl-bar" onclick="this.classList.toggle('on')"></div>
-        </div>
-        <div class="sec-label">Ringkasan &amp; Ramalan</div>
-        <div class="sum-row"><div class="sum-num">1</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 1..."></div>
-        <div class="sum-row"><div class="sum-num">2</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 2..."></div>
-        <div class="sum-row"><div class="sum-num">3</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 3..."></div>
-        <div class="sum-row"><div class="sum-num">4</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 4..."></div>
-        <div class="sum-row"><div class="sum-num">5</div><input class="sum-inp" type="text" placeholder="Ringkasan / ramalan 5..."></div>
-      </td>
-      <td class="cost-td">
-        <div class="sec-label">Anggaran Kos</div>
-        <table class="cost-tbl">
-          <thead><tr><th>Bil</th><th>Program / Aktiviti</th><th>Kos (RM)</th><th>Catatan</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>2</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>3</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>4</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>5</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr><td>6</td><td><input class="ci" type="text" placeholder="Nama program..."></td><td><input class="ci" type="text" placeholder="0.00"></td><td><input class="ci" type="text" placeholder="—"></td></tr>
-            <tr class="cost-total"><td colspan="2" style="text-align:right;">JUMLAH</td><td>RM 0.00</td><td></td></tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </table>
+    </table>
+
+    <table class="main">
+      <tr>
+        <th colspan="5">Sub Objektif</th>
+        <th colspan="2">Tugas Utama</th>
+        <th colspan="12">Status Pencapaian Program</th>
+        <th colspan="3">Tanggungjawab</th>
+      </tr>
+      <tr>
+        <td class="sub"></td><td class="sub"></td><td class="sub"></td><td class="sub"></td><td class="sub"></td>
+        <td class="num"></td><td class="task"></td>
+        <td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td>
+        <td class="resp"></td><td class="resp"></td><td class="resp"></td>
+      </tr>
+      <tr>
+        <td><input></td><td><input></td><td><input></td><td><input value="0"></td><td><input></td>
+        <td>1</td><td class="task"><input value="ORIENTASI PENGAWAS"></td>
+        <td><input value="0"></td><td><input value="0"></td><td><input></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input></td>
+        <td>A</td><td>B</td><td>C</td>
+      </tr>
+      <tr>
+        <td><input></td><td><input></td><td><input></td><td><input></td><td><input value="0"></td>
+        <td>2</td><td class="task"><input value="KEM KEPIMPINAN"></td>
+        <td><input></td><td><input></td><td><input></td><td><input value="0"></td><td><input></td><td><input value="0"></td><td><input value="0"></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
+        <td>A</td><td>B</td><td>C</td>
+      </tr>
+      <tr>
+        <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
+        <td>3</td><td class="task"><input value="LAWATAN KE MENARA GADING"></td>
+        <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input value="0"></td><td><input value="0"></td><td><input></td><td><input value="0"></td><td><input></td>
+        <td>A</td><td>B</td><td>C</td>
+      </tr>
+      <tr>
+        <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
+        <td>4</td><td class="task"><input value="MAJLIS APRESIASI PENGAWAS"></td>
+        <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input></td>
+        <td>A</td><td>B</td><td>C</td>
+      </tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td><td class="task"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td><td class="task"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+
+    <table class="lower">
+      <tr>
+        <td class="subobj-col">
+          <table class="subobj-table">
+            <tr>
+              <td></td><td></td><td></td>
+              <td><div class="vtxt">Meningkatkan peratus pengawas yang mengamalkan kelakuan baik</div></td>
+              <td><div class="vtxt">Meningkatkan bilangan pengawas yang berketrampilan baik</div></td>
+            </tr>
+          </table>
+        </td>
+        <td class="diag-cell">
+          <svg viewBox="0 0 374 280" preserveAspectRatio="none">
+            <line x1="0" y1="0" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="374" y1="0" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="0" y1="280" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="374" y1="280" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="187" y1="140" x2="374" y2="145" stroke="#111" stroke-width="1.8"/>
+          </svg>
+          <div class="diag-label diag-top">Tugas Utama</div>
+          <div class="diag-label diag-left">Pelaksana</div>
+          <div class="diag-label diag-right">Tarikh<br>Sasaran</div>
+          <div class="diag-label diag-bottom">Ringkasan &amp; Ramalan</div>
+          <div class="diag-label diag-cost">Kos</div>
+        </td>
+        <td class="sched-wrap">
+          <table class="sched-grid">
+            <tr>
+              <td><div class="v">Januari</div></td><td><div class="v">Februari</div></td><td><div class="v">Mac</div></td><td><div class="v">April</div></td><td><div class="v">Mei</div></td><td><div class="v">Jun</div></td><td><div class="v">Julai</div></td><td><div class="v">Ogos</div></td><td><div class="v">September</div></td><td><div class="v">Oktober</div></td><td><div class="v">November</div></td><td><div class="v">Disember</div></td><td><div class="v">PK HEM</div></td><td><div class="v">KETUA GURU PENGAWAS</div></td><td><div class="v">GURU PENGAWAS</div></td>
+            </tr>
+          </table>
+          <table class="cost">
+            <tr><th class="n">Bil</th><th>Program / Aktiviti</th><th class="k">Kos</th><th>Catatan</th></tr>
+            <tr><td class="n">1</td><td><input value="Orientasi Pengawas"></td><td class="k"><input value="RM300"></td><td><input></td></tr>
+            <tr><td class="n">2</td><td><input value="Kem Kepimpinan"></td><td class="k"><input value="RM500"></td><td><input></td></tr>
+            <tr><td class="n">3</td><td><input value="Lawatan Ke Menara Gading"></td><td class="k"><input value="RM500"></td><td><input></td></tr>
+            <tr><td class="n">4</td><td><input value="Majlis Apresiasi Pengawas"></td><td class="k"><input value="RM300"></td><td><input></td></tr>
+            <tr><td class="n">&nbsp;</td><td></td><td></td><td></td></tr>
+            <tr><td class="n">&nbsp;</td><td></td><td></td><td></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table class="summary">
+      <tr><td class="sn">1</td><td><input value="Meningkatkan daya kepimpinan dan ketrampilan pengawas sekolah."></td></tr>
+      <tr><td class="sn">&nbsp;</td><td><input></td></tr>
+      <tr><td class="sn">&nbsp;</td><td><input></td></tr>
+      <tr><td class="sn">&nbsp;</td><td><input></td></tr>
+    </table>
+  </div>
 </div>
+
+<div id="page-ops" class="page">
+  <div class="sheet">
+    <div class="title">One Page Project Manager ( OPPM )<div class="subtitle">OPERASI</div></div>
+    <table class="hdr">
+      <tr>
+        <td rowspan="2" class="logo-cell"><div class="logo-wrap"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'><circle cx='55' cy='55' r='48' fill='%23f3f3f3' stroke='%23111' stroke-width='2'/><text x='55' y='50' text-anchor='middle' font-size='10' font-family='Arial' fill='%23111'>LOGO</text><text x='55' y='64' text-anchor='middle' font-size='10' font-family='Arial' fill='%23111'>SEKOLAH</text></svg>" alt="Logo"></div></td>
+        <td><div class="pair"><div class="label">Pengurus</div><div class="value"><input value="KETUA GURU PENGAWAS"></div></div></td>
+        <td><div class="pair"><div class="label">Objektif:</div><div class="value"></div></div></td>
+        <td><div class="pair"><div class="label">Tarikh:</div><div class="value"><input value="FEB – DISEMBER 2026"></div></div></td>
+      </tr>
+      <tr>
+        <td><div class="pair"><div class="label">Bidang Fokus</div><div class="value"><div style="font-weight:700">LAWATAN KE MENARA GADING</div><div>Meningkatkan bilangan pengawas yang berketrampilan baik</div></div></div></td>
+        <td colspan="2"><div class="pair" style="grid-template-columns:220px 1fr"><div class="label">&nbsp;</div><div class="value"><textarea>- Memberi keseronokan dan makna kepada pengawas untuk melaksanakan tugas dengan penuh komited.</textarea></div></div></td>
+      </tr>
+    </table>
+
+    <table class="main">
+      <tr>
+        <th colspan="5">Sub Objektif</th>
+        <th colspan="2">Tugas Utama</th>
+        <th colspan="12">Status Pencapaian Program</th>
+        <th colspan="4">Tanggungjawab</th>
+      </tr>
+      <tr>
+        <td class="sub"></td><td class="sub"></td><td class="sub"></td><td class="sub"></td><td class="sub"></td>
+        <td class="num"></td><td class="task"><input value="KEM JATI DIRI" style="font-weight:700"></td>
+        <td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td><td class="month"></td>
+        <td class="resp"></td><td class="resp"></td><td class="resp"></td><td class="resp"></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td></td><td></td><td></td>
+        <td>1</td><td class="task"><input value="Persediaan Kertas Kerja"></td>
+        <td></td><td></td><td><input value="0"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <td>A</td><td></td><td>C</td><td></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td></td><td></td><td></td>
+        <td>2</td><td class="task"><input value="Pembentukan JK"></td>
+        <td></td><td></td><td><input value="0"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <td>A</td><td></td><td>C</td><td></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td><input value="0"></td><td></td><td></td>
+        <td>3</td><td class="task"><input value="Mesyuarat dan Perlantikan AJK"></td>
+        <td></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td></td><td></td>
+        <td>D</td><td>A</td><td>C</td><td></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td>
+        <td>4</td><td class="task"><input value="Pelaksanaan program"></td>
+        <td></td><td></td><td></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td></td>
+        <td></td><td>A</td><td>C</td><td></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td>
+        <td>5</td><td class="task"><input value="Pemantauan program"></td>
+        <td></td><td></td><td></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td></td>
+        <td>A</td><td>B</td><td>D</td><td></td>
+      </tr>
+      <tr>
+        <td></td><td></td><td><input value="0"></td><td></td><td></td>
+        <td>6</td><td class="task"><input value="Pelaporan"></td>
+        <td></td><td></td><td></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td><input value="0"></td><td></td><td></td><td></td>
+        <td>A</td><td></td><td>C</td><td></td>
+      </tr>
+    </table>
+
+    <table class="lower">
+      <tr>
+        <td class="subobj-col">
+          <table class="subobj-table">
+            <tr>
+              <td><div class="vtxt">Memastikan pengawas dapat memberikan komitmen yang tinggi terhadap tugas.</div></td>
+              <td><div class="vtxt">Meningkatkan keseronokan bekerja kepada pengawas.</div></td>
+              <td><div class="vtxt">Meningkatkan daya ketrampilan dan komitmen pengawas.</div></td>
+            </tr>
+          </table>
+        </td>
+        <td class="diag-cell">
+          <svg viewBox="0 0 374 280" preserveAspectRatio="none">
+            <line x1="0" y1="0" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="374" y1="0" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="0" y1="280" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="374" y1="280" x2="187" y2="140" stroke="#111" stroke-width="1.8"/>
+            <line x1="187" y1="140" x2="374" y2="145" stroke="#111" stroke-width="1.8"/>
+          </svg>
+          <div class="diag-label diag-top">Tugas Utama</div>
+          <div class="diag-label diag-left">Pelaksana</div>
+          <div class="diag-label diag-right">Tarikh<br>Sasaran</div>
+          <div class="diag-label diag-bottom">Ringkasan &amp; Ramalan</div>
+          <div class="diag-label diag-cost">Kos</div>
+        </td>
+        <td class="sched-wrap">
+          <table class="sched-grid">
+            <tr>
+              <td><div class="v">Januari</div></td><td><div class="v">Februari</div></td><td><div class="v">Mac</div></td><td><div class="v">April</div></td><td><div class="v">Mei</div></td><td><div class="v">Jun</div></td><td><div class="v">Julai</div></td><td><div class="v">Ogos</div></td><td><div class="v">September</div></td><td><div class="v">Oktober</div></td><td><div class="v">November</div></td><td><div class="v">Disember</div></td><td><div class="v">PK HEM</div></td><td><div class="v">KETUA GURU PENGAWAS</div></td><td><div class="v">GURU PENGAWAS</div></td>
+            </tr>
+          </table>
+          <table class="cost">
+            <tr><th class="n">Bil</th><th>Program / Aktiviti</th><th class="k">Kos</th><th>Catatan</th></tr>
+            <tr><td class="n">1</td><td><input value="Lawatan Ke Menara Gading"></td><td class="k"><input value="500"></td><td><input></td></tr>
+            <tr><td class="n">2</td><td><input></td><td class="k"><input></td><td><input></td></tr>
+            <tr><td class="n">3</td><td><input></td><td class="k"><input></td><td><input></td></tr>
+            <tr><td class="n">4</td><td><input></td><td class="k"><input></td><td><input></td></tr>
+            <tr><td class="n">5</td><td><input></td><td class="k"><input></td><td><input></td></tr>
+            <tr><td class="n">6</td><td><input></td><td class="k"><input></td><td><input></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table class="summary">
+      <tr><td class="sn">1</td><td><input value="Memastikan 80% pengawas menjadi teladan kepada murid lain."></td></tr>
+      <tr><td class="sn">2</td><td><input value="Memastikan 90% pengawas menjalankan tanggungjawab disiplin seperti yang ditetapkan."></td></tr>
+      <tr><td class="sn">3</td><td><input></td></tr>
+      <tr><td class="sn">4</td><td><input></td></tr>
+      <tr><td class="sn">5</td><td><input></td></tr>
+    </table>
+  </div>
 </div>
 
 <script>
-  function showPage(name, btn) {
-    document.querySelectorAll('.oppm-page').forEach(p => p.classList.remove('visible'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('visible');
-    btn.classList.add('active');
-  }
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
 </script>
-
 </body>
 </html>
