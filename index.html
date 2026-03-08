@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,24 +29,25 @@
         .dashboard-card { background-color: white; border-radius: 12px; box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
         .kpi-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
         .ei-score { background-color: #f87171; } .qra-score { background-color: #34d399; } .tbs-score { background-color: #60a5fa; } 
-        .qsam-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
         .action-button { flex-grow: 1; font-weight: 700; padding: 1rem 1.5rem; border-radius: 12px; transition: all 0.2s ease-in-out; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-<!-- Sidebar Menu -->
+<!-- Sidebar Toggle Button -->
 <button id="sidebarToggle" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-indigo-700 text-white shadow-lg hover:bg-indigo-800 transition-all duration-200">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
 </button>
 
+<!-- Sidebar Overlay -->
 <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden backdrop-blur-sm"></div>
 
+<!-- Sidebar Drawer -->
 <div id="sidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col border-r border-gray-200">
     <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white flex justify-between items-center">
         <div>
             <h2 class="text-xl font-extrabold text-indigo-900 tracking-tight">Menu Utama</h2>
-            <p class="text-xs text-indigo-500">Sistem Perancangan Strategik</p>
+            <p class="text-xs text-indigo-500">RPM 2026-2035</p>
         </div>
         <button id="sidebarClose" class="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -55,59 +56,46 @@
 
     <nav class="flex-grow p-4 space-y-3 overflow-y-auto">
         <!-- LINK 1: Perancangan Strategik Teras -->
-        <a href="https://gowsmk.github.io/StrategicPlan2026/Perancangan%20Strategik%20Teras.html" target="_blank" class="flex items-center p-3 rounded-xl bg-yellow-50 hover:bg-yellow-100 text-yellow-800 font-bold transition duration-200 border border-yellow-200 group">
-            <span class="bg-yellow-200 p-2 rounded-lg mr-3 group-hover:bg-yellow-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2m6-4a10 10 0 11-20 0 10 10 0 0120 0z"></path></svg>
-            </span>
+        <a href="https://gowsmk.github.io/StrategicPlan2026/Perancangan%20Strategik%20Teras.html" class="flex items-center p-3 rounded-xl bg-yellow-50 hover:bg-yellow-100 text-yellow-800 font-bold border border-yellow-200 group">
+            <span class="bg-yellow-200 p-2 rounded-lg mr-3 group-hover:bg-yellow-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2m6-4a10 10 0 11-20 0 10 10 0 0120 0z"></path></svg></span>
             Perancangan Strategik Teras
         </a>
 
-        <!-- BARU: LINK 2: Rujukan Utama RPM 2026-2035 -->
-        <a href="https://gowsmk.github.io/StrategicPlan2026/RPM%202026%20-2035.html" target="_blank" class="flex items-center p-3 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-cyan-800 font-bold transition duration-200 border border-cyan-200 group">
-            <span class="bg-cyan-200 p-2 rounded-lg mr-3 group-hover:bg-cyan-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-            </span>
+        <!-- REQUESTED LINK: Rujukan Utama RPM 2026-2035 -->
+        <a href="https://gowsmk.github.io/StrategicPlan2026/RPM%202026%20-2035.html" target="_blank" class="flex items-center p-3 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-cyan-800 font-bold border border-cyan-200 group">
+            <span class="bg-cyan-200 p-2 rounded-lg mr-3 group-hover:bg-cyan-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></span>
             Rujukan Utama RPM 2026-2035
         </a>
 
         <div class="border-t border-gray-100 my-4"></div>
 
-        <!-- LINK 3: Pengurusan Kurikulum -->
-        <a href="https://gowsmk.github.io/StrategicPlan2026/pengurusan.html" class="flex items-center p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold transition duration-200 border border-indigo-100 group">
-            <span class="bg-indigo-200 p-2 rounded-lg mr-3 group-hover:bg-indigo-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-            </span>
+        <a href="https://gowsmk.github.io/StrategicPlan2026/pengurusan.html" class="flex items-center p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold border border-indigo-100 group">
+            <span class="bg-indigo-200 p-2 rounded-lg mr-3 group-hover:bg-indigo-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></span>
             Pengurusan Kurikulum
         </a>
 
-        <!-- LINK 4: Plan Intervensi -->
-        <a href="https://gowsmk.github.io/StrategicPlan2026/planIntervensi.html" target="_blank" class="flex items-center p-3 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold transition duration-200 border border-teal-100 group">
-            <span class="bg-teal-200 p-2 rounded-lg mr-3 group-hover:bg-teal-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            </span>
+        <a href="https://gowsmk.github.io/StrategicPlan2026/planIntervensi.html" target="_blank" class="flex items-center p-3 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold border border-teal-100 group">
+            <span class="bg-teal-200 p-2 rounded-lg mr-3 group-hover:bg-teal-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></span>
             Plan Intervensi
         </a>
     </nav>
-    <div class="p-4 bg-gray-50 border-t text-xs text-center text-gray-500">
-        <p>&copy; 2026 SMK Seri Pulai Perdana</p>
-    </div>
+    <div class="p-4 bg-gray-50 border-t text-xs text-center text-gray-500"><p>&copy; 2026 SMK Seri Pulai Perdana</p></div>
 </div>
 
-<!-- Main App Content -->
+<!-- Loading Overlay -->
 <div id="loadingOverlay" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
     <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
-        <p class="mt-4 text-indigo-700 font-semibold">Memulakan Aplikasi...</p>
+        <p class="mt-4 text-indigo-700 font-semibold">Memuatkan Data Strategik...</p>
     </div>
 </div>
 
 <div id="app" class="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto pt-16">
     <header class="text-center mb-8">
         <h1 class="text-4xl font-extrabold text-indigo-900 mb-2 tracking-tight">SMK Seri Pulai Perdana</h1>
-        <h2 id="pageMainTitle" class="text-2xl font-bold text-gray-800">Pelan Strategik Mata Pelajaran</h2>
+        <h2 id="pageMainTitle" class="text-2xl font-bold text-gray-800 italic">Pelan Strategik Mata Pelajaran</h2>
     </header>
 
-    <!-- Subject Selection -->
     <div id="subjectManagementSection" class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto mb-8 space-y-4">
         <div>
             <label for="subjectSelector" class="block text-lg font-medium text-gray-700 mb-2">1. Pilih Mata Pelajaran:</label>
@@ -117,28 +105,23 @@
             <label for="newSubjectInput" class="block text-lg font-medium text-gray-700 mb-2">2. Tambah Subjek Baharu:</label>
             <div class="flex space-x-2">
                 <input type="text" id="newSubjectInput" placeholder="Contoh: Kimia" class="flex-grow p-3 border border-green-300 rounded-lg">
-                <button id="addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-3 rounded-lg hover:bg-green-700 transition">Tambah</button>
+                <button id="addNewSubjectButton" class="bg-green-600 text-white font-semibold px-4 py-3 rounded-lg hover:bg-green-700">Tambah</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Editor -->
     <div id="planEditorContainer" class="bg-white p-6 rounded-xl shadow-2xl hidden">
         <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-            <button id="switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition">
-                ← Tukar Subjek
-            </button>
+            <button id="switchSubjectButton" class="text-sm text-indigo-500 hover:text-indigo-700 font-medium py-1 px-3 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition">← Tukar Subjek</button>
             <div class="flex space-x-2">
                 <button id="toggleEditView" class="text-white font-semibold px-4 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600">Edit</button>
                 <button id="toggleDashboardView" class="text-white font-semibold px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700">Dashboard</button>
             </div>
         </div>
-
         <div id="dynamicPlanContent"></div>
-
         <div class="border-t pt-4 mt-6 flex justify-between items-center" id="saveSection">
-            <button id="downloadPlanButton" class="action-button bg-gray-700 text-white mr-4">JSON Export</button>
-            <button id="saveButton" class="action-button bg-green-600 text-white">Simpan Strategi</button>
+            <button id="downloadPlanButton" class="action-button bg-gray-700 text-white mr-4">JSON</button>
+            <button id="saveButton" class="action-button bg-green-600 text-white">Save Strategy</button>
         </div>
     </div>
 </div>
@@ -148,7 +131,6 @@
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // API Key dan ID App diuruskan oleh persekitaran
     const firebaseConfig = {
         apiKey: "AIzaSyDvGANnXKmwWlpRT3Wlfsm-WBOEIC62SWU",
         authDomain: "strategic2026.firebaseapp.com",
@@ -162,47 +144,131 @@
     const SUBJECTS_DOC_PATH = `artifacts/${appId}/public/data/subject_config/subject_list`;
     const PLAN_COLLECTION_BASE = `artifacts/${appId}/public/data/pelan_strategik`;
 
+    // --- RPM 2026-2035 REFINED DATA ---
+    const DEFAULT_MASTER_DATA = {
+        visi: "Pendidikan Bermutu, Insan Terdidik, Negara Sejahtera.",
+        misi: "Melestarikan Sistem Pendidikan yang Bermutu untuk Membangunkan Potensi Individu bagi Memenuhi Aspirasi Negara.",
+        bhag: "Melahirkan Insan Sejahtera yang Beradab, Berilmu, Berkemahiran, Berdaya Tahan dan Berkeyakinan.",
+        smartPrinciple: "Menepati Tumpuan RPM: Mutu, Akses & Ekuiti, Ketersediaan Sumber, Keluwesan dan Kemampanan.",
+        entanglementMeasure: "Gred C minimum dalam 4 subjek teras bagi semua murid.",
+        swot: { s: "- Barisan pentadbir komited.\n- 85% guru mahir kurikulum baharu.", w: "- Capaian internet terhad.\n- Motivasi murid mencabar.", o: "- Sokongan PIBG padu.\n- Kerjasama industri TVET.", c: "- Pengaruh media sosial.\n- Masalah sosioekonomi keluarga." },
+        matlamatStrategik: "Merapatkan Jurang, Meningkatkan Mutu, Meraih Kejayaan Bersama.",
+        strategiList: ["Memperkukuh Literasi & Numerasi", "Pembangunan Bakat Holistik", "Pendidikan Berasaskan Kompetensi"],
+        pelanTaktikal: [], qsamData: [], prosesPelaksanaan: []
+    };
+
     let db, auth, currentSubject, currentPlanData = {}, currentView = 'edit';
 
-    // Logik pemulihan aplikasi
     async function init() {
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            await signInAnonymously(auth);
-            
-            document.getElementById('loadingOverlay').classList.add('hidden');
-            loadSubjectList();
-        } catch (e) {
-            console.error(e);
-        }
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        await signInAnonymously(auth);
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        loadSubjectList();
     }
 
     async function loadSubjectList(selectSubject = null) {
         const subjectsRef = doc(db, SUBJECTS_DOC_PATH);
         const snap = await getDoc(subjectsRef);
-        let subjects = snap.exists() ? snap.data().subjects : ["Sejarah", "Matematik"];
-        
+        let subjects = snap.exists() ? snap.data().subjects : ["Sejarah", "Matematik", "Sains"];
         const selector = document.getElementById('subjectSelector');
-        selector.innerHTML = '<option value="" disabled selected>--- Pilih Subjek ---</option>';
-        subjects.forEach(s => selector.innerHTML += `<option value="${s}">${s}</option>`);
+        selector.innerHTML = '<option value="" disabled selected>--- Sila Pilih Subjek ---</option>';
+        subjects.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s; opt.textContent = s;
+            selector.appendChild(opt);
+        });
+        if (selectSubject) { selector.value = selectSubject; loadPlan(selectSubject); }
+    }
+
+    async function loadPlan(subject) {
+        currentSubject = subject;
+        document.getElementById('planEditorContainer').classList.remove('hidden');
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+        document.getElementById('pageMainTitle').innerHTML = `Pelan Strategik: <span class="text-indigo-700">${subject}</span>`;
         
-        if (selectSubject) {
-            selector.value = selectSubject;
-            loadPlan(selectSubject);
+        const path = `${PLAN_COLLECTION_BASE}/${subject.toLowerCase().replace(/\s+/g, '_')}_plan`;
+        const snap = await getDoc(doc(db, path));
+        currentPlanData = snap.exists() ? snap.data() : { ...DEFAULT_MASTER_DATA };
+        setAppView('edit');
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    function setAppView(view) {
+        currentView = view;
+        const container = document.getElementById('dynamicPlanContent');
+        container.innerHTML = view === 'edit' ? getEditHTML() : getDashboardHTML();
+        populateUI(currentPlanData);
+    }
+
+    function getEditHTML() {
+        return `
+            <div class="space-y-8">
+                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 shadow-sm">
+                    <h3 class="font-bold text-indigo-900 mb-4 border-b border-indigo-200 pb-2">Ringkasan Eksekutif (RPM 2026-2035)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Visi</label><textarea id="visiIn" class="w-full p-2 border rounded text-sm" rows="2"></textarea></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Misi</label><textarea id="misiIn" class="w-full p-2 border rounded text-sm" rows="2"></textarea></div>
+                        <div class="md:col-span-2"><label class="text-xs font-bold text-gray-500 uppercase">Matlamat Utama (Insan Sejahtera)</label><input id="bhagIn" class="w-full p-2 border rounded font-bold text-indigo-800" type="text"></div>
+                    </div>
+                </div>
+                <div id="mapPreview"></div>
+                <div class="p-6 bg-white border rounded-xl shadow-sm">
+                    <h3 class="font-bold text-gray-700 mb-4 uppercase text-sm">Analisis SWOT</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <textarea id="swot_s" placeholder="Kekuatan" class="p-2 border rounded text-sm" rows="3"></textarea>
+                        <textarea id="swot_w" placeholder="Kelemahan" class="p-2 border rounded text-sm" rows="3"></textarea>
+                        <textarea id="swot_o" placeholder="Peluang" class="p-2 border rounded text-sm" rows="3"></textarea>
+                        <textarea id="swot_c" placeholder="Cabaran" class="p-2 border rounded text-sm" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function getDashboardHTML() {
+        return `<div class="dashboard-container"><div id="mapDash"></div></div>`;
+    }
+
+    function populateUI(data) {
+        if(currentView === 'edit') {
+            document.getElementById('visiIn').value = data.visi;
+            document.getElementById('misiIn').value = data.misi;
+            document.getElementById('bhagIn').value = data.bhag;
+            document.getElementById('swot_s').value = data.swot.s;
+            document.getElementById('swot_w').value = data.swot.w;
+            document.getElementById('swot_o').value = data.swot.o;
+            document.getElementById('swot_c').value = data.swot.c;
+            renderMap(data, 'mapPreview');
+        } else {
+            renderMap(data, 'mapDash');
         }
     }
 
-    // Navigasi Sidebar
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarDrawer = document.getElementById('sidebarDrawer');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    function renderMap(data, id) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.innerHTML = `
+            <div class="strategy-map-container">
+                <div class="strategy-perspective impact"><div class="perspective-title">I. IMPACT (INSAN SEJAHTERA)</div><div>${data.bhag}</div></div>
+                <div class="strategy-arrow"></div>
+                <div class="strategy-perspective outcome"><div class="perspective-title">II. OUTCOME (KPI)</div><div>${data.entanglementMeasure}</div></div>
+            </div>`;
+    }
 
-    sidebarToggle.onclick = () => { sidebarDrawer.classList.remove('-translate-x-full'); sidebarOverlay.classList.remove('hidden'); };
-    sidebarClose.onclick = () => { sidebarDrawer.classList.add('-translate-x-full'); sidebarOverlay.classList.add('hidden'); };
-    sidebarOverlay.onclick = sidebarClose.onclick;
+    // Handlers
+    document.getElementById('sidebarToggle').onclick = () => { document.getElementById('sidebarDrawer').classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay').classList.remove('hidden'); };
+    document.getElementById('sidebarClose').onclick = () => { document.getElementById('sidebarDrawer').classList.add('-translate-x-full'); document.getElementById('sidebarOverlay').classList.add('hidden'); };
+    document.getElementById('subjectSelector').onchange = (e) => loadPlan(e.target.value);
+    document.getElementById('switchSubjectButton').onclick = () => document.getElementById('planEditorContainer').classList.add('hidden');
+    document.getElementById('toggleEditView').onclick = () => setAppView('edit');
+    document.getElementById('toggleDashboardView').onclick = () => setAppView('dashboard');
+    document.getElementById('saveButton').onclick = async () => {
+        const path = `${PLAN_COLLECTION_BASE}/${currentSubject.toLowerCase().replace(/\s+/g, '_')}_plan`;
+        const data = { ...currentPlanData, visi: document.getElementById('visiIn').value, misi: document.getElementById('misiIn').value, bhag: document.getElementById('bhagIn').value, updatedAt: serverTimestamp() };
+        await setDoc(doc(db, path), data);
+        alert('Disimpan!');
+    };
 
     init();
 </script>
